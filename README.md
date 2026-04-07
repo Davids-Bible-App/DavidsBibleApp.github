@@ -2,7 +2,7 @@
 A Tauri2 SolidJS App for Windows and Android
 
 ## Bible Translations (SQLite)
-This repository hosts various Bible translations in SQLite format, optimized for use in the [Your App Name] application.
+This repository hosts various Bible translations in SQLite format, optimized for use in the [Davids Bible App] application.
 
 ## 📥 Download Instructions
 
@@ -21,9 +21,13 @@ To get the most recent updates, visit our **[Releases Page](https://github.com)*
 | ... | ... | ... | ... |
 
 ## 🛠 How to Use
-1. Download the `.sqlite` file for your preferred language.
-2. Place the file in the `/translations` folder of your [App Name] installation.
-3. Restart the app to see the new translation in the settings.
+1. Download the `.dba` file for your preferred language.
+2. Download the `Translations` folder to keep an offline backup of all translations, KJV Strongs Dictionary and Cross References - Databases.
+3. Use the individual links above, on a slower network, or only for specific files.
+4. Use the app's upload feature to add the new translations, these should be instantly available, KJV Strongs needs a restart or refresh.
+<img width="471" height="430" alt="image" src="https://github.com/user-attachments/assets/4d511bda-2da1-45a9-832b-0d07b3bd3d8f" />
+
+
 
 ## 📄 License
 *"MIT License - All Rights Reserved").*
