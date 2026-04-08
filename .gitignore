@@ -1,0 +1,12 @@
+node_modules
+dist
+*-copy*
+TEMP/
+.vscode
+.context
+linecount
+.prettierignore
+gen0/
+src-tauri/gen0/
+tmp
+/tmp

@@ -1,4 +1,4 @@
-/* Base Resets & Colors */
+/* 1. THE THEME ENGINE */
 :root {
   color-scheme: light dark;
 
@@ -13,6 +13,7 @@
   --gradient-blue: linear-gradient(135deg, #4b92f7 0%, #1e5dd6 100%);
 }
 
+/* 2. CORE STYLES */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -31,7 +32,7 @@ a {
   color: var(--accent-blue);
 }
 
-/* Layout container */
+/* 3. LAYOUT & SIDEBAR */
 .container {
   display: flex;
   max-width: 1200px;
@@ -51,11 +52,11 @@ a {
 }
 
 .logo-card {
-  background: var(--gradient-blue);
+  background: var(--gradient-blue); /* Gradient stays vibrant in both */
   border-radius: 12px;
   padding: 30px 20px;
   text-align: center;
-  color: white;
+  color: white; /* Keep white text on the blue background */
   margin-bottom: 20px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
@@ -77,6 +78,7 @@ a {
 
 .toc-card {
   background-color: var(--bg-card);
+  border: 1px solid var(--border-color); /* Added border for Light Mode definition */
   border-radius: 12px;
   padding: 25px 20px;
   max-height: calc(100vh - 280px); /* Allow internal scroll if links are long */
