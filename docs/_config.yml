@@ -1,17 +1,14 @@
-theme: jekyll-theme-cayman
-
 title: "David’s Bible App"
 description: "A clean, fast, offline Bible study tool — free for everyone."
 show_downloads: false
 
-# Load custom CSS
+# Remove or comment out the 'theme: jekyll-theme-cayman' line
+# so we can use our own custom layout from scratch.
+
 sass:
   style: compressed
 
-include:
-  - assets/css/custom.css
-
-# Navigation (we will render this manually)
+# Navigation
 nav:
   - name: Home
     link: /

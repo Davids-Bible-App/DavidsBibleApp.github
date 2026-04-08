@@ -11,6 +11,17 @@ title: David’s Bible App
 
 ---
 
+# Getting started with David's Bible App
+
+<a href="https://github.com/Davids-Bible-App" class="btn-outline">View on GitHub</a>
+
+<div class="tag-container">
+  <span class="tag">getting started</span>
+  <span class="tag">study tool</span>
+</div>
+
+Finding somewhere to host your content...
+
 ## Why This App Exists
 
 Most Bible apps are cluttered, slow, or locked behind subscriptions.  
