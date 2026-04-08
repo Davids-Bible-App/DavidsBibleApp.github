@@ -3,8 +3,12 @@
   <head>
     <meta charset="utf-8" />
     <title>{{ page.title }} | {{ site.title }}</title>
+
+    <!-- Disable Cayman default stylesheet -->
+    <link rel="stylesheet" href="" />
+
+    <!-- Load your custom CSS -->
     <link rel="stylesheet" href="{{ '/assets/css/custom.css' | relative_url }}" />
-    {{ site.theme }}
   </head>
 
   <body>
