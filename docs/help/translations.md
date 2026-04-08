@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Translations
+title: Navigation
 ---
 
 # Translations

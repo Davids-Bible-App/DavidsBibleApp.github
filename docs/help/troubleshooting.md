@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Troubleshooting
+title: Navigation
 ---
 
 # Troubleshooting

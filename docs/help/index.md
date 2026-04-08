@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Help Center
+title: Navigation
 ---
 
 # Help Center

@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Search
+title: Navigation
 ---
 
 # Search

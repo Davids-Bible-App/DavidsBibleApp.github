@@ -25,6 +25,23 @@
       {% endif %}
     </section>
 
-    <main class="content">{{ content }}</main>
+    <
+    <main class="layout">
+      {% if page.sidebar != false %}
+      <aside class="sidebar">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="/help/">Overview</a></li>
+          <li><a href="/help/navigation/">Navigation</a></li>
+          <li><a href="/help/search/">Search</a></li>
+          <li><a href="/help/translations/">Translations</a></li>
+          <li><a href="/help/settings/">Settings</a></li>
+          <li><a href="/help/troubleshooting/">Troubleshooting</a></li>
+        </ul>
+      </aside>
+      {% endif %}
+
+      <section class="content">{{ content }}</section>
+    </main>
   </body>
 </html>

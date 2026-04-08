@@ -1,5 +1,6 @@
 ---
 layout: default
+sidebar: false
 title: David’s Bible App
 ---
 
