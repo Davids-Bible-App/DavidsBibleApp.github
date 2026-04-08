@@ -3,17 +3,24 @@ title: "David’s Bible App"
 description: "A clean, fast, offline Bible study tool — free for everyone."
 show_downloads: false
 
-# Optional: top navigation
-navigation:
-  - title: Home
-    url: /
-  - title: Features
-    url: /features
-  - title: Downloads
-    url: /downloads
-  - title: Help
-    url: /help/
-  - title: FAQ
-    url: /faq
-  - title: Release Notes
-    url: /release-notes
+# Load custom CSS
+sass:
+  style: compressed
+
+include:
+  - assets/css/custom.css
+
+# Navigation (we will render this manually)
+nav:
+  - name: Home
+    link: /
+  - name: Features
+    link: /features/
+  - name: Downloads
+    link: /downloads/
+  - name: Help
+    link: /help/
+  - name: FAQ
+    link: /faq/
+  - name: Release Notes
+    link: /release-notes/

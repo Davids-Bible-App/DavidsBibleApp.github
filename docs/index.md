@@ -3,40 +3,62 @@ layout: default
 title: David’s Bible App
 ---
 
-# David’s Bible App
-
-A clean, fast, offline Bible study tool — **free for everyone**.
+<div class="hero">
+  <h1>David’s Bible App</h1>
+  <p>A clean, fast, offline Bible study tool — free for everyone.</p>
+</div>
 
 ---
 
-## ✨ Why This App Exists
+## Why This App Exists
 
 Most Bible apps are cluttered, slow, or locked behind subscriptions.  
-**David’s Bible App** focuses on what matters:
+**David’s Bible App** focuses on clarity, speed, and a peaceful reading experience.
 
-- Fast navigation
+It’s built for people who want:
+
+- Instant navigation
 - Clean reading
 - Easy comparison of translations
 - Offline access
 - Zero ads
-- 100% free
+- 100% free study tools
 
 ---
 
-## 🚀 Key Features
+## Core Features
 
-- **Instant navigation** to any book, chapter, or verse
-- **Parallel translations** (NIV, KJ21, ESV, and more)
-- **Powerful search** with filters
-- **Bookmarks & highlights**
-- **Dark mode / light mode**
-- **Local translation files** for offline use
+<div class="feature-grid">
 
-See the full list on the [Features page](/features).
+### 📖 Clean Reading
+
+A distraction‑free layout designed for long reading sessions.
+
+### 🔍 Powerful Search
+
+Find verses instantly with keyword and phrase search.
+
+### 📚 Parallel Translations
+
+Compare multiple translations side‑by‑side.
+
+### 🎨 Themes
+
+Light, dark, and sepia modes for comfortable reading.
+
+### 📌 Bookmarks & Highlights
+
+Save verses and organise your study.
+
+### 🌐 Offline Support
+
+All translations are stored locally — no internet required.
+
+</div>
 
 ---
 
-## 📱 Screenshots
+## Screenshots
 
 _(Add your images to `docs/assets/images/` and replace these placeholders)_
 
@@ -46,19 +68,15 @@ _(Add your images to `docs/assets/images/` and replace these placeholders)_
 
 ---
 
-## 📥 Download
+## Get Started
 
-Get the latest version from the [Downloads page](/downloads).
-
----
-
-## 📘 Need Help?
-
-Visit the [Help Center](/help/) for guides, tips, and troubleshooting.
+👉 **Download the latest version** on the [Downloads page](/downloads/)  
+👉 **Learn how to use the app** in the [Help Center](/help/)  
+👉 **Explore all features** on the [Features page](/features/)
 
 ---
 
-## ❤️ Free for Everyone
+## Free for Everyone
 
 This app is a gift — no ads, no tracking, no subscriptions.  
 If it helps you study, that’s all that matters.

@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>{{ page.title }} | {{ site.title }}</title>
+    <link rel="stylesheet" href="{{ '/assets/css/custom.css' | relative_url }}" />
+    {{ site.theme }}
+  </head>
+
+  <body>
+    <nav class="navbar">
+      {% for item in site.nav %}
+      <a href="{{ item.link | relative_url }}">{{ item.name }}</a>
+      {% endfor %}
+    </nav>
+
+    <section class="hero">
+      {% if page.title == "David’s Bible App" %}
+      <h1>{{ site.title }}</h1>
+      <p>{{ site.description }}</p>
+      {% endif %}
+    </section>
+
+    <main class="content">{{ content }}</main>
+  </body>
+</html>
