@@ -1,0 +1,19 @@
+theme: jekyll-theme-cayman
+title: "David’s Bible App"
+description: "A clean, fast, offline Bible study tool — free for everyone."
+show_downloads: false
+
+# Optional: top navigation
+navigation:
+  - title: Home
+    url: /
+  - title: Features
+    url: /features
+  - title: Downloads
+    url: /downloads
+  - title: Help
+    url: /help/
+  - title: FAQ
+    url: /faq
+  - title: Release Notes
+    url: /release-notes

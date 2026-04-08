@@ -48,6 +48,23 @@ Applications for Windows (.msi) and Android (.apk, .aab) versions and future upd
    ![alt text](image.png)
    - _Note: KJV Strongs data may require an app restart or refresh to initialize._
 
+## How to Install
+
+The key point was to be fully operational offline, and with that in mind, you cannot directly download to install, but download and install through the App, and thereby have an offline copy.
+TO BE FINISHED...
+
+## Why Create Another Bible Application?
+
+Great question?
+During a bible study with my son, I was sharing my most used, bible Android App.
+The app has not been updated for years, and all resource download links have become stale.
+Translations and other items are no longer available, anywhere. At least I could not find any.
+
+My son suggested building one, and after much deliberation, discussions, prayer and searching for tools and public bible resources...
+The process began in the Seventh Month of 2025.
+
+The key point was to be fully operational offline, and have all the features we wanted to see.
+
 ## 📄 License
 
 MIT License - Copyright (c) 2026 Davids Bible App
