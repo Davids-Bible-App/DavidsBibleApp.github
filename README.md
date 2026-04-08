@@ -7,11 +7,13 @@ A Tauri2 SolidJS App for Windows and Android
 This repository hosts Bible translations optimized for **Davids Bible App**.
 These files use the `.dba` extension but are standard SQLite databases.
 
+The Strongs and CrossRef use .db, and will not show up in the Translations installed, as they work with existing translations and need not be directly chosen. (Refresh, or reload, after installing to use)
+
 ## 📥 Download Instructions
 
 ### 1. Latest Versions
 
-Applications for Windows (.exe) and Android (.apk) versions and future updates, visit our **[Releases Page](https://github.com/Davids-Bible-App/DavidsBibleApp.github/releases/latest)**.
+Applications for Windows (.msi) and Android (.apk, .aab) versions and future updates, visit our **[Releases Page](https://github.com/Davids-Bible-App/DavidsBibleApp.github/releases/latest)**.
 
 ### 2. Available Translations
 
