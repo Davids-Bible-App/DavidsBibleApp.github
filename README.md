@@ -71,4 +71,11 @@ MIT License - Copyright (c) 2026 Davids Bible App
 
 ---
 
-_This is an automated storage repository for Davids Bible App._
+## Known Bugs To Fix or ToDo Before Next Release
+
+- MemeMaker Images from Thumbnails, Not always displayed.
+- Range-Sliders Turn Orange when Audio Played.
+- Android Media Tray - Next turns Artist to Unknown.
+- Translations, Add Multiple at once, Not just One by One.
+- JumpTo Link While Audio Playing Can DeSynce Page and Audio Chapter.
+- Further Optomizations Needed on Load.
