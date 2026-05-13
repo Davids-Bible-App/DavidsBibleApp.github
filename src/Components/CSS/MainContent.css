@@ -1,0 +1,25 @@
+.edge-to-edge {
+  /*  Android 15+ Edge-To-Edge Handling  */
+  position: relative;
+  inset: 0;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  background-color: var(--ThemeBackgrounds2);
+}
+.inset-wrapper {
+  /*  Android System Bars - Insets  */
+  margin-top: var(--edge2edge-top);
+  margin-bottom: var(--edge2edge-bottom);
+  margin-left: var(--edge2edge-left);
+  margin-right: var(--edge2edge-right);
+  overflow: hidden; /* important */
+}
+
+.Main-Content {
+  background-color: var(--background-color);
+  box-shadow: var(--outset-shadows);
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}

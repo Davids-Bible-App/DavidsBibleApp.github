@@ -1,0 +1,74 @@
+.ControlBox-footer {
+  width: 100%;
+  position: fixed;
+  bottom: 0; /* Off Screen */
+  left: 0;
+  z-index: 1;
+}
+.ControlBox-nav {
+  display: flex;
+  justify-content: center;
+  background: var(--front-gradient);
+  background: var(--glass);
+  backdrop-filter: var(--glassBlur);
+  box-shadow: var(--glassShadow);
+}
+.ControlBox-content {
+  position: relative;
+  overflow: hidden;
+  transition: height 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.ControlBox-scroller {
+  width: 100%;
+  scrollbar-width: none;
+  overflow-x: scroll;
+}
+
+.ControlBox-highlighters {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-inline: 0.5rem;
+}
+.ControlBox-footer [data-clr] {
+  --clr: attr(data-clr type(<color>), url("/none.svg"));
+  background: var(--clr);
+}
+.ControlBox-btn-row {
+  display: flex;
+  align-items: center;
+  margin: 0.4rem;
+  justify-content: space-between;
+  &:has(.ControlBox-group:only-child) {
+    justify-content: center;
+  }
+}
+
+.ControlBox-button {
+  padding: 0.7rem;
+  margin: 0.2rem;
+}
+.ControlBox-button:has(svg) {
+  padding: 0;
+  margin: 0;
+}
+.ControlBox-highlighters .ControlBox-button {
+  padding: 1rem;
+  margin: 0.2rem;
+  border-radius: 50%;
+  &:hover {
+    margin-top: 2px;
+  }
+}
+.ControlBox-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-inline: 0.3rem;
+  width: 100%;
+  & pre {
+    line-height: 0;
+    font-size: xx-small;
+  }
+}

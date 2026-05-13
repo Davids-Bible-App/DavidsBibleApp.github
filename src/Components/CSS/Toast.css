@@ -1,0 +1,153 @@
+:root {
+  --success: #34c759;
+  --error: #ff3b30;
+  --warning: #ff9e30;
+  --info: #3479c7;
+  --none: #707070;
+}
+.toast-stack {
+  position: fixed;
+  bottom: calc(var(--toastPosY) + var(--edge2edge-bottom)); /* Distance from bottom */
+  left: calc(50% - ((var(--edge2edge-left) + var(--edge2edge-right)) / 2));
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column-reverse; /* Newest toasts appear at the bottom */
+  gap: 12px;
+  z-index: 10000;
+  pointer-events: none;
+  width: 100%;
+  max-width: 400px; /* Limits width on large screens */
+  align-items: center;
+}
+
+.toast-item {
+  pointer-events: auto;
+  position: relative;
+  width: 90%; /* Responsive width within the 400px max */
+  background: var(--front-gradient);
+  background: var(--glass);
+  backdrop-filter: var(--glassBlur);
+  box-shadow: var(--glassShadow);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  overflow: hidden;
+  touch-action: pan-y;
+  user-select: none;
+  will-change: transform, opacity;
+}
+
+.toast-body {
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  gap: 12px;
+}
+
+.toast-icon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+.success .toast-icon {
+  color: var(--success);
+}
+.error .toast-icon {
+  color: var(--error);
+}
+.warning .toast-icon {
+  color: var(--warning);
+}
+.info .toast-icon {
+  color: var(--info);
+}
+.none .toast-icon {
+  color: var(--none);
+}
+
+.toast-message {
+  color: currentColor;
+  font-size: 14px;
+  font-weight: 500;
+  flex-grow: 1;
+}
+
+.toast-close {
+  background: none;
+  border: none;
+  color: currentColor;
+  cursor: pointer;
+  min-width: 16px;
+  min-height: 16px;
+  padding: 0;
+  transition: color 0.2s;
+}
+.toast-close:hover {
+  color: white;
+}
+
+/* Timer Bar Logic */
+.toast-timer {
+  height: 3px;
+  width: 100%;
+  background: var(--none);
+  transform-origin: left;
+  animation: toast-shrink linear forwards;
+}
+.success .toast-timer {
+  background: var(--success);
+}
+.error .toast-timer {
+  background: var(--error);
+}
+.warning .toast-timer {
+  background: var(--warning);
+}
+.info .toast-timer {
+  background: var(--info);
+}
+.none .toast-timer {
+  background: var(--none);
+}
+
+@keyframes toast-shrink {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+/* --- TRANSITION GROUP CLASSES --- */
+
+.toast-enter-active {
+  animation: toast-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.toast-exit-active {
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+  pointer-events: none;
+}
+
+/* Use !important to ensure the exit state doesn't flicker back to center if swiped */
+.toast-exit-to {
+  opacity: 0 !important;
+  transform: translateY(20px) scale(0.9) !important;
+}
+
+.toast-move {
+  transition: transform 0.4s ease;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

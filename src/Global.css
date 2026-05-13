@@ -1,0 +1,209 @@
+/* Only works for OS or Browser Theme, Not Manual Change */
+@function --light-dark(--light, --dark) {
+  result: var(--light);
+  @media (prefers-color-scheme: dark) {
+    result: var(--dark);
+  }
+}
+
+@property --danger-color {
+  syntax: "<color>";
+  inherits: false; /* False to not inherit currenColor */
+  initial-value: red;
+}
+
+/*? Main Theme */
+:root {
+  --navHeight: 3rem;
+  --navWidthSB: 90%;
+  --contentContainer: clamp(200px, 80%, 800px);
+  --contentContainer2: clamp(200px, 95%, 800px);
+  --verseNoEm: 700;
+
+  --header-pressed-button-inset-shadows: inset 0.75vw 0.75vw 0.75vw rgba(0, 0, 0, 0.3);
+
+  --select: light-dark(hsla(0, 0%, 27%, 0.1), hsla(0, 0%, 73%, 0.2));
+  --hlNone: transparent;
+
+  --Clr1: light-dark(oklch(0.838 0.17 21.2), oklch(0.792 0.162 21.2));
+  --Clr2: light-dark(oklch(0.846 0.168 55.4), oklch(0.801 0.159 55.4));
+  --Clr3: light-dark(oklch(0.909 0.128 96.7), oklch(0.776 0.159 96.7));
+  --Clr4: light-dark(oklch(0.9 0.112 132.1), oklch(0.72 0.103 132.1));
+  --Clr5: light-dark(oklch(0.882 0.102 187.4), oklch(0.73 0.1 174.2));
+  --Clr6: light-dark(oklch(0.861 0.118 226.8), oklch(0.685 0.109 226.8));
+  --Clr7: light-dark(oklch(0.842 0.157 259.3), oklch(0.796 0.148 259.3));
+  --Clr8: light-dark(oklch(0.829 0.182 314.7), oklch(0.784 0.171 314.7));
+
+  --alpha: --light-dark(0.5, 0.5);
+
+  --hlClr1: oklch(from var(--Clr1) l c h / var(--alpha));
+  --hlClr2: oklch(from var(--Clr2) l c h / var(--alpha));
+  --hlClr3: oklch(from var(--Clr3) l c h / var(--alpha));
+  --hlClr4: oklch(from var(--Clr4) l c h / var(--alpha));
+  --hlClr5: oklch(from var(--Clr5) l c h / var(--alpha));
+  --hlClr6: oklch(from var(--Clr6) l c h / var(--alpha));
+  --hlClr7: oklch(from var(--Clr7) l c h / var(--alpha));
+  --hlClr8: oklch(from var(--Clr8) l c h / var(--alpha));
+
+  --front-gradient: linear-gradient(
+    0deg,
+    light-dark(hsl(0, 0%, 85%), hsl(0, 0%, 15%)) 0%,
+    light-dark(hsl(0, 0%, 95%), hsl(0, 0%, 25%)) 100%
+  );
+}
+
+/*? Main Root */
+:root {
+  interpolate-size: allow-keywords;
+  color-scheme: light dark;
+  background-color: var(--background-color);
+  color: var(--text-color);
+
+  /* padding-top: env(safe-area-inset-top, 0); */
+  /* Set via js */
+  --edge2edge-top: ;
+  --edge2edge-bottom: ;
+  --edge2edge-left: ;
+  --edge2edge-right: ;
+  --inset: var(--edge2edge-top) var(--edge2edge-right) var(--edge2edge-bottom) var(--edge2edge-left);
+
+  /*? Font Section */
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 1rem;
+  line-height: 1.3rem;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+
+  p,
+  li,
+  figcaption {
+    text-wrap: pretty;
+    /* max-width: 65ch; */
+  }
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/*? Main Scrolling */
+.scroll_Win {
+  scrollbar-gutter: stable both-edges;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ThemeScroll2) var(--ThemeScroll2);
+
+  &:hover {
+    scrollbar-color: var(--ThemeScroll1) var(--ThemeScroll2);
+  }
+}
+
+/*? Main Textures */
+.paper {
+  background: --light-dark(var(--t1), var(--clr-gray-900));
+}
+.bannerOverlay {
+  background: var(--textureImage), var(--bannerOv);
+  will-change: transform;
+}
+.paperOverlay {
+  background: --light-dark(var(--paper), var(--clr-gray-900));
+  background: var(--paper);
+
+  /* Force the browser to cache the complex blend as a flat texture */
+  contain: paint layout;
+  will-change: transform;
+}
+
+/* JumpTo Links */
+.Entry-ref {
+  display: inline;
+  font-size: 0.8rem;
+  color: var(--ThemeAccent1);
+  margin-bottom: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  user-select: none;
+  &:hover {
+    color: var(--ThemeAccent2);
+  }
+}
+
+/*? Main Defaults */
+html,
+body,
+#root {
+  overflow: hidden; /* CRITICAL */
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  position: fixed; /* Stops webview panning */
+  top: 0;
+  left: 0;
+}
+
+/* prettier-ignore */
+h1,h2,h3,h4,h5,h6 {
+  text-align: center;
+  user-select: none;
+}
+h1 {
+  font-size: clamp(1.8rem, 7vw + 1rem, 5rem);
+}
+
+input,
+select,
+button {
+  /* Defaults */
+  border: 1px solid black;
+  border: 1px solid var(--btn-borderInv);
+  border-radius: 0.25rem;
+  margin: 1px;
+  font-size: 0.7em;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--text-color-dimmed);
+  transition: border-color 0.25s;
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
+  outline: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  background: var(--bk-button-color);
+  &:hover {
+    background: var(--bk-button-hover-color);
+  }
+  &.active,
+  &:active {
+    background-color: var(--bk-button-pressed-color);
+    box-shadow: var(--header-pressed-button-inset-shadows);
+    transition: all 0.1s ease;
+  }
+}
+
+.btn {
+  width: -webkit-fill-available;
+  padding-block: 12px;
+  box-shadow: none;
+  border: 1px solid transparent;
+  &:hover {
+    background-color: var(--bk-button-hover-color);
+  }
+  &.active,
+  &:active {
+    background-image: linear-gradient(90deg, var(--d5-LD), var(--d1-LD));
+    border: 1px solid var(--d5-LD);
+    color: var(--text-color-alllight); /* For Dark Buttons */
+  }
+}
+
+.row {
+  display: flex;
+  justify-content: center;
+}

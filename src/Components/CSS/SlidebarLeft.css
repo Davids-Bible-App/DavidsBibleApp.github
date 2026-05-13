@@ -1,0 +1,146 @@
+.SlidebarLeft-aside {
+  position: absolute;
+  display: flex;
+  height: calc(100% - var(--edge2edge-top) - var(--edge2edge-bottom));
+  width: var(--navWidthSB);
+  background-color: var(--bk-side-color);
+  touch-action: pan-y;
+  overflow: hidden;
+
+  /* GPU Acceleration & Layout caching */
+  contain: layout paint;
+  will-change: transform;
+  backface-visibility: hidden;
+  perspective: 1000px;
+
+  /* CSS Variable Parallax Math */
+  /* Starts shifted left, moves to 0 as drag-x increases */
+  transform: translate3d(calc(-33.333% + (var(--drag-x, 0px) / 3)), 0, 0);
+
+  &.no-transition {
+    transition: none;
+  }
+}
+
+.SlidebarLeft-SBcontentWrap {
+  height: 100%;
+}
+
+@keyframes SlidebarLeft-move {
+  0% {
+    transform-origin: bottom left;
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.2);
+  }
+}
+
+.SlidebarLeft-votd {
+  isolation: isolate;
+  display: grid;
+  grid-template-areas: "stack";
+  place-items: center;
+  height: 130px;
+  border-bottom: 4px solid #555;
+  overflow: hidden;
+
+  .SlidebarLeft-stackImg {
+    grid-area: stack;
+    z-index: 0;
+    opacity: 0.9;
+    width: 100%;
+    height: 130px;
+    object-fit: cover;
+    object-position: top;
+    contain: layout paint;
+    will-change: transform;
+    backface-visibility: hidden;
+  }
+
+  .SlidebarLeft-stackText {
+    grid-area: stack;
+    z-index: 1;
+    font-size: medium;
+    font-style: italic;
+    font-weight: bold;
+    text-align: center;
+    --shadow-light: -1px 1px 3px rgba(0, 0, 0, 0.7), 1px -1px 3px rgba(0, 0, 0, 0.7);
+    --shadow-dark: -1px 1px 3px rgba(255, 255, 255, 0.7), 1px -1px 3px rgba(255, 255, 255, 0.7);
+    text-shadow: --light-dark(var(--shadow-light), var(--shadow-dark));
+    /* text-shadow:
+      -1px 1px 3px rgba(255, 255, 255, 0.7),
+      1px -1px 3px rgba(255, 255, 255, 0.7); */
+    color: light-dark(#fff3f3, #444);
+    color: var(--text-color-alt);
+    padding: 1rem;
+    user-select: none;
+  }
+}
+
+.SlidebarLeft-animate-image {
+  animation: SlidebarLeft-move 15s 1s ease alternate infinite;
+  will-change: transform;
+}
+
+.SlidebarLeft-selections {
+  display: grid;
+  grid-template-columns: 1fr 60px;
+  height: calc(100% - 134px - 50px); /** calc(container - votd - btn) */
+
+  .SlidebarLeft-col {
+    overflow-y: auto;
+    scrollbar-width: none;
+    margin-block: 0.3em;
+    /* content-visibility: auto; */
+  }
+  .SlidebarLeft-dataChapter {
+    border-left: 2px solid #555;
+  }
+}
+
+.SlidebarLeft-aside .btn {
+  font-size: large;
+  font-style: italic;
+}
+
+.SlidebarLeft-btnBox {
+  display: flex;
+  position: absolute;
+  inset: 0;
+  top: initial;
+  flex-wrap: nowrap;
+  & .ChaptersBtn-btn,
+  & .SlidebarLeft-btn {
+    text-transform: uppercase;
+    font-size: clamp(0.75rem, 3vw, 1rem);
+    padding-block: 13px;
+    height: 50px;
+  }
+}
+
+.SlidebarLeft-topShadow {
+  isolation: isolate;
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 100;
+  background-color: transparent;
+  --x-adjust: 2px;
+  box-shadow: var(--inset-shadows);
+  pointer-events: none;
+}
+
+.BooksBtn-btn {
+  text-align: left;
+  padding-left: 5%;
+}
+
+/* Add this to ensure the main container respects the variable */
+.main-container {
+  transform: translate3d(var(--drag-x, 0px), 0, 0);
+  will-change: transform;
+  backface-visibility: hidden;
+  perspective: 1000px;
+}

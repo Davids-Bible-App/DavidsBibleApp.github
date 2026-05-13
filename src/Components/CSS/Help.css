@@ -1,0 +1,89 @@
+:root {
+  color-scheme: light dark;
+  --bg-main: light-dark(#f0f2f5, #18191a);
+  --bg-card: light-dark(#ffffff, #242526);
+  --text-primary: light-dark(#1c1e21, #e4e6eb);
+  --text-secondary: light-dark(#65676b, #b0b3b8);
+  --accent-blue: light-dark(#0064d1, #2e89ff);
+  --border-color: light-dark(#ced0d4, #3e4042);
+  --tag-bg: light-dark(#e4e6eb, #3a3b3c);
+  --gradient-blue: linear-gradient(135deg, #4b92f7 0%, #1e5dd6 100%);
+}
+
+.Help-container {
+  display: flex;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  gap: 40px;
+  background-color: var(--bg-main);
+}
+
+.Help-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 40px;
+}
+
+.Help-logo-card {
+  background: var(--gradient-blue);
+  border-radius: 12px;
+  padding: 30px 20px;
+  text-align: center;
+  color: white;
+  margin-bottom: 20px;
+}
+
+.Help-toc-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 25px 20px;
+}
+
+.Help-nav-link {
+  display: block;
+  color: var(--text-primary);
+  padding: 6px 0;
+  font-size: 0.9rem;
+}
+
+/* The Rendered Markdown Area */
+.Help-content {
+  flex-grow: 1;
+  min-width: 0;
+  color: var(--text-primary);
+}
+
+.Help-content h1 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+}
+.Help-content h2 {
+  font-size: 1.8rem;
+  margin-top: 40px;
+  border-bottom: 1px solid var(--border-color);
+}
+.Help-content p {
+  margin-bottom: 16px;
+}
+.Help-content ul {
+  margin-left: 20px;
+  margin-bottom: 16px;
+}
+
+/* Style the first paragraph after H1 differently (The Date/Meta) */
+.Help-content h1 + p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+/* Style inline code inside that specific header area as Tags */
+.Help-content h1 + p + p code {
+  background-color: var(--tag-bg);
+  color: var(--text-secondary);
+  border: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+}

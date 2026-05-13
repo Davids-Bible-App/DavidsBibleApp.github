@@ -1,0 +1,96 @@
+.Editions-outerWrap {
+  position: absolute;
+  font-size: small;
+  z-index: 1;
+  border: 1px solid var(--btn-border);
+  border-radius: 10px;
+  min-width: 120px;
+}
+
+.Editions-dropper {
+  display: inline-flex;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 0.45rem 0.6rem 0.3rem;
+  border-radius: 10px;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  background: var(--bk-button-color);
+  &:hover {
+    color: var(--verseNo);
+    background: var(--bk-button-hover-color);
+  }
+  &.active,
+  &:active {
+    background: var(--bk-button-pressed-color);
+    box-shadow: var(--header-pressed-button-inset-shadows);
+    transition: all 0.1s ease;
+  }
+  & .Editions-caret {
+    transition: transform 300ms ease;
+  }
+  & .Editions-rotate {
+    transform: rotate(180deg);
+  }
+}
+
+.Editions-selectionBtns {
+  display: flex;
+  width: stretch;
+  padding: 0.4rem;
+  gap: 0.4rem;
+  & button {
+    font-size: 0.5rem;
+    width: stretch;
+    background: none;
+    border: 1px solid var(--btn-border);
+    border-radius: 7px;
+    &:hover {
+      color: var(--verseNo);
+    }
+  }
+}
+
+.Editions-outerWrap content {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  align-items: center;
+  transition: height 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.Editions-scroller {
+  overflow: hidden;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(87, 87, 87) transparent;
+  width: 98%;
+}
+
+.Editions-outerWrap ul {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.BibleEdition-listItem {
+  display: flex;
+  justify-content: space-between;
+  width: stretch;
+  align-items: center;
+  list-style: none;
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  user-select: none;
+  padding: 0.1rem 0.8rem;
+  -webkit-tap-highlight-color: transparent;
+  & .BibleEdition-icon {
+    color: rgb(255, 0, 0);
+  }
+  & .BibleEdition-iconColor {
+    color: #06ab00;
+  }
+  &:hover .BibleEdition-file {
+    color: var(--verseNo);
+  }
+}

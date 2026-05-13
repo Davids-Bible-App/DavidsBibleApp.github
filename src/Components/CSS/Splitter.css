@@ -1,0 +1,252 @@
+/* Dragger Bar -----------------------------------*/
+.dragger-bar {
+  background-color: transparent;
+  cursor: grab;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  touch-action: none; /* Prevent page scroll while dragging */
+  position: absolute;
+  z-index: 10;
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+/* Dragger Bar - Vertical Mode (Top of panel) */
+.dragger-vertical {
+  flex-direction: row;
+  width: 100%;
+  height: 16px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  border-right: none;
+  border-top: 1px dashed #777;
+
+  & .DraggerBar-alignBtnBox {
+    /* background-color: #d9534f; */
+  }
+}
+
+/* Dragger Bar - Horizontal Mode (Left edge of panel) */
+.dragger-horizontal {
+  flex-direction: column;
+  width: 16px;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-bottom: none;
+  border-left: 1px dashed #777;
+}
+
+/* Buttons on the dragger bar ----------------------------------*/
+.dragger-bar button {
+  padding: 8px;
+  margin: 0;
+  font-size: 11px;
+  color: currentColor;
+  cursor: pointer;
+  border: none;
+  box-shadow: none;
+  touch-action: none; /* Prevent page scroll while dragging */
+}
+.dragger-vertical button {
+  transform: translateY(-8px);
+  background: transparent;
+  padding-inline: 4px;
+  margin-inline: 2rem;
+}
+.dragger-vertical .DraggerBar-alignBtnBox button {
+  margin-inline: 0.5rem;
+}
+.dragger-horizontal button,
+.dragger-horizontal .DraggerBar-alignBtnBox {
+  transform: translateX(-8.5px);
+  background: transparent;
+}
+.dragger-horizontal .DraggerBar-alignBtnBox button {
+  writing-mode: vertical-rl; /* Rotate text for vertical layout */
+  transform: rotate(180deg);
+}
+
+/* 1. Hide the UNLOCKED icon when the button is in the 'true' (LOCKED) state */
+#lockToggleBtn[data-locked="true"] #unlockedIcon {
+  display: none;
+}
+
+/* 2. Hide the LOCKED icon when the button is in the 'false' (UNLOCKED) state */
+#lockToggleBtn[data-locked="false"] #lockedIcon {
+  display: none;
+}
+#lockedIcon {
+  padding-block: 2px;
+  color: cornflowerblue;
+}
+#unlockedIcon {
+  padding-block: 2px;
+  color: #777;
+}
+.bi-arrow-repeat {
+  color: tomato;
+}
+.dragger-vertical .bi-arrow-repeat {
+  transform: translateY(1px) rotate(45deg);
+}
+
+/* DraggerBar Button BackColor */
+.dragger-vertical button,
+.dragger-vertical .DraggerBar-alignBtnBox button,
+.dragger-horizontal button,
+.dragger-horizontal .DraggerBar-alignBtnBox button {
+  /* background: linear-gradient(to bottom, var(--ThemeBackgrounds0)); */
+  /* background-size: 2px 100%; */
+  background-repeat: no-repeat;
+  background-position: center;
+  /* margin-block: 2rem; */
+}
+.dragger-vertical button,
+.dragger-vertical .DraggerBar-alignBtnBox button {
+  /* background-size: 100% 2px; */
+  /* background: transparent; */
+}
+
+.dragger-bar button:hover {
+  background: transparent;
+}
+
+.DraggerBar-alignBtnBox {
+  display: flex;
+  flex-direction: inherit;
+  & button {
+    font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    font-weight: 400;
+    padding-inline: 7px;
+    background: var(--paper);
+    &:hover {
+      background: var(--paper);
+    }
+  }
+}
+
+.dragger-bar:hover,
+.dragger-bar:active {
+  background-color: light-dark(rgb(from var(--t1) r g b / 0.7), rgba(0 0 0 / 0.2));
+}
+
+.dragger-bar button svg {
+  /* background-color: light-dark(rgb(from var(--t1) r g b / 0.7), rgba(0 0 0 / 0.2)); */
+  border-radius: 2rem;
+}
+
+.DraggerBar-alignBtnBox :is(button, button:hover) {
+  /* background-color: light-dark(rgb(from var(--t1) r g b / 0.5), #222222); */
+  padding: 0;
+  padding-inline: 6px;
+  border-radius: 2rem;
+}
+
+/* Main app container -------------------------------------*/
+.app-container {
+  position: relative;
+  display: flex;
+  /* Subtract navHeight from Top and Bottom to get perfect viewport fit */
+  height: calc(100vh - var(--edge2edge-top) - var(--edge2edge-bottom) - (var(--navHeight) * 2));
+  margin-top: var(--navHeight);
+  overflow: hidden; /* Prevents outer scroll */
+  background-color: var(--background-color);
+}
+
+/* Flex Directions */
+.flex-vertical {
+  flex-direction: column;
+}
+.flex-horizontal {
+  flex-direction: row;
+}
+
+/* Panels Common */
+.primary-panel,
+.secondary-panel {
+  /*! overflow: hidden; /* Internal content scrolls, not the panel itself ( BAD in global scope ) */
+  min-width: 0;
+  min-height: 0;
+}
+
+/* Scrollable Content Areas */
+.primary-content,
+.secondary-content {
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  /*! padding-bottom: 50px; /* Safe buffer for last verse ( BAD in global scope ) */
+}
+
+/* Close Message */
+.close-message {
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--background-color);
+  color: var(--verseNo);
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: normal;
+  font-size: small;
+  font-style: normal;
+  z-index: 210;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+
+/* Switches to row for side-by-side layout */
+.app-horizontal-layout {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.app-vertical-layout {
+  background-color: var(--background-color);
+}
+
+.primary-panel {
+  height: 100%;
+}
+.app-vertical-layout .primary-panel {
+  min-height: 0;
+}
+.app-horizontal-layout .primary-panel {
+  position: fixed;
+  left: 0;
+}
+
+/* Secondary Panel (Overlay) ----------------------------*/
+.secondary-panel {
+  position: fixed;
+}
+
+.primary-content,
+.secondary-content {
+  /* background-color: var(--background-color); */
+  flex-grow: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  min-height: 0;
+  height: 100%;
+}
+
+.app-horizontal-layout .primary-content,
+.app-horizontal-layout .secondary-content {
+  height: calc(100% - (var(--navHeight) * 2));
+}
+.app-vertical-layout .primary-content {
+  height: calc(100% - (var(--navHeight)));
+}
+.app-vertical-layout .secondary-content {
+  height: calc(100% - (var(--navHeight)));
+}

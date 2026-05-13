@@ -1,0 +1,119 @@
+.history-container {
+  height: 100%;
+  width: var(--contentContainer);
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 45px 1fr;
+  grid-column-gap: 0px;
+  grid-row-gap: 0px;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-inline: 1rem;
+}
+
+.history-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.history-refresh-btn:hover {
+  text-decoration: underline;
+}
+
+.history-list {
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  list-style-type: none;
+  width: 100%;
+  padding: 0 0 50px;
+  margin: 0;
+}
+
+/* Update the existing .history-item to use flexbox */
+.history-item {
+  cursor: pointer;
+  border-radius: 0.25rem;
+  border: 1px solid var(--btn-border);
+  background-color: transparent;
+  transition: background-color 0.2s ease;
+  width: stretch;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Allow the text container to take up the main space */
+.history-item-content {
+  padding: 0.3rem 1rem;
+  flex-grow: 1;
+}
+
+/* Delete Button Styles */
+.history-item-delete {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  transition: all 0.2s ease;
+}
+
+.history-item-delete:hover {
+  background-color: #fee2e2;
+  color: #ef4444;
+}
+
+/* Header action buttons layout */
+.history-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.history-btn {
+  font-size: 0.875rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.history-btn:hover {
+  text-decoration: underline;
+}
+
+.history-clear-btn {
+  color: #ef4444;
+}
+
+.history-item:hover {
+  background-color: var(--bk-button-hover-color);
+}
+
+.history-item-ref {
+  font-weight: 600;
+  font-size: small;
+}
+
+.history-item-meta {
+  font-size: 0.75rem;
+  color: #6b7280;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.25rem;
+}
+
+.history-empty {
+  color: #6b7280;
+}

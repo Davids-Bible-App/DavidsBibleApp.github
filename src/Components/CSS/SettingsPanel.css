@@ -1,0 +1,308 @@
+.SettingsPanel-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 0 1.5rem 1.5rem;
+  overflow: hidden;
+  margin-block: 0 1rem;
+  width: clamp(150px, 100%, 800px);
+  & * {
+    user-select: none;
+  }
+}
+
+.SettingsPanel-header {
+  border: none;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-bottom: 1rem;
+  position: sticky;
+  top: 0rem; /* Adjusts for the padding of the parent */
+  z-index: 10;
+  font-weight: bold;
+  font-size: 1.3rem;
+  background-color: rgba(0, 0, 0, 0.2);
+  margin-inline: -0.4rem;
+  & button {
+    border: none;
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 0.5rem;
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.3);
+      border: none;
+    }
+  }
+}
+
+/* Slide-in panel */
+.SettingsPanel-container {
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+  overflow: hidden;
+  overflow-y: auto;
+  accent-color: var(--verseNo);
+  pointer-events: auto;
+  padding-inline: 10px;
+  & * {
+    box-shadow: none;
+  }
+  & :where(input:not(input[type="range"]), button):hover {
+    border: 1px solid var(--btn-border);
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+  }
+  & input[type="range"]:active {
+    box-shadow: none;
+  }
+}
+
+/* Title */
+.SettingsPanel-title {
+  margin: 0 0 1rem 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.SettingsPanel-wrapper heading {
+  display: inline-block;
+  font-size: medium;
+  font-weight: 600;
+  width: 100%;
+  border-bottom: 1px solid var(--btn-border);
+  margin-block-end: 0.5rem;
+}
+
+.SettingsPanel-sections {
+  margin-top: 0.5rem;
+}
+
+/* Sections */
+.SettingsPanel-section {
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+  & label {
+    font-size: 0.9rem;
+  }
+}
+
+.SettingsPanel-section h3 {
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+/* Inputs */
+.SettingsPanel-input {
+  width: 100%;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--btn-borderInv);
+  border-radius: 6px;
+  margin-top: 0.25rem;
+  font-size: 1rem;
+  background-color: rgb(0 0 0 / 0.2);
+  &:hover,
+  &:focus {
+    background-color: rgb(0 0 0 / 0.2);
+    border: 1px solid var(--btn-border);
+    color: var(--text-color);
+  }
+}
+
+/* Buttons */
+.SettingsPanel-openBtn {
+  padding: 0.6rem 1rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.SettingsPanel-resetBtn,
+.SettingsPanel-actionBtn {
+  margin-top: 0.5rem;
+  padding: 0.6rem 1rem;
+  border-radius: 7px;
+  background-color: rgba(0, 0, 0, 0.1);
+  border: 1px solid transparent;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 1px solid transparent;
+    color: var(--text-color);
+  }
+}
+
+.SettingsPanel-saveBtn {
+  margin-top: auto;
+  background-color: transparent;
+  &:hover {
+    border: 1px solid transparent;
+    background-color: transparent;
+    color: var(--text-color);
+  }
+}
+
+/* --- Custom Toggle Switches --- */
+.SettingsPanel-toggles {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 0.5rem;
+  padding-inline: 0.5rem;
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.toggle-label {
+  font-weight: 600;
+  max-width: 50px; /* Keeps the toggles perfectly aligned horizontally */
+}
+
+/* Text state (Highlights/Sidelights) fading based on active status */
+.toggle-state {
+  opacity: 0.4;
+  transition:
+    opacity 0.3s ease,
+    font-weight 0.3s ease;
+  width: 70px;
+  text-align: center;
+}
+
+.toggle-state.active {
+  opacity: 1;
+  color: var(--verseNo); /* Uses your accent color for the active text */
+}
+
+/* The Switch Container */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 19px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The Slider */
+.slider {
+  width: 40px;
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #111;
+  transition: 0.4s;
+}
+
+/* The Circle */
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 13px;
+  width: 13px;
+  left: 4px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.4s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Active State Colors */
+input:checked + .slider {
+  background-color: var(--verseNo, #2196f3);
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 2px var(--verseNo, #2196f3);
+}
+
+/* Movement */
+input:checked + .slider:before {
+  transform: translateX(18px);
+}
+
+/* Rounded shape */
+.slider.round {
+  border-radius: 18px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+/* Container to hold toggles on left, slider on right */
+.Highlights-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* gap: 1.5rem; */
+}
+
+/* The right-side slider container */
+.Opacity-slider-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  height: 90px; /* Adjust based on your row heights */
+  margin-inline: 11px;
+}
+
+input[type="range"].vertical-range {
+  writing-mode: vertical-lr;
+  direction: rtl;
+  width: 1px; /* Thickness of track */
+  height: 100%;
+  margin: 0;
+  cursor: pointer;
+  &::-webkit-slider-thumb {
+    margin-left: -7px;
+    height: 15px;
+    width: 15px;
+  }
+}
+
+/* Styling the stacked "Opacity" text */
+.Opacity-labels {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  text-orientation: sideways-right;
+  font-size: 0.75rem;
+  font-weight: bold;
+  line-height: 1;
+  color: var(--text-color-dimmed); /* Adjust to your variable */
+}
+
+/* Add to bottom of SettingsPanel.css */
+
+.SettingsPanel-input.select-sm {
+  width: auto;
+  padding: 0.2rem 0.4rem;
+  margin-top: 0;
+  font-size: 0.9rem;
+  cursor: pointer;
+  background-color: #232323;
+  background-color: var(--ThemeBackgrounds0);
+}
+
+/* Dim the size dropdown when "None" is selected */
+.SettingsPanel-input.select-sm:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}

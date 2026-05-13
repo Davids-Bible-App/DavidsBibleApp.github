@@ -1,0 +1,212 @@
+
+/* ─── Container ──────────────────────────────────────────────────────────── */
+
+.CountdownTimer-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 24px 16px;
+  background: transparent;
+}
+
+.CountdownTimer-title {
+  margin: 0;
+  margin-bottom: -1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--main-icon-text-color);
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+
+/* ─── Picker row ─────────────────────────────────────────────────────────── */
+
+.CountdownTimer-picker {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.picker-locked .scroll-col-window {
+  cursor: default;
+}
+
+/* ─── Separator ──────────────────────────────────────────────────────────── */
+
+.scroll-sep {
+  /* Align colon to the centre row, above the label space */
+  align-self: flex-start;
+  margin-top: calc(48px * 2 - 2px);
+  padding: 0 2px;
+  font-size: 1.8rem;
+  font-weight: 300;
+  line-height: 48px;
+  color: var(--main-icon-text-color);
+  user-select: none;
+  pointer-events: none;
+}
+
+/* ─── Scroll column ──────────────────────────────────────────────────────── */
+
+.scroll-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.scroll-col-window {
+  position: relative;
+  width: 76px;
+  height: 240px; /* VISIBLE(5) × ITEM_H(48) */
+  overflow: hidden;
+  touch-action: none; /* let pointer events handle scrolling */
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* ─── Centre-row highlight — inset neu style ─────────────────────────────── */
+
+.scroll-highlight {
+  position: absolute;
+  top: 50%;
+  left: 6px;
+  right: 6px;
+  height: 48px;
+  transform: translateY(-50%);
+  border-radius: 10px;
+  /* Raised inner border matching the neu palette */
+  box-shadow:
+    inset 1px 1px 3px var(--neu-dark),
+    inset -1px -1px 3px var(--neu-light);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ─── Scrolling list ─────────────────────────────────────────────────────── */
+
+.scroll-list {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  will-change: transform;
+}
+
+/* Base item — hidden by default so only the three tiers below show */
+.scroll-item {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  letter-spacing: 0.06em;
+  /* Items beyond tier 2 are effectively invisible */
+  opacity: 0;
+  font-weight: 300;
+  transition: opacity 0.1s ease;
+}
+
+/* Tier 1 — selected (centre) */
+.scroll-item-sel {
+  opacity: 1;
+  font-weight: 700;
+  color: var(--main-icon-text-color);
+  /* Slightly brighter than the variable for the active row */
+  filter: brightness(1.6);
+}
+
+/* Tier 2 — one step away */
+.scroll-item-near {
+  opacity: 0.55;
+  font-weight: 400;
+  color: var(--main-icon-text-color);
+}
+
+/* Tier 3 — two steps away */
+.scroll-item-far {
+  opacity: 0.22;
+  font-weight: 300;
+  color: var(--main-icon-text-color);
+}
+
+/* ─── Column label ───────────────────────────────────────────────────────── */
+
+.scroll-label {
+  font-size: 0.6rem;
+  font-weight: 500;
+  color: var(--main-icon-text-color);
+  opacity: 0.8;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.CountdownTimer-controls {
+  display: flex;
+  gap: 14px;
+}
+
+.CountdownTimer-btn {
+  /* Raised neu wrapper */
+  background: var(--controls-normal-button-wrapper-gradient);
+  box-shadow: var(--controls-button-wrapper-neu-shadows);
+
+  /* Front-face inset highlight */
+  /* We layer it via a pseudo-element so the wrapper shadow stays intact */
+  position: relative;
+  overflow: hidden;
+
+  border: none;
+  border-radius: 12px;
+  padding: 10px 28px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+
+  transition:
+    box-shadow 0.12s ease,
+    transform 0.1s ease;
+}
+
+/* Front-face gloss layer */
+.CountdownTimer-btn::before {
+  content: "";
+  position: absolute;
+  /* inset: 0; */
+  background: var(--controls-normal-button-front-gradient);
+  border-radius: inherit;
+  box-shadow: var(--controls-normal-button-inset-shadows);
+  pointer-events: none;
+}
+
+/* Pressed state — sink into the surface */
+.CountdownTimer-btn:active {
+  transform: scale(0.96);
+  box-shadow: var(--controls-pressed-button-inset-shadows);
+}
+
+.CountdownTimer-btn:active::before {
+  background: var(--controls-pressed-button-front-gradient);
+}
+
+/* ── Text colours differentiate each action ── */
+
+.CountdownTimer-btn.start {
+  /* Green — "go" */
+  color: #4ade80;
+}
+
+/* Resume shares the .start class and gets the same green */
+
+.CountdownTimer-btn.stop {
+  /* Amber-orange — "pause / warning" */
+  color: #fb923c;
+}
+
+.CountdownTimer-btn.reset {
+  /* Neutral — uses the theme's icon/text colour */
+  color: var(--main-icon-text-color);
+}

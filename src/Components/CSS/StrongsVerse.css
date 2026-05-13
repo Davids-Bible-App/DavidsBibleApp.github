@@ -1,0 +1,203 @@
+/* Container & Header */
+.StrongsVerse-container {
+  overflow: auto;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1rem 0;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+
+  overflow-y: auto;
+  /* box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8); */
+  color: var(--text-color);
+  & center {
+    color: var(--text-color-dimmer);
+    font-size: medium;
+    font-weight: bold;
+  }
+}
+
+.StrongsVerse-header {
+  display: flex;
+  justify-content: center;
+  text-wrap: balance;
+  text-align: center;
+  border-bottom: 1px solid var(--btn-border);
+  padding-bottom: 0.8rem;
+  margin-bottom: 1rem;
+  font-weight: bold;
+  font-size: 1.3rem;
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+  color: var(--text-color);
+  position: sticky;
+  top: -1.5rem; /* Adjusts for the padding of the parent */
+  padding-top: 1rem;
+  z-index: 10;
+}
+
+.StrongsVerse-header h2 {
+  margin: 0;
+  font-size: 1.75rem;
+  color: #1a1a1a;
+}
+
+.StrongsVerse-header p {
+  margin: 0.25rem 0 0 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.StrongsVerse-loading {
+  color: #888;
+  font-style: italic;
+  padding: 1rem 0;
+}
+
+/* Card Layout */
+.StrongsVerse-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.StrongsVerse-card {
+  /* background: var(--ThemeBackgrounds1); */
+  /* border: 1px solid var(--btn-border); */
+  border-radius: 8px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.StrongsVerse-card:hover {
+  /* border: 1px solid var(--btn-border-hov); */
+}
+
+@media (min-width: 768px) {
+  .StrongsVerse-card {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
+
+/* English Word Section (Left Side) */
+.StrongsVerse-english-section {
+  flex: 1;
+  border-bottom: 1px solid var(--btn-border);
+  padding-bottom: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .StrongsVerse-english-section {
+    border-bottom: none;
+    border-right: 1px solid var(--btn-border);
+    padding-bottom: 0;
+    padding-right: 1rem;
+    max-width: 30%;
+  }
+}
+
+.StrongsVerse-word-base {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-color-dimmed);
+}
+
+.StrongsVerse-word-added {
+  font-size: 1.25rem;
+  font-style: italic;
+  color: var(--text-color-dimmed);
+}
+
+.StrongsVerse-added-label {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #888;
+  margin-top: 0.25rem;
+}
+
+/* Dictionary Section (Right Side) */
+.StrongsVerse-dict-section {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.StrongsVerse-no-dict {
+  font-size: 0.9rem;
+  color: var(--text-color-dimmed);
+  font-style: italic;
+}
+
+.StrongsVerse-dict-entry {
+  /* background: var(--ThemeBackgrounds2); */
+  border-radius: 6px;
+  padding: 0.5rem;
+  position: relative;
+}
+
+.StrongsVerse-strongs-tag {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: var(--ThemeBackgrounds1);
+  color: #688fbc;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}
+
+.StrongsVerse-original-header {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.StrongsVerse-lemma {
+  font-size: 2rem;
+  font-family: "Times New Roman", Times, serif; /* Good for Hebrew/Greek points */
+  color: var(--text-color);
+}
+
+.StrongsVerse-phonetics {
+  display: flex;
+  flex-direction: column;
+}
+
+.StrongsVerse-transliteration {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-color-dimmed);
+}
+
+.StrongsVerse-pronunciation {
+  font-size: 0.8rem;
+  color: var(--text-color-dimmer);
+}
+
+.StrongsVerse-def-details {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-color);
+}
+
+.StrongsVerse-def-details p {
+  margin: 0.25rem 0;
+}
+
+.StrongsVerse-def-details strong {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-color-dimmer);
+}

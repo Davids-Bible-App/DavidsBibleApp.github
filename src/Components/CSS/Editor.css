@@ -1,0 +1,112 @@
+.Editor-Container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border: 1px solid var(--ThemeAccent1, #444);
+  border-radius: 8px;
+  background-color: light-dark(rgb(255 255 255 / 0.2), rgb(0 0 0 / 0.2));
+  color: var(--text-color);
+  overflow: hidden;
+}
+
+.Editor-Toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 8px;
+  background-color: light-dark(rgb(255 255 255 / 0.4), rgb(0 0 0 / 0.4));
+  border-bottom: 1px solid var(--ThemeAccent1, #444);
+  align-items: center;
+}
+
+.Editor-Toolbar button {
+  background: transparent;
+  border: 1px solid transparent;
+  color: inherit;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.Editor-Toolbar button:hover {
+  background-color: light-dark(rgb(255 255 255 / 0.2), rgb(0 0 0 / 0.2));
+  border-color: var(--ThemeAccent1);
+}
+
+.Editor-Toolbar button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.Editor-Toolbar .divider {
+  width: 1px;
+  height: 20px;
+  background-color: var(--ThemeAccent1);
+  margin: 0 4px;
+}
+
+.Editor-Content {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+  outline: none;
+  line-height: 1.6;
+}
+
+/* WYSIWYG Editor Styles */
+.Editor-Content[placeholder]:empty:before {
+  content: attr(placeholder);
+  color: #888;
+  pointer-events: none;
+}
+
+.Editor-Content h1 {
+  font-size: 2em;
+  border-bottom: 1px solid #444;
+  padding-bottom: 0.3em;
+}
+.Editor-Content h2 {
+  font-size: 1.5em;
+  border-bottom: 1px solid #444;
+  padding-bottom: 0.3em;
+}
+.Editor-Content h3 {
+  font-size: 1.25em;
+}
+.Editor-Content blockquote {
+  border-left: 4px solid var(--ThemeAccent1);
+  margin: 0;
+  padding-left: 16px;
+  color: var(--text-color-dimmed);
+  font-style: italic;
+}
+.Editor-Content img {
+  max-width: 100%;
+  border-radius: 4px;
+}
+.Editor-Content hr {
+  border: 0;
+  height: 1px;
+  background: var(--ThemeAccent1);
+  margin: 16px 0;
+}
+
+.Editor-Footer {
+  display: flex;
+  gap: 10px;
+  padding: 8px;
+  justify-content: space-between;
+  background-color: light-dark(rgb(255 255 255 / 0.2), rgb(0 0 0 / 0.2));
+  border-top: 1px solid var(--ThemeCtrl2);
+}
+
+.Editor-Footer button {
+  padding: 4px 12px;
+  background: var(--ThemeCtrl2);
+  border: none;
+  border-radius: 4px;
+  color: inherit;
+  cursor: pointer;
+}

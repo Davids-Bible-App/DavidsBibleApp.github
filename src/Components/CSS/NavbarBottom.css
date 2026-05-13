@@ -1,0 +1,114 @@
+.ctl-L,
+.ctl-R {
+  position: absolute;
+  top: calc(var(--navHeight) / 7);
+  border-radius: 50rem;
+  padding: 3px 3px 0;
+  border: none;
+}
+.ctl-L {
+  left: 50px;
+}
+.ctl-R {
+  right: 50px;
+}
+
+.NavbarBottom-footer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: var(--navHeight);
+  background: var(--bannerBot);
+}
+
+.NavbarBottom-footer nav {
+  position: relative;
+  user-select: none;
+}
+
+.NavbarBottom-footer content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: var(--navHeight);
+}
+
+.NavbarBottom-pageUp,
+.NavbarBottom-pageDown {
+  position: absolute;
+  top: -20px;
+  border-radius: 50rem;
+  width: 40px;
+  height: 40px;
+  padding: 2px;
+  font-size: 28px;
+  background: var(--bk-button-color1);
+  &:hover {
+    background: var(--bk-button-hover-color);
+  }
+  &.active,
+  &:active {
+    background: var(--bk-button-pressed-color);
+    box-shadow: var(--header-pressed-button-inset-shadows);
+    transition: all 0.1s ease;
+  }
+}
+.NavbarBottom-pageDown {
+  left: 7px;
+}
+.NavbarBottom-pageUp {
+  right: 7px;
+}
+
+.NavbarBottom-txt {
+  font-size: 25px;
+}
+
+.NavbarBottom-box {
+  --blkPad: 1.2rem;
+
+  /* box */
+  border-radius: calc(var(--blkPad) / 3);
+  corner-shape: scoop;
+  /* box-shadow: 0 0 0 1px var(--banClr), 0 1px 0 1px #585858; */
+
+  /* content */
+  display: flex;
+  place-content: center;
+  inline-size: fit-content;
+  padding-inline: calc(var(--blkPad) * 1.5);
+  padding-block: calc(var(--blkPad) / 4);
+
+  /* font */
+  font-size: var(--blkPad);
+  color: var(--banClr);
+  text-shadow: var(--banSdw);
+}
+
+.NavbarBottom-burnInText {
+  animation: NavbarBottom-burnin-text 6s forwards;
+  font-size: clamp(0.8rem, 4vw, 1.2rem);
+}
+@keyframes NavbarBottom-burnin-text {
+  0% {
+    text-shadow: none;
+    opacity: 0;
+  }
+
+  70% {
+    text-shadow:
+      0 1px 2px #ffa500,
+      0 0 7px #ffa500,
+      0 0 10px #ffa500,
+      0 0 20px #ffa500,
+      0 0 30px #ff0000,
+      0 0 10px #ff8d00,
+      0 0 50px #ff0000;
+    color: #fff6a9;
+  }
+
+  100% {
+    color: --light-dark(var(--clr-gray-700), var(--clr-gray-960));
+    text-shadow: --light-dark(#d6d6d6 0 1px 0, var(--clr-gray-700) 0 1px 0);
+  }
+}

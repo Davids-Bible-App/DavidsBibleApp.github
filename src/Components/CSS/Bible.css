@@ -1,0 +1,274 @@
+.Bible-container {
+  display: flex;
+  justify-self: center;
+  width: var(--contentContainer);
+  padding-top: calc(var(--navHeight) - 1rem);
+  padding-bottom: calc(var(--navHeight) + 8rem);
+}
+
+.Bible-header {
+  display: inline-block;
+  width: stretch;
+  top: calc(-3rem + var(--navHeight)); /* Adjusts for the padding of the parent */
+  z-index: 10;
+
+  margin-inline: -40px;
+  padding-inline: 40px;
+  margin-block: 0;
+  padding-block: 0;
+}
+
+.Bible-header h4 {
+  margin: 0;
+  padding-block: 0.4rem;
+  font-size: clamp(12px, 3vw, 20px);
+  line-height: 1.15;
+  text-wrap: pretty;
+}
+
+.VerseParts-list-wrap {
+  margin-top: 2rem;
+}
+
+.Bible-headings {
+  margin-block: 1rem 0.3rem;
+  font-style: italic;
+  font-size: smaller;
+  color: color-mix(in srgb, var(--text-color) 50%, #000 0%);
+}
+
+.noteId-pop {
+  position-area: top;
+  margin: 0;
+  margin-bottom: 4px;
+  padding: 8px 12px;
+  background: var(--background-color);
+  color: var(--text-color);
+  border: 1px solid var(--btn-border);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-size: 0.9em;
+  max-width: 250px;
+}
+
+.VerseParts-summary {
+  display: inline;
+  font-size: x-small;
+  font-style: italic;
+  user-select: none;
+  color: var(--text-color-dimmed);
+  line-height: 1rem;
+  transition: color 0.5s;
+  margin-inline: -1px 2px;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  display: inline;
+  cursor: url("info2.cur"), help;
+  background: transparent;
+  &:active,
+  &:hover {
+    color: #ff7300;
+    background: transparent;
+  }
+}
+
+.VerseParts-detail {
+  block-size: 0;
+  padding-block: 0;
+  padding-inline: 1rem;
+  font-size: smaller;
+  opacity: 0;
+  display: none;
+  transition: all 0.3s linear;
+  transition-behavior: allow-discrete;
+  content-visibility: visible;
+}
+
+.VerseParts-detail.open {
+  padding: 1rem;
+  margin-block: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: smaller;
+  display: block;
+  background: var(--background-opaque);
+  color: var(--text-color-dimmed);
+  opacity: 1;
+  block-size: calc-size(auto, size);
+
+  @starting-style {
+    opacity: 0;
+    block-size: 0;
+    padding-block: 0;
+  }
+}
+
+.VerseParts-inline-icon {
+  cursor: pointer;
+  pointer-events: auto;
+  margin-inline-start: -7px;
+  filter: drop-shadow(0 1px 0px rgba(0, 0, 0, 0.2)) drop-shadow(0 1px 1px rgba(0, 0, 0, 0.32));
+}
+
+.VerseParts-note-abreviation {
+  min-width: 0;
+  max-width: 10ch;
+  overflow-x: clip;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 11px;
+  color: --light-dark(#7e7e7e, #8b8b8b);
+  margin-left: 2px;
+  line-height: 1;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Apply highlight if the attribute contains "Clr" */
+list.use-highlights verse[data-clr*="Clr"] {
+  --clr: attr(data-clr type(<color>), tomato);
+  background: var(--clr);
+  border-radius: 2rem;
+  padding-inline-start: 0.35rem;
+  text-shadow: light-dark(#00000011, #00000099) 1px 1px 5px;
+}
+
+list.use-sidelights[data-clr*="Clr"] {
+  --clr: attr(data-clr type(<color>), tomato);
+
+  --border: #555;
+  box-shadow:
+    -0.4px 0 var(--border),
+    -5px 0 var(--clr),
+    -5.4px 0 var(--border);
+
+  margin-inline-start: -20px;
+  padding-inline-start: 20px;
+}
+list.use-sidelights verse {
+  background: transparent;
+}
+
+.select {
+  background-color: var(--select);
+  user-select: none;
+  border-radius: 0.5rem;
+  box-shadow:
+    -20px 0 var(--select),
+    20px 0 var(--select);
+  margin-inline-start: 0;
+  padding-inline-start: 0;
+}
+
+verse[data-clr*="Clr"]:has(+ .VerseParts-note-trigger) {
+  margin-inline-end: 8px;
+}
+
+.VerseParts-note-trigger {
+  text-indent: 0;
+}
+
+.VerseParts-crossref-trigger {
+  color: var(--text-color-highlights);
+  cursor: pointer;
+  margin-inline: 0 0.7rem;
+  padding-inline: 0.3rem;
+}
+
+.VerseParts-WordsOfJesus {
+  color: var(--wordsOfJesus);
+}
+
+list {
+  list-style: decimal;
+  list-style-position: inside;
+  user-select: none;
+  border-radius: 0.5rem;
+
+  &:first-of-type {
+    display: inline-block;
+    text-indent: -0.8em;
+    list-style: none;
+    user-select: none;
+  }
+
+  &:first-of-type .detail {
+    text-indent: 0;
+  }
+
+  &:first-of-type [data-clr*="Clr"] {
+    padding-inline-start: 0;
+  }
+
+  &::marker {
+    text-shadow: -1px -1px 2px #a5a5a57e;
+    color: var(--verseNo);
+    font-size: smaller;
+    line-height: initial;
+    font-weight: 400;
+  }
+
+  &:first-of-type::marker {
+    color: transparent;
+    text-shadow: none;
+  }
+  &:first-of-type::first-letter {
+    /* prettier-ignore */
+    font-family: 
+             Georgia,
+             Verdana,
+             Monaco,
+             Arial,
+             Courier New,
+             Lucida Console
+            ;
+    color: var(--verseNo);
+    /* background-image: url("/letter.svg"); */
+    background-image: var(--reader-bg-image, none);
+    background-repeat: no-repeat;
+    initial-letter: 2 1; /* Drop-cap 2x-Size 1x-LineDrop */
+    font-weight: 700;
+    text-shadow:
+      -1px -1px 0 #000,
+      1px -1px 0 #000,
+      -1px 1px 0 #000,
+      1px 1px 0 #000;
+
+    /* Main Micro-adjustments */
+  }
+}
+
+/* JumpTo Highlight Verse */
+@keyframes verse-glow {
+  0% {
+    box-shadow: none;
+    background-color: inherit;
+    opacity: 1;
+  }
+  20% {
+    box-shadow:
+      20px 0 30px 15px var(--JumpTo),
+      -20px 0 30px 15px var(--JumpTo);
+    background-color: var(--JumpTo);
+    opacity: 0.7;
+  }
+  100% {
+    box-shadow: none;
+    background-color: inherit;
+    opacity: 1;
+  }
+}
+.highlight-pulse {
+  animation: verse-glow 2.5s 1s ease-out;
+}
+
+.Bible-fallback {
+  padding: 3rem;
+  text-align: center;
+  text-wrap: pretty;
+
+  h3,
+  h4 {
+    color: tomato;
+  }
+}

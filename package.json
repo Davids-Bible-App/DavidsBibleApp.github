@@ -1,0 +1,50 @@
+{
+  "name": "davidsbible",
+  "version": "1.0.2",
+  "description": "",
+  "type": "module",
+  "scripts": {
+    "start": "vite",
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview",
+    "tauri": "tauri",
+    "build:android:apk": "npm run tauri android build --apk && node rename-builds.js",
+    "build:android:aab": "npm run tauri android build && node rename-builds.js",
+    "develope:android": "npm run tauri android dev",
+    "build:android:fast": "npm run tauri android build -- --apk true",
+    "build:win:fast": "npm run tauri build -- --bundles nsis",
+    "build:icons": "npm run tauri icon ./public/book.svg",
+    "android:init": "npm run tauri android init",
+    "cargo:clean": "./tauri-src/cargo clean",
+    "cargo:update": "./tauri-src/cargo update",
+    "cargo:upgrade": "./tauri-src/cargo upgrade --incompatible allow",
+    "adb:logcat": "adb logcat | grep 'davidsbible_lib' "
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@choochmeque/tauri-plugin-sharekit-api": "^0.2.5",
+    "@tauri-apps/api": "^2.10.0",
+    "@tauri-apps/plugin-dialog": "^2.7.0",
+    "@tauri-apps/plugin-fs": "^2.4.4",
+    "@tauri-apps/plugin-haptics": "^2.3.2",
+    "@tauri-apps/plugin-opener": "^2.5.0",
+    "@tauri-apps/plugin-os": "^2.3.1",
+    "@tauri-apps/plugin-process": "^2.3.1",
+    "@tauri-apps/plugin-sql": "^2.3.0",
+    "@tauri-apps/plugin-window-state": "^2.4.0",
+    "@zumer/snapdom": "^2.1.0",
+    "marked": "^18.0.0",
+    "solid-js": "^1.9.3",
+    "solid-transition-group": "^0.3.0",
+    "tauri-plugin-background-service": "^0.5.2",
+    "tauri-plugin-keep-screen-on-api": "^0.1.4",
+    "tauri-plugin-m3": "^0.2.2",
+    "tauri-plugin-music-notification-api": "github:AverTry/tauri-plugin-music-notification"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2",
+    "vite": "^6.0.3",
+    "vite-plugin-solid": "^2.11.0"
+  }
+}

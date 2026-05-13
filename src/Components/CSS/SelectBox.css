@@ -1,0 +1,110 @@
+.SelectBox-container {
+  position: relative;
+  width: 150px;
+  user-select: none;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+.SelectBox-trigger {
+  padding: 5.4px 14px;
+  cursor: pointer;
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-size: 0.85rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.1s;
+  gap: 8px;
+  max-width: 100%;
+  background: var(--s5-LD);
+  border: 1px solid var(--btn-border);
+}
+
+.SelectBox-trigger:hover {
+  background: var(--d3-LD);
+}
+
+.SelectBox-dropdown {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  right: 0;
+  background: var(--s5-LD);
+  border: 1px solid var(--btn-border);
+  border-radius: 8px;
+  max-height: 240px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+}
+
+.SelectBox-search-container {
+  padding: 8px;
+  position: sticky;
+  top: 0;
+  background: var(--d5-LD);
+  border-bottom: 1px solid var(--btn-border);
+}
+
+.SelectBox-search-input {
+  width: 100%;
+  padding: 6px;
+  border-radius: 4px;
+  background: var(--s5-LD);
+  border: 1px solid var(--btn-border);
+  color: white;
+  font-size: 0.8rem;
+  outline: none;
+}
+
+.SelectBox-search-input:focus {
+  border-color: var(--text-color-dimmed);
+}
+
+.SelectBox-group-label {
+  padding: 6px 10px;
+  background: var(--d3-LD);
+  border: 2px solid var(--text-color-alllight);
+  border-radius: 0.5rem;
+  color: var(--text-color-alllight);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: bold;
+}
+
+.SelectBox-option-item {
+  font-size: 0.85rem;
+  padding: 7.5px;
+  cursor: pointer;
+  color: var(--text-color-alllight);
+  transition: background 0.1s;
+}
+
+.SelectBox-option-item:hover {
+  background: var(--d3-LD);
+  border-radius: 0.5rem;
+}
+
+.SelectBox-label-text {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+  color: var(--text-color-alllight);
+}
+
+.SelectBox-arrow {
+  flex-shrink: 0; /* Prevents the arrow from getting squashed by long text */
+  font-size: 0.6rem;
+  opacity: 0.7;
+}
+
+/* Drop-up support */
+.SelectBox-dropdown.is-up {
+  top: auto;
+  bottom: calc(100% + 5px); /* Moves it above the trigger */
+  box-shadow: 0 -10px 15px -3px rgba(0, 0, 0, 0.3); /* Reverse shadow */
+}

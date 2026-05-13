@@ -1,0 +1,33 @@
+.RibbonVersion-aWrap {
+  position: absolute;
+  left: 87px;
+  top: -7px;
+  z-index: 100;
+  cursor: pointer;
+  filter: drop-shadow(0 5px 5px rgba(78, 78, 78, 0.7));
+}
+.RibbonVersion-ribbonOuter {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 60% 90%, 50% 100%, 40% 90%, 0 100%);
+  background: var(--text-color);
+  border: 1px solid var(--text-color); /* Pseudo Border */
+}
+.RibbonVersion-ribbonInner {
+  width: 2.5ch;
+  height: 2ch;
+  clip-path: inherit;
+  background: var(--verseNo);
+  padding: 0px 0 4px 0;
+  text-align: center;
+  margin-top: 4px;
+  & span {
+    font-size: 10px;
+    font-weight: bold;
+    font-variant: small-caps;
+    color: #eeeeee;
+    text-shadow: #5a5a5a 1px 1px 1px;
+  }
+}
+.RibbonVersion-closeBtn {
+  font-size: 0.72rem;
+  color: light-dark(red, darkred);
+}

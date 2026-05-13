@@ -1,0 +1,123 @@
+/* Modals and chips */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--glass1);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.modal-card {
+  background: var(--glass);
+  backdrop-filter: var(--glassBlur);
+  box-shadow: var(--glassShadow);
+  color: var(--text-color);
+  border: 1px solid var(--btn-border);
+  padding: 25px;
+  border-radius: 12px;
+  width: 350px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  & h3 {
+    color: var(--ThemeAccent2);
+  }
+}
+.modal-verse {
+  font-size: small;
+  text-align: center;
+  text-wrap: pretty;
+  font-style: italic;
+  width: 100%;
+  padding: 5px;
+}
+.modal-input {
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  background-color: var(--bg-color);
+  border: 1px solid var(--btn-border);
+  border-radius: 6px;
+  margin-bottom: 15px;
+}
+.chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 15px 0;
+}
+.topic-chip {
+  background: rgb(var(--ThemeAccent2));
+  color: var(--text-color);
+  border: none;
+  padding: 4px 12px;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+.filter-bar {
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Topic, Note Modals */
+.modal-card.note-modal {
+  width: 500px;
+  max-width: 90vw;
+}
+.modal-textarea {
+  width: 100%;
+  height: 200px;
+  padding: 12px;
+  box-sizing: border-box;
+  background-color: var(--bg-color);
+  border: 1px solid var(--btn-border);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1.5;
+  resize: vertical;
+  margin-bottom: 15px;
+  outline: 2px solid var(--ThemeAccent1);
+}
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.topic-tag {
+  font-weight: bold;
+  color: var(--text-color);
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
+.verse-ref {
+  color: var(--text-color);
+  font-family: monospace;
+}
+
+.primary-btn {
+  background: var(--ThemeAccent2);
+  color: var(--text-color-inverted);
+  border: none;
+  padding: 8px 20px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  &:hover {
+    background: var(--ThemeAccent1);
+  }
+}
+.secondary-btn {
+  background: transparent;
+  color: var(--text-color);
+  border: 1px solid var(--btn-border);
+  padding: 8px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.primary-btn:hover {
+  filter: brightness(1.1);
+}

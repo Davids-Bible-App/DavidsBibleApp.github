@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/mobile-schema.json",
+  "identifier": "mobile-capability",
+  "windows": ["main"],
+  "platforms": ["iOS", "android"],
+  "permissions": ["core:app:allow-register-listener", "process:allow-exit", "music-notification:default", "notification:default", "notification:allow-is-permission-granted", "notification:allow-request-permission", "background-service:default", "background-service:allow-is-running"]
+}

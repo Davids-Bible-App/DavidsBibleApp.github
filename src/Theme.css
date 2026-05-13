@@ -1,0 +1,143 @@
+:root {
+  /* --- THEME PALETTE --- */
+
+  --hue: 250;
+  --t1: oklch(from oklch(0.95 0.021 250) l c var(--hue));
+  --t2: oklch(from oklch(0.94 0.041 250) l c var(--hue));
+  --t3: oklch(from oklch(0.93 0.061 250) l c var(--hue));
+  --t4: oklch(from oklch(0.92 0.081 250) l c var(--hue));
+  --t5: oklch(from oklch(0.91 0.099 250) l c var(--hue));
+  --t8: oklch(from oklch(0.8 0.099 250) l c var(--hue));
+  --s3: oklch(from oklch(0.63 0.07 250) l c var(--hue));
+  --s5: oklch(from oklch(0.61 0.09 250) l c var(--hue));
+  --d1: oklch(from oklch(0.45 0.05 250) l c var(--hue));
+  --d3: oklch(from oklch(0.43 0.07 250) l c var(--hue));
+  --d5: oklch(from oklch(0.41 0.09 250) l c var(--hue));
+
+  --base-lite: 255 255 255;
+  --base-dark: 0 0 0;
+  --gray: 35 35 35;
+
+  /* Grays & Neutrals */
+  --clr-gray-200: #eeeeee;
+  --clr-gray-400: #cccccc;
+  --clr-gray-500: #aaaaaa;
+  --clr-gray-600: #888888;
+  --clr-gray-700: #555555;
+  --clr-gray-800: #444444;
+  --clr-gray-850: #333333;
+  --clr-gray-870: #2a2a2a;
+  --clr-gray-900: #222222;
+  --clr-gray-960: #111111;
+
+  /* Accents & Special */
+  --clr-red-dark: darkred;
+  --clr-orange: orange;
+  --clr-orange-deep: #d57c29;
+  --clr-brown: #7c4512;
+  --clr-brown-rich: rgba(116, 56, 0, 1);
+  --clr-gold: gold;
+  --clr-gold-dim: rgba(192, 164, 4);
+  --clr-red-tint: rgba(175, 114, 114, 0.1);
+
+  /** --- MAPPINGS --- */
+  /** --- MAPPINGS --- */
+  /** --- MAPPINGS --- */
+
+  --wordsOfJesus: light-dark(var(--clr-red-dark), var(--clr-orange));
+  --verseNo: light-dark(var(--clr-brown), var(--clr-gold-dim));
+  --stitches: light-dark(var(--clr-brown-rich), var(--clr-gold));
+  --text-color: light-dark(var(--clr-gray-900), var(--clr-gray-400));
+  --text-color-alt: light-dark(var(--t1), var(--clr-gray-800));
+  --text-color-dimmed: light-dark(var(--clr-gray-800), var(--clr-gray-500));
+  --text-color-dimmer: light-dark(var(--clr-gray-900), var(--clr-gray-600));
+  --text-color-inverted: light-dark(var(--clr-gray-400), var(--clr-gray-900));
+  --text-color-alllight: light-dark(var(--clr-gray-400), var(--clr-gray-400));
+  --text-color-highlights: light-dark(var(--clr-orange-deep), var(--clr-gold-dim));
+
+  /* --background-color: light-dark(var(--clr-gray-400), var(--clr-gray-900)); */
+  --background-opaque: light-dark(rgb(var(--base-lite) / 0.6), rgb(var(--gray) / 0.3));
+  --bk-button-color1: light-dark(var(--clr-gray-400), var(--clr-gray-850));
+  --bk-button-hover-color: light-dark(var(--clr-gray-400), var(--clr-gray-900));
+  --bk-button-color: transparent;
+  --bk-button-pressed-color: light-dark(var(--clr-gray-400), var(--clr-gray-800));
+  /* --bk-side-color: light-dark(var(--clr-gray-400), var(--clr-gray-900)); */
+  --btn-border: light-dark(rgb(var(--base-dark) / 0.1), rgb(var(--base-lite) / 0.1));
+  --btn-border-hov: light-dark(rgb(var(--base-dark) / 0.2), rgb(var(--base-lite) / 0.2));
+  --btn-borderInv: light-dark(rgb(var(--base-lite) / 0.5), rgb(var(--base-dark) / 0.1));
+
+  --front-gradient: linear-gradient(
+    0deg,
+    light-dark(hsl(0, 0%, 85%), var(--clr-gray-900)) 0%,
+    light-dark(var(--clr-gray-200), var(--clr-gray-800)) 100%
+  );
+
+  --x-adjust: 0px;
+  --inset-shadows: inset var(--x-adjust) 0px 6px 0px light-dark(rgb(var(--gray) / 0.5), var(--clr-gray-960));
+  --outset-shadows: 0px 0px 11px 0px light-dark(rgb(var(--gray) / 0.5), var(--clr-gray-960));
+
+  --btm-shadow: light-dark(var(--clr-dark-a07), rgb(var(--base-dark) / 0.6)) 1px 1px 5px;
+  --top-shadow: light-dark(var(--clr-dark-a07), rgb(var(--base-dark) / 0.6)) -1px -1px 5px;
+
+  --s5-LD: light-dark(var(--s5), var(--clr-gray-870));
+  --d3-LD: light-dark(var(--d3), var(--clr-gray-900));
+  --d5-LD: light-dark(var(--d5), var(--clr-gray-850));
+  --d1-LD: light-dark(var(--s5), var(--clr-gray-600));
+
+  --background-color: light-dark(var(--t5), var(--clr-gray-900));
+  --bk-side-color: light-dark(var(--t5), var(--clr-gray-900));
+
+  --verseNo: light-dark(var(--d5), var(--clr-gold-dim));
+  --stitches: light-dark(var(--d5), var(--clr-gold));
+
+  --bk-button-color1: light-dark(var(--t5), var(--clr-gray-850));
+  --bk-button-hover-color: light-dark(var(--t8), var(--clr-gray-800));
+
+  --banner: --light-dark(
+    linear-gradient(to bottom, var(--t5), var(--t8)),
+    linear-gradient(0deg, var(--clr-gray-900) 0%, var(--clr-gray-800) 100%)
+  );
+
+  /* PaperOverlay */
+  --combiLight: url("/light.webp"), linear-gradient(var(--t1));
+  --combiDark: url("/dark.webp"), linear-gradient(#000);
+  --paper: --light-dark(var(--combiLight), var(--combiDark));
+  /* BannerOverlay */
+  --bannerOv: --light-dark(linear-gradient(to bottom, var(--t5), var(--t8)), linear-gradient(0deg, #000 0%, #222 100%));
+  --textureImage: --light-dark(url("/light.webp"), url("/dark.webp"));
+
+  --select: light-dark(var(--t2), var(--clr-gray-850));
+  --select2: light-dark(var(--t5), var(--clr-gray-850));
+  --JumpTo: light-dark(var(--t8), var(--clr-gold-dim));
+  --ThemeAccent1: light-dark(var(--s5), var(--clr-gold-dim));
+  --ThemeAccent2: light-dark(var(--d3), var(--clr-gold-dim));
+  --ThemeBaccent1: light-dark(var(--s3), var(--clr-gray-960));
+  --ThemeBaccent2: light-dark(var(--d1), var(--clr-gray-960));
+  --ThemeBackgrounds0: light-dark(var(--t1), var(--clr-gray-900));
+  --ThemeBackgrounds1: light-dark(var(--t2), var(--clr-gray-870));
+  --ThemeBackgrounds2: light-dark(var(--t5), var(--clr-gray-850));
+  --ThemeCtrl0: light-dark(var(--t1), var(--clr-gray-960));
+  --ThemeCtrl1: light-dark(var(--t2), var(--clr-gray-850));
+  --ThemeCtrl2: light-dark(var(--t8), var(--clr-gray-900));
+  --ThemeCtrl3: light-dark(var(--t8), var(--clr-gray-800));
+  --ThemeScroll1: light-dark(var(--d1-LD), rgb(87, 87, 87));
+  --ThemeScroll2: light-dark(transparent, transparent);
+  --ThemeWrap1: light-dark(var(--t4), var(--clr-gray-960));
+
+  --glass: light-dark(oklch(from var(--t5) l c h / 0.2), transparent);
+  --glass1: light-dark(oklch(from var(--t2) l c h / 0.5), rgb(var(--gray) / 0.7));
+
+  --glassBlur: blur(12px);
+  --glassShadow: 0 12px 40px rgb(var(--base-dark) / 0.4);
+
+  --backdropBtns: --light-dark(
+    radial-gradient(ellipse 250px 400px at 100% 100%, var(--t5), var(--t4), var(--t3), transparent),
+    radial-gradient(
+      ellipse 250px 400px at 100% 100%,
+      rgb(var(--gray) / 1),
+      rgb(var(--gray) / 0.9),
+      rgb(var(--gray) / 0.9),
+      transparent
+    )
+  );
+}

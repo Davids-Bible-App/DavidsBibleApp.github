@@ -1,0 +1,110 @@
+@import "Theme.css";
+@import "Global.css";
+
+.App-loader-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 9999;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background-color: light-dark(whitesmoke, #0f1114);
+  color: var(--text-color);
+  font-family: sans-serif;
+
+  width: 100vw;
+  height: 100vh;
+  margin-top: 0;
+  padding-top: 0;
+  overflow: hidden;
+
+  transition:
+    opacity 0.6s ease-in-out,
+    visibility 0.6s;
+}
+
+/* Handling the transition */
+.App-loader-overlay.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* The Spinner */
+.App-thinking-loader {
+  width: 64px;
+  height: 64px;
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.App-thinking-loader::before,
+.App-thinking-loader::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 4px solid transparent;
+  border-top-color: #4285f4;
+  animation: App-spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+
+.App-thinking-loader::after {
+  border-top-color: #34a853;
+  animation-delay: -0.4s;
+}
+
+/* The Pulse */
+.App-pulse-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 30px;
+  height: 30px;
+  background: radial-gradient(circle, #4285f4 0%, transparent 70%);
+  border-radius: 50%;
+  animation: App-pulse 2s ease-in-out infinite;
+}
+
+@keyframes App-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes App-pulse {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 1;
+  }
+} /* Fading Text */
+
+.App-loading-text {
+  font-size: 1.1rem;
+  letter-spacing: 0.5px;
+  animation: App-fade 1.5s ease-in-out infinite;
+}
+
+@keyframes App-fade {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
