@@ -79,3 +79,4 @@ MIT License - Copyright (c) 2026 Davids Bible App
 - Translations, Add Multiple at once, Not just One by One.
 - JumpTo Link While Audio Playing Can DeSynce Page and Audio Chapter.
 - Further Optomizations Needed on Load.
+- Docs to be Made, and General Help File
