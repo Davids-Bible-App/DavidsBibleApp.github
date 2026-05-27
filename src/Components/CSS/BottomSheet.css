@@ -15,11 +15,18 @@
   transition: height 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   overflow: hidden;
   box-sizing: border-box;
+
+  will-change: transform;
 }
 
 /* Disable transition while dragging so it sticks 1:1 to the finger */
 .BottomSheet-Container.dragging {
   transition: none;
+}
+
+/* Suppress hit-testing on children during drag (avoids hover recalcs each frame) */
+.BottomSheet-Container.dragging .BottomSheet-Content {
+  /* pointer-events: none; */
 }
 
 .BottomSheet-Overlay {
@@ -61,6 +68,7 @@
   display: flex;
   justify-content: center;
   overflow: hidden;
-
   padding-block: 2px;
+
+  contain: layout paint;
 }

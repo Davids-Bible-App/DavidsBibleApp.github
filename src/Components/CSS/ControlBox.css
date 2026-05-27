@@ -50,6 +50,7 @@
   margin: 0.2rem;
 }
 .ControlBox-button:has(svg) {
+  display: flex;
   padding: 0;
   margin: 0;
 }

@@ -239,3 +239,44 @@ pub fn normalize_book_id(raw: &str) -> String {
     .to_string()
 }
 
+// #[tauri::command]
+// pub async fn save_context_history(state: State<'_, DbPaths>, query: String) -> Result<(), String> {
+//     let conn = Connection::open(&state.profile_path).map_err(|e| e.to_string())?;
+//     conn.execute(
+//         "INSERT OR REPLACE INTO context_history (query) VALUES (?1)",
+//         [&query],
+//     ).map_err(|e| e.to_string())?;
+//     Ok(())
+// }
+
+// #[tauri::command]
+// pub async fn get_context_history(
+//     state: State<'_, DbPaths>,
+//     limit: i32
+// ) -> Result<Vec<String>, String> {
+//     let conn = Connection::open(&state.profile_path).map_err(|e| e.to_string())?;
+//     let mut stmt = conn.prepare("SELECT query FROM context_history ORDER BY timestamp DESC LIMIT ?1")
+//         .map_err(|e| e.to_string())?;
+
+//     let rows = stmt.query_map([limit], |row| row.get(0)).map_err(|e| e.to_string())?;
+//     let mut history = Vec::new();
+//     for r in rows { history.push(r.map_err(|e| e.to_string())?); }
+//     Ok(history)
+// }
+
+// #[tauri::command]
+// pub async fn delete_context_history_item(state: State<'_, DbPaths>, query: String) -> Result<(), String> {
+//     let conn = Connection::open(&state.profile_path).map_err(|e| e.to_string())?;
+//     conn.execute(
+//         "DELETE FROM context_history WHERE query = ?1",
+//         [&query],
+//     ).map_err(|e| e.to_string())?;
+//     Ok(())
+// }
+
+// #[tauri::command]
+// pub async fn clear_context_history(state: State<'_, DbPaths>) -> Result<(), String> {
+//     let conn = Connection::open(&state.profile_path).map_err(|e| e.to_string())?;
+//     conn.execute("DELETE FROM context_history", []).map_err(|e| e.to_string())?;
+//     Ok(())
+// }

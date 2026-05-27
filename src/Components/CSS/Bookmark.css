@@ -1,0 +1,270 @@
+/* ─────────────────────────────────────────────
+   Bookmark.css  –  Neumorphic, light & dark
+   ───────────────────────────────────────────── */
+
+/* ── Panel ──────────────────────────────────── */
+.Bookmark-panel {
+  display: flex;
+  flex-direction: column;
+  /* gap: 1.2rem; */
+  min-width: 280px;
+  max-width: 480px;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: "Georgia", serif;
+}
+
+/* ── Header ─────────────────────────────────── */
+.Bookmark-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.Bookmark-header-icon {
+  font-size: 1.3rem;
+}
+.Bookmark-header-title {
+  flex: 1;
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--main-icon-text-color);
+  letter-spacing: 0.02em;
+}
+.Bookmark-close-btn {
+  background: var(--header-button-wrapper-gradient);
+  border: none;
+  border-radius: 50%;
+  width: 2rem;
+  height: 2rem;
+  cursor: pointer;
+  font-size: 0.8rem;
+  color: var(--main-icon-text-color);
+  box-shadow: var(--header-button-wrapper-neu-shadows);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: box-shadow 0.15s;
+}
+.Bookmark-close-btn:active {
+  box-shadow: var(--header-pressed-button-inset-shadows);
+}
+
+/* ── List ───────────────────────────────────── */
+.Bookmark-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.Bookmark-list::-webkit-scrollbar {
+  width: 4px;
+}
+.Bookmark-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.Bookmark-list::-webkit-scrollbar-thumb {
+  background: var(--neu-light);
+  border-radius: 2px;
+}
+
+.Bookmark-empty {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--main-icon-text-color);
+  opacity: 0.6;
+  margin: 0.5rem 0;
+}
+
+/* ── Item card ──────────────────────────────── */
+.Bookmark-item {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  background: var(--main-cover-wrapper-gradient);
+  border-radius: 1rem;
+  box-shadow: var(--controls-button-wrapper-neu-shadows);
+  /* transition only for the non-drag translateY shifts applied by JS */
+  will-change: transform;
+  position: relative;
+}
+
+/* Item that is currently being dragged — the slot stays but is invisible */
+.Bookmark-item--active {
+  /* visibility: hidden !important; */
+}
+
+/* ── Drag handle ────────────────────────────── */
+.Bookmark-drag-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2rem;
+  flex-shrink: 0;
+  cursor: grab;
+  border-radius: 1rem 0 0 1rem;
+  background: var(--header-button-wrapper-gradient);
+  box-shadow: inset -1px 0 0 rgba(0, 0, 0, 0.06);
+  color: var(--main-icon-text-color);
+  opacity: 0.55;
+  transition:
+    opacity 0.15s,
+    background 0.15s;
+  /* Prevent text selection while dragging */
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+.Bookmark-drag-handle:hover {
+  opacity: 0.9;
+}
+.Bookmark-drag-handle:active {
+  cursor: grabbing;
+}
+
+.Bookmark-drag-icon {
+  width: 12px;
+  height: 16px;
+  pointer-events: none;
+}
+
+/* ── Item body ──────────────────────────────── */
+.Bookmark-item-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.75rem 0.9rem 0.75rem 0.7rem;
+  min-width: 0;
+}
+
+.Bookmark-item-top {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.Bookmark-item-title {
+  flex: 1;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--main-icon-text-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Reference pill ─────────────────────────── */
+.Bookmark-item-ref {
+  padding: 0.3rem 0.4rem;
+  background: var(--header-button-wrapper-gradient);
+  border-radius: 0.5rem;
+  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.08);
+}
+.Bookmark-item-verse {
+  font-size: 0.9rem;
+  color: var(--main-icon-text-color);
+  opacity: 0.9;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+/* ── Footer ─────────────────────────────────── */
+.Bookmark-item-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.1rem;
+}
+.Bookmark-item-date {
+  font-size: 0.7rem;
+  color: var(--main-icon-text-color);
+  opacity: 0.6;
+}
+
+/* ── Action buttons ─────────────────────────── */
+.Bookmark-item-actions {
+  display: flex;
+  gap: 0.3rem;
+  flex-shrink: 0;
+}
+.Bookmark-action-btn {
+  background: var(--controls-normal-button-wrapper-gradient);
+  border: none;
+  border-radius: 0.45rem;
+  width: 1.9rem;
+  height: 1.9rem;
+  font-size: 0.82rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--controls-button-wrapper-neu-shadows);
+  color: var(--main-icon-text-color);
+  transition:
+    background 0.15s,
+    box-shadow 0.15s;
+}
+.Bookmark-action-btn:active {
+  box-shadow: var(--controls-pressed-button-inset-shadows);
+}
+.Bookmark-delete-btn:hover,
+.Bookmark-delete-btn:active {
+  background: var(--controls-pressed-button-wrapper-gradient);
+  color: #fff;
+}
+.Bookmark-save-btn:hover,
+.Bookmark-save-btn:active {
+  background: var(--header-pressed-wrapper-gradient);
+  color: #fff;
+}
+
+/* ── Inline edit input ──────────────────────── */
+.Bookmark-input {
+  flex: 1;
+  background: var(--controls-normal-button-wrapper-gradient);
+  border: none;
+  border-radius: 0.6rem;
+  padding: 0.45rem 0.65rem;
+  font-size: 0.88rem;
+  color: var(--main-icon-text-color);
+  box-shadow: var(--controls-button-wrapper-neu-shadows);
+  outline: none;
+  min-width: 0;
+}
+.Bookmark-input:focus {
+  box-shadow:
+    inset 1px 1px 3px rgba(0, 0, 0, 0.15),
+    inset -1px -1px 3px rgba(255, 255, 255, 0.1),
+    0 0 0 2px rgba(255, 94, 26, 0.25);
+}
+.Bookmark-input::placeholder {
+  color: var(--main-icon-text-color);
+  opacity: 0.5;
+}
+
+/* ── Ghost (floating clone while dragging) ──── */
+/*
+ * The ghost is appended to <body> and clones .Bookmark-item.
+ * CSS variables are on :root so they work outside .Bookmark-panel.
+ */
+.Bookmark-item--ghost {
+  background: var(--main-cover-wrapper-gradient) !important;
+  border-radius: 1rem;
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.28),
+    0 4px 10px rgba(0, 0, 0, 0.18),
+    var(--controls-button-wrapper-neu-shadows) !important;
+  opacity: 0.96;
+  /* Slight scale-up so it clearly "lifts" off the list */
+  transform-origin: center center;
+  scale: 1.025;
+}
+
+.bookmark-underline {
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 94, 26, 0.55); /* your accent orange */
+  text-decoration-color: var(--verseNo); /* your accent orange */
+  text-decoration-style: solid;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1.5px;
+  transition: text-decoration-color 0.3s ease;
+}

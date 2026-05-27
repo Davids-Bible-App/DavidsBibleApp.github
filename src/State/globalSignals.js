@@ -5,6 +5,7 @@ export const [bible1, setBible1] = createSignal("eng_kjv");
 export const [book, setBook] = createSignal("JHN");
 export const [chapterNo, setChapterNo] = createSignal(1);
 export const [targetVerse, setTargetVerse] = createSignal(null);
+export const [targetVerses, setTargetVerses] = createSignal(null);
 export const [chapterBtn, setChapterBtn] = createSignal(1);
 export const [testamentBtn, setTestamentBtn] = createSignal("nt");
 export const [bookOrderNo, setBookOrderNo] = createSignal();

@@ -1,20 +1,11 @@
-import { createSignal, createResource, createEffect, createMemo, Match, For, onCleanup } from "solid-js";
+import { createSignal, createResource, createEffect, createMemo, Match, on, For, onCleanup } from "solid-js";
 import { settings, registerRefetchers } from "../State/settingsStore.js";
 import { updateAndLogScripture } from "../State/historyStore";
 import { invoke } from "@tauri-apps/api/core";
 import { toggleSheet } from "../State/sheetStore";
 import "./CSS/Bible.css";
 import { expandedCtl, setExpandedCtl, setActiveCrossRef, isDarkMode } from "../State/globalSignals.js";
-import {
-  setBibleVersion,
-  book,
-  chapterNo,
-  targetVerse,
-  bookBtn,
-  activePaper,
-  isSecondaryVisible,
-  setActiveNoteVerse,
-} from "../State/globalSignals.js";
+import { setBibleVersion, book, chapterNo, targetVerse, targetVerses, setTargetVerses, bookBtn, activePaper, isSecondaryVisible, setActiveNoteVerse } from "../State/globalSignals.js";
 
 function NoteTooltip(props) {
   const note = () => {
@@ -27,11 +18,7 @@ function NoteTooltip(props) {
 
   return (
     <>
-      <button
-        class="VerseParts-summary"
-        popovertarget={popoverId}
-        style={`anchor-name: ${anchorName};font-size:0.7em;`}
-      >
+      <button class="VerseParts-summary" popovertarget={popoverId} style={`anchor-name: ${anchorName};font-size:0.7em;`}>
         &nbsp;{props.id}
       </button>
 
@@ -115,6 +102,18 @@ export default function Bible(props) {
     }
   };
 
+  // (A) Clear the underlines whenever the user navigates to a different chapter.
+  //     { defer: true } means it won't fire on the initial read — only on changes.
+  createEffect(
+    on(
+      chapterNo,
+      (ch, prev) => {
+        if (prev !== undefined) setTargetVerses(null);
+      },
+      { defer: true },
+    ),
+  );
+
   createEffect(() => {
     if (chapters.state === "ready") {
       setVerses(chapters().content);
@@ -155,11 +154,7 @@ export default function Bible(props) {
             }}
           >
             <chapter>
-              <div
-                style={!isSecondaryVisible() && settings.titleView && "position: sticky;"}
-                class="Bible-header paper"
-                classList={{ paperOverlay: activePaper() }}
-              >
+              <div style={!isSecondaryVisible() && settings.titleView && "position: sticky;"} class="Bible-header paper" classList={{ paperOverlay: activePaper() }}>
                 <Show
                   when={chapterNo() === 1}
                   fallback={
@@ -232,20 +227,7 @@ export default function Bible(props) {
                         {!wasHeading && <br />}
                         {(wasHeading = false)}
                       </Match>
-                      <Match when={verse.type === "verse"}>
-                        {
-                          <VerseParts
-                            activeVersion={activeVersion()}
-                            verse={verse}
-                            footNotes={footNotes}
-                            itemNo={verse.number}
-                            ver={ver}
-                            setVer={setVer}
-                            availableRefs={availableRefs}
-                            onRefClick={handleRefClick}
-                          />
-                        }
-                      </Match>
+                      <Match when={verse.type === "verse"}>{<VerseParts activeVersion={activeVersion()} verse={verse} footNotes={footNotes} itemNo={verse.number} ver={ver} setVer={setVer} availableRefs={availableRefs} onRefClick={handleRefClick} />}</Match>
                     </Switch>
                   )}
                 </For>
@@ -318,6 +300,7 @@ function VerseParts(props) {
         classList={{
           select: selected(),
           "highlight-pulse": props.verse.number === targetVerse(),
+          "bookmark-underline": targetVerses()?.includes(props.verse.number),
           highlighted: !!props.verse.highlight,
           "use-sidelights": isSidelight(),
           "use-highlights": !isSidelight(),
@@ -343,15 +326,7 @@ function VerseParts(props) {
         }}
         style={`${!props.ver() ? "display: list-item" : "display: contents"};`}
       >
-        <verse
-          classList={props.ver() && { select: selected() }}
-          data-ed={props.activeVersion.translation?.short_name}
-          data-tr={props.activeVersion.translation?.id}
-          data-bk={props.activeVersion.bk?.id}
-          data-ch={chapterNo()}
-          data-vs={props.verse.number}
-          data-clr={props.verse.highlight || "none"}
-        >
+        <verse classList={props.ver() && { select: selected() }} data-ed={props.activeVersion.translation?.short_name} data-tr={props.activeVersion.translation?.id} data-bk={props.activeVersion.bk?.id} data-ch={chapterNo()} data-vs={props.verse.number} data-clr={props.verse.highlight || "none"}>
           <span
             style={!props.ver() && "display: none"}
             // classList={props.ver() && { verseFL: props.verse.number === 1 }}

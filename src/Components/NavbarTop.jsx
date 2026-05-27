@@ -50,22 +50,9 @@ export default function NavbarTop(props) {
                 }}
                 id="NavbarTop-left"
               >
-                <svg
-                  width="18px"
-                  height="18px"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  transform="matrix(-1, 0, 0, 1, 0, 0)"
-                >
-                  <path
-                    d="M5.5 9.25C5.08579 9.25 4.75 9.58579 4.75 10C4.75 10.4142 5.08579 10.75 5.5 10.75H11.5C11.9142 10.75 12.25 10.4142 12.25 10C12.25 9.58579 11.9142 9.25 11.5 9.25H5.5Z"
-                    fill="currentColor"
-                  />
-                  <path
-                    d="M5.75 14C5.75 13.5858 6.08579 13.25 6.5 13.25H10.5C10.9142 13.25 11.25 13.5858 11.25 14C11.25 14.4142 10.9142 14.75 10.5 14.75H6.5C6.08579 14.75 5.75 14.4142 5.75 14Z"
-                    fill="currentColor"
-                  />
+                <svg width="18px" height="18px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" transform="matrix(-1, 0, 0, 1, 0, 0)">
+                  <path d="M5.5 9.25C5.08579 9.25 4.75 9.58579 4.75 10C4.75 10.4142 5.08579 10.75 5.5 10.75H11.5C11.9142 10.75 12.25 10.4142 12.25 10C12.25 9.58579 11.9142 9.25 11.5 9.25H5.5Z" fill="currentColor" />
+                  <path d="M5.75 14C5.75 13.5858 6.08579 13.25 6.5 13.25H10.5C10.9142 13.25 11.25 13.5858 11.25 14C11.25 14.4142 10.9142 14.75 10.5 14.75H6.5C6.08579 14.75 5.75 14.4142 5.75 14Z" fill="currentColor" />
                   <path
                     fill-rule="evenodd"
                     clip-rule="evenodd"
@@ -79,27 +66,17 @@ export default function NavbarTop(props) {
                 class="NavbarTop-search"
                 onClick={(e) => {
                   e.stopPropagation();
-                  toggleSheet("search", "Min");
+                  toggleSheet("search", "Mid");
                 }}
                 id="NavbarTop-SrcTog"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="18"
-                  height="18"
-                  fill="currentColor"
-                  class="bi bi-search"
-                  viewBox="0 0 18 18"
-                >
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-search" viewBox="0 0 18 18">
                   <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
                 </svg>
               </button>
 
               <Show when={props.isSecondaryVisible() || !settings.titleView}>
-                <div
-                  class="NavbarTop-bookChap"
-                  style={!props.isSecondaryVisible() && !settings.titleView && "top: 23px;"}
-                >
+                <div class="NavbarTop-bookChap" style={!props.isSecondaryVisible() && !settings.titleView && "top: 23px;"}>
                   <b>
                     <span>{book()}</span>
                     &nbsp;
@@ -107,16 +84,7 @@ export default function NavbarTop(props) {
                   </b>
                 </div>
               </Show>
-              <div
-                style={
-                  props.isSecondaryVisible()
-                    ? props.orientation() === "vertical"
-                      ? "flex-direction: column"
-                      : "flex-direction: row"
-                    : "flex-direction: row"
-                }
-                class="NavbarTop-bibleTitles"
-              >
+              <div style={props.isSecondaryVisible() ? (props.orientation() === "vertical" ? "flex-direction: column" : "flex-direction: row") : "flex-direction: row"} class="NavbarTop-bibleTitles">
                 <Show when={!props.isSecondaryVisible()}>
                   <div class="NavbarTop-txtBible0">
                     <b>{props.getInfo(bible1())?.english_name}</b>
@@ -133,9 +101,7 @@ export default function NavbarTop(props) {
               </div>
               <button
                 onPointerDown={(e) => e.stopPropagation()}
-                style={
-                  props.isSecondaryVisible() && props.orientation() === "horizontal" ? "right: unset" : "right: 2.5rem"
-                }
+                style={props.isSecondaryVisible() && props.orientation() === "horizontal" ? "right: unset" : "right: 2.5rem"}
                 onClick={(e) => {
                   props.toggleSecondaryPanel();
                   props.psr() && props.psr().scrollTo({ top: 0 });
@@ -160,17 +126,7 @@ export default function NavbarTop(props) {
                   </svg>
                 </Show>
                 <Show when={props.isSecondaryVisible()}>
-                  <svg
-                    id="splitBtnOrientation"
-                    style={
-                      props.isSecondaryVisible() && props.orientation() === "horizontal" && "transform: rotate(90deg)"
-                    }
-                    width="18px"
-                    height="18px"
-                    viewBox="0 0 800 800"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
+                  <svg id="splitBtnOrientation" style={props.isSecondaryVisible() && props.orientation() === "horizontal" && "transform: rotate(90deg)"} width="18px" height="18px" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <g transform="matrix(33.333333,0,0,33.333333,0,0)">
                       <path
                         d="M11.943,1.25L12.057,1.25C14.366,1.25 16.175,1.25 17.586,1.44C19.031,1.634 20.171,2.039 21.066,2.934C21.961,3.829 22.366,4.969 22.56,6.414C22.75,7.825 22.75,9.634 22.75,11.943L22.75,12.057C22.75,14.366 22.75,16.175 22.56,17.586C22.366,19.031 21.961,20.171 21.066,21.066C20.171,21.961 19.031,22.366 17.586,22.56C16.175,22.75 14.366,22.75 12.057,22.75L11.943,22.75C9.634,22.75 7.825,22.75 6.414,22.56C4.969,22.366 3.829,21.961 2.934,21.066C2.039,20.171 1.634,19.031 1.44,17.586C1.25,16.175 1.25,14.366 1.25,12.057L1.25,11.943C1.25,9.634 1.25,7.825 1.44,6.414C1.634,4.969 2.039,3.829 2.934,2.934C3.829,2.039 4.969,1.634 6.414,1.44C7.825,1.25 9.634,1.25 11.943,1.25ZM6.614,2.926C5.335,3.098 4.564,3.425 3.995,3.995C3.425,4.564 3.098,5.335 2.926,6.614C2.752,7.914 2.75,9.622 2.75,12C2.75,14.378 2.752,16.086 2.926,17.386C3.098,18.665 3.425,19.436 3.995,20.005C4.564,20.575 5.335,20.902 6.614,21.074C7.914,21.248 9.622,21.25 12,21.25C14.378,21.25 16.086,21.248 17.386,21.074C18.665,20.902 19.436,20.575 20.005,20.005C20.575,19.436 20.902,18.665 21.074,17.386C21.248,16.086 21.25,14.378 21.25,12C21.25,9.622 21.248,7.914 21.074,6.614C20.902,5.335 20.575,4.564 20.005,3.995C19.436,3.425 18.665,3.098 17.386,2.926C16.086,2.752 14.378,2.75 12,2.75C9.622,2.75 7.914,2.752 6.614,2.926Z"
@@ -191,22 +147,9 @@ export default function NavbarTop(props) {
                 }}
                 id="NavbarTop-right"
               >
-                <svg
-                  width="18px"
-                  height="18px"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  transform="matrix(1, 0, 0, 1, 0, 0)"
-                >
-                  <path
-                    d="M5.5 9.25C5.08579 9.25 4.75 9.58579 4.75 10C4.75 10.4142 5.08579 10.75 5.5 10.75H11.5C11.9142 10.75 12.25 10.4142 12.25 10C12.25 9.58579 11.9142 9.25 11.5 9.25H5.5Z"
-                    fill="currentColor"
-                  />
-                  <path
-                    d="M5.75 14C5.75 13.5858 6.08579 13.25 6.5 13.25H10.5C10.9142 13.25 11.25 13.5858 11.25 14C11.25 14.4142 10.9142 14.75 10.5 14.75H6.5C6.08579 14.75 5.75 14.4142 5.75 14Z"
-                    fill="currentColor"
-                  />
+                <svg width="18px" height="18px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" transform="matrix(1, 0, 0, 1, 0, 0)">
+                  <path d="M5.5 9.25C5.08579 9.25 4.75 9.58579 4.75 10C4.75 10.4142 5.08579 10.75 5.5 10.75H11.5C11.9142 10.75 12.25 10.4142 12.25 10C12.25 9.58579 11.9142 9.25 11.5 9.25H5.5Z" fill="currentColor" />
+                  <path d="M5.75 14C5.75 13.5858 6.08579 13.25 6.5 13.25H10.5C10.9142 13.25 11.25 13.5858 11.25 14C11.25 14.4142 10.9142 14.75 10.5 14.75H6.5C6.08579 14.75 5.75 14.4142 5.75 14Z" fill="currentColor" />
                   <path
                     fill-rule="evenodd"
                     clip-rule="evenodd"

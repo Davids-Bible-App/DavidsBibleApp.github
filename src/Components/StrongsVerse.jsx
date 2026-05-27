@@ -85,8 +85,7 @@ export default function StrongsVerse(props) {
     undefined,
     {
       // Keep your equality check to prevent unnecessary re-renders
-      equals: (prev, next) =>
-        prev && prev.bk === next.bk && prev.bookName === next.bookName && prev.ch === next.ch && prev.vs === next.vs,
+      equals: (prev, next) => prev && prev.bk === next.bk && prev.bookName === next.bookName && prev.ch === next.ch && prev.vs === next.vs,
     },
   );
 
@@ -117,9 +116,7 @@ export default function StrongsVerse(props) {
           {(word) => (
             <div class="StrongsVerse-card">
               <div class="StrongsVerse-english-section">
-                <span class={word.isAdded ? "StrongsVerse-word-added" : "StrongsVerse-word-base"}>
-                  {word.englishWord}
-                </span>
+                <span class={word.isAdded ? "StrongsVerse-word-added" : "StrongsVerse-word-base"}>{word.englishWord}</span>
                 <Show when={word.isAdded}>
                   <span class="StrongsVerse-added-label">Was added for language flow.</span>
                 </Show>
@@ -130,10 +127,7 @@ export default function StrongsVerse(props) {
                   <For each={word.definitions}>
                     {(def) => (
                       <div class="StrongsVerse-dict-entry">
-                        <button
-                          onClick={() => props.setActiveLookup({ query: def.strongsId, origin: word.englishWord })}
-                          class="StrongsVerse-strongs-tag"
-                        >
+                        <button onClick={() => props.setActiveLookup({ query: def.strongsId, origin: word.englishWord })} class="StrongsVerse-strongs-tag">
                           {def.strongsId}
                         </button>
 

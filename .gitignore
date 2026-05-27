@@ -6,5 +6,6 @@ TEMP/
 .context
 linecount
 .prettierignore
-tmp
-/tmp
+gen0/
+src-tauri/gen0/
+/images

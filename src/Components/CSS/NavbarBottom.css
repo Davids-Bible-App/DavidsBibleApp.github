@@ -1,6 +1,7 @@
 .ctl-L,
 .ctl-R {
   position: absolute;
+  display: flex;
   top: calc(var(--navHeight) / 7);
   border-radius: 50rem;
   padding: 3px 3px 0;
@@ -8,6 +9,9 @@
 }
 .ctl-L {
   left: 50px;
+  & svg {
+    margin-bottom: 3px;
+  }
 }
 .ctl-R {
   right: 50px;

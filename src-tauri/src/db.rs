@@ -164,6 +164,16 @@ pub fn init_db(app_handle: &tauri::AppHandle) -> Result<(), String> {
             UNIQUE(translation_id, book_id, chapter, verse_id)
         );
         CREATE INDEX IF NOT EXISTS idx_history_time ON read_history(updated_at DESC);
+
+        CREATE TABLE IF NOT EXISTS bookmarks (
+            id         INTEGER PRIMARY KEY AUTOINCREMENT,
+            title      TEXT    NOT NULL UNIQUE,
+            verses     TEXT    NOT NULL,   -- JSON: [{tr, bk, ch, vs}, ...]
+            sort_order INTEGER DEFAULT 0,
+            updated_at INTEGER DEFAULT (strftime('%s','now'))
+        );
+        
+        CREATE INDEX IF NOT EXISTS idx_bm_time ON bookmarks(updated_at DESC);
     ",
     )
     .map_err(|e| e.to_string())?;

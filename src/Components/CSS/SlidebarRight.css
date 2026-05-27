@@ -6,7 +6,7 @@
   touch-action: pan-y;
 
   width: calc(90vw + var(--edge2edge-right));
-  height: calc(100% - var(--edge2edge-bottom));
+  height: 100vh;
 
   overflow: hidden;
   will-change: transform, opacity;
@@ -16,8 +16,9 @@
 
 .SlidebarRight-aside nav {
   display: flex;
+  flex: 1;
+  min-height: 0;
   width: 100%;
-  height: 100%;
 
   padding-top: var(--edge2edge-top);
   padding-bottom: var(--edge2edge-bottom);
@@ -26,8 +27,10 @@
 }
 
 .SlidebarRight-safe-content {
+  display: flex;
+  flex-direction: column;
   background-color: var(--bk-side-color);
   flex: 1;
+  min-height: 0;
   width: 100%;
-  height: 100%;
 }

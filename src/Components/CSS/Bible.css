@@ -142,8 +142,8 @@ list.use-sidelights[data-clr*="Clr"] {
     -5px 0 var(--clr),
     -5.4px 0 var(--border);
 
-  margin-inline-start: -20px;
-  padding-inline-start: 20px;
+  margin-inline: -20px;
+  padding-inline: 20px;
 }
 list.use-sidelights verse {
   background: transparent;
@@ -156,8 +156,8 @@ list.use-sidelights verse {
   box-shadow:
     -20px 0 var(--select),
     20px 0 var(--select);
-  margin-inline-start: 0;
-  padding-inline-start: 0;
+  margin-inline: 0;
+  padding-inline: 0;
 }
 
 verse[data-clr*="Clr"]:has(+ .VerseParts-note-trigger) {

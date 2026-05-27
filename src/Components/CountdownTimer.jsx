@@ -1,5 +1,5 @@
 // src/Components/CountdownTimer.jsx
-import { createSignal, onCleanup, onMount, For } from "solid-js";
+import { createSignal, createMemo, onCleanup, onMount, Index, batch } from "solid-js";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { type } from "@tauri-apps/plugin-os";
@@ -38,6 +38,7 @@ const ensureServiceStopped = async () => {
 //    disabled   () => boolean  locks interaction when true
 //    label      string         e.g. "HH" / "MM" / "SS"
 
+const BUFFER = 3;
 const ITEM_H = 48; // px — height of each row
 const VISIBLE = 5; // rows visible in the window (must be odd)
 
@@ -99,8 +100,13 @@ const ScrollColumn = (props) => {
   };
 
   // Static item list — range never changes after mount
-  const items = Array.from({ length: props.max - props.min + 1 }, (_, i) => props.min + i);
-
+  const visibleItems = createMemo(() => {
+    const center = val();
+    const half = Math.floor(VISIBLE / 2) + BUFFER;
+    const start = Math.max(props.min, center - half);
+    const end = Math.min(props.max, center + half);
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+  });
   return (
     <div class="scroll-col">
       <div class="scroll-col-window" ref={(r) => (el = r)} onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp} onWheel={onWheel} style={{ cursor: props.disabled() ? "default" : "ns-resize" }}>
@@ -113,24 +119,31 @@ const ScrollColumn = (props) => {
         <div
           class="scroll-list"
           style={{
+            position: "relative",
+            height: `${(props.max - props.min + 1) * ITEM_H}px`, // full logical height, not just visible
             transform: `translateY(${translateY()}px)`,
             transition: isDragging() ? "none" : "transform 0.14s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
           }}
         >
-          <For each={items}>
-            {(i) => (
+          <Index each={visibleItems()}>
+            {(item) => (
               <div
                 class="scroll-item"
                 classList={{
-                  "scroll-item-sel": i === val(),
-                  "scroll-item-near": Math.abs(i - val()) === 1,
-                  "scroll-item-far": Math.abs(i - val()) >= 2,
+                  "scroll-item-sel": item() === val(),
+                  "scroll-item-near": Math.abs(item() - val()) === 1,
+                  "scroll-item-far": Math.abs(item() - val()) >= 2,
+                }}
+                style={{
+                  position: "absolute",
+                  top: `${(item() - props.min) * ITEM_H}px`, // same slot as the full list
+                  width: "100%",
                 }}
               >
-                {String(i).padStart(2, "0")}
+                {String(item()).padStart(2, "0")}
               </div>
             )}
-          </For>
+          </Index>
         </div>
       </div>
 
@@ -150,19 +163,19 @@ const CountdownTimer = (props) => {
   let unlistenTick = null;
   let unlistenDone = null;
 
-  const totalSeconds = () => hours() * 3600 + minutes() * 60;
+  const totalSeconds = createMemo(() => hours() * 3600 + minutes() * 60);
 
   // ── What the picker displays ──────────────────────────────────────────────
   //
   //  editable  — no timer loaded at all: user sets hours + minutes
   //  locked    — timer is running OR paused: show live / paused countdown
   //
-  const hasTime = () => secondsLeft() > 0;
-  const editable = () => !isActive() && !hasTime();
+  const hasTime = createMemo(() => secondsLeft() > 0);
+  const editable = createMemo(() => !isActive() && !hasTime());
 
-  const dispH = () => (hasTime() ? Math.floor(secondsLeft() / 3600) : hours());
-  const dispM = () => (hasTime() ? Math.floor((secondsLeft() % 3600) / 60) : minutes());
-  const dispS = () => (hasTime() ? secondsLeft() % 60 : 0);
+  const dispH = createMemo(() => (hasTime() ? Math.floor(secondsLeft() / 3600) : hours()));
+  const dispM = createMemo(() => (hasTime() ? Math.floor((secondsLeft() % 3600) / 60) : minutes()));
+  const dispS = createMemo(() => (hasTime() ? secondsLeft() % 60 : 0));
 
   // ── Backend event handlers (unchanged) ────────────────────────────────────
 
@@ -180,26 +193,30 @@ const CountdownTimer = (props) => {
   };
 
   onMount(async () => {
-    unlistenTick = await listen("my-service://timer-tick", (event) => {
-      const remaining = Number(event.payload);
-      setSecondsLeft(remaining);
-      setIsActive(remaining > 0);
-    });
+    setTimeout(async () => {
+      unlistenTick = await listen("my-service://timer-tick", (event) => {
+        const remaining = Number(event.payload);
+        batch(() => {
+          setSecondsLeft(remaining);
+          setIsActive(remaining > 0);
+        });
+      });
 
-    unlistenDone = await listen("my-service://timer-done", async () => {
-      setSecondsLeft(0);
-      setIsActive(false);
-      await handleBackendTrigger();
-      await ensureServiceStopped();
-    });
+      unlistenDone = await listen("my-service://timer-done", async () => {
+        setSecondsLeft(0);
+        setIsActive(false);
+        await handleBackendTrigger();
+        await ensureServiceStopped();
+      });
 
-    if (await isServiceRunning()) {
-      const remaining = await invoke("timer_get_remaining");
-      if (remaining > 0) {
-        setSecondsLeft(Number(remaining));
-        setIsActive(true);
+      if (await isServiceRunning()) {
+        const remaining = await invoke("timer_get_remaining");
+        if (remaining > 0) {
+          setSecondsLeft(Number(remaining));
+          setIsActive(true);
+        }
       }
-    }
+    }, 0);
   });
 
   onCleanup(() => {
@@ -222,27 +239,36 @@ const CountdownTimer = (props) => {
   const stopTimer = async () => {
     setIsActive(false);
     const remaining = await invoke("timer_pause");
+    type() === "android" && (await props.pause());
+    type() === "windows" && (await props.audioRef.pause());
+    props.setIsPlaying(false);
     setSecondsLeft(Number(remaining));
   };
 
   const resetTimer = async () => {
     await invoke("timer_cancel");
+    // type() === "windows" && (await props.audioRef.pause());
+    // props.setIsPlaying(false);
     setIsActive(false);
-    setSecondsLeft(0);
+    if (secondsLeft() === 0) {
+      // Already restored — second press clears the picker
+      setHours(0);
+      setMinutes(0);
+    } else {
+      // First press — stop and restore to the set time
+      setSecondsLeft(0);
+    }
     await ensureServiceStopped();
   };
 
   const handleBegin = async () => {
+    if (totalSeconds() <= 0) return;
+
     try {
-      if (props.hasState() || (props.playableSrc() && !props.isPlaying())) {
-        await startTimer();
-        type() === "android" && (await props.resume());
-        type() === "windows" && props.audioRef.play();
-        props.setIsPlaying(true);
-      } else if (!props.hasState() || (props.playableSrc() && !props.isPlaying() && totalSeconds() > 0)) {
-        await startTimer();
-        type() === "android" && props.togglePlay();
-        type() === "windows" && props.audioRef.play();
+      await startTimer();
+      if (!props.isPlaying()) {
+        type() === "android" && (await props.togglePlay());
+        type() === "windows" && props.playableSrc() && props.audioRef.play();
         props.setIsPlaying(true);
       }
     } catch (err) {
@@ -258,7 +284,7 @@ const CountdownTimer = (props) => {
 
       {/* Drum-roll picker — replaces both the old display and the number inputs */}
       <div class={`CountdownTimer-picker${editable() ? "" : " picker-locked"}`}>
-        <ScrollColumn value={dispH} onChange={(v) => editable() && setHours(v)} min={0} max={23} disabled={() => !editable()} label="HH" />
+        <ScrollColumn value={dispH} onChange={(v) => editable() && setHours(v)} min={0} max={5} disabled={() => !editable()} label="HH" />
 
         <div class="scroll-sep">:</div>
 
@@ -273,7 +299,7 @@ const CountdownTimer = (props) => {
       <div class="CountdownTimer-controls">
         {!isActive() ? (
           <button class="CountdownTimer-btn start" onClick={handleBegin}>
-            {secondsLeft() > 0 ? "Resume" : "Start"}
+            <span>{secondsLeft() > 0 ? "Resume" : "Start"}</span>
           </button>
         ) : (
           <button
@@ -290,7 +316,7 @@ const CountdownTimer = (props) => {
               }
             }}
           >
-            Stop
+            <span>Stop</span>
           </button>
         )}
         <button class="CountdownTimer-btn reset" onClick={resetTimer}>

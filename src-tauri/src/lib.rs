@@ -51,6 +51,11 @@ pub fn run() {
         builder = builder.plugin(tauri_plugin_window_state::Builder::new().build());
         }
 
+    // #[cfg(target_os = "android")]
+    //     {
+    //         builder = builder.plugin(tauri_plugin_music_notification_api::init());
+    //     }
+
     // 2. Consolidated Invoke Handler
     builder
         .invoke_handler(tauri::generate_handler![
@@ -68,19 +73,36 @@ pub fn run() {
             commands::audio::timer_cancel,
             commands::audio::timer_get_remaining,
 
+            // From commands/bookmark.rs
+            commands::bookmark::add_bookmark,
+            commands::bookmark::rename_bookmark,
+            commands::bookmark::delete_bookmark,
+            commands::bookmark::get_bookmarks,
+            commands::bookmark::reorder_bookmarks,
+            commands::bookmark::overwrite_bookmark,
+
             // From commands/meme.rs
             commands::meme::save_meme_image,
             commands::meme::delete_meme_image,
 
             // From commands/context.rs
             commands::context::parse_bible_reference,
+            // commands::context::save_context_history,
+            // commands::context::get_context_history,
+            // commands::context::clear_context_history,
+            // commands::context::delete_context_history_item,
 
             // From commands/search.rs
             commands::search::unified_search,
             commands::search::fts5_search_all_selected,
+            // commands::search::save_search_query,
+            // commands::search::get_search_history,
+            // commands::search::delete_search_history_item,
+            // commands::search::clear_all_search_history,
 
             // From commands/reader.rs
             commands::reader::copy_translation_file,
+            commands::reader::copy_translation_files,
             commands::reader::delete_db_file,
 
             commands::reader::lookup_strongs,
@@ -96,7 +118,6 @@ pub fn run() {
             commands::reader::get_chapterverse_data,
             commands::reader::get_verse,
             commands::reader::get_verses,
-            
             // From commands/profile.rs
             commands::profile::get_read_history,
             commands::profile::log_history_entry,

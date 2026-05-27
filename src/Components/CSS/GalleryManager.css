@@ -3,41 +3,65 @@
    ============================================================ */
 
 .GalleryManager-main {
-  color: var(--text-color);
-  height: 100%;
-  width: 100%;
   display: flex;
   flex-direction: column;
+  color: var(--text-color);
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  overflow: hidden;
 }
 
-.GalleryManager-content {
+/* Uni-wrap for inline padding - Style adjust for scroll-gutters stable */
+.GalleryManager-undertab {
+  display: flex;
+  flex-direction: column;
   flex: 1;
-  overflow-y: auto;
-  scrollbar-gutter: stable both-edges;
-  scrollbar-width: thin;
-  scrollbar-color: var(--ThemeScroll2) var(--ThemeScroll2);
-  padding-bottom: 5rem;
-  user-select: none;
-  &:hover {
-    scrollbar-color: var(--ThemeScroll1) var(--ThemeScroll2);
-  }
+  min-height: 0;
+  padding-inline: 4px;
 }
 
 .GalleryManager-search-wrap {
-  padding: 10px;
-  /* background: var(--ThemeWrap1); */
+  flex-shrink: 0;
+  padding-block: 10px;
+}
+
+.GalleryManager-content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1;
+  min-height: 0;
+}
+
+.GalleryManager-card-wrap {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  gap: 0.75rem;
+  padding-block: 0.1rem 0.3rem;
 }
 
 .GalleryManager-input {
+  padding: 8px;
+  resize: vertical;
+  line-height: 1.4;
+  background: var(--controls-normal-button-wrapper-gradient);
+  border: none;
+  border-radius: 0.65rem;
+  font-size: 0.9rem;
+  font-family: "Georgia", serif;
+  color: var(--d1-LD);
+  box-shadow: var(--controls-button-wrapper-neu-shadows);
+  outline: none;
   width: 100%;
-  background: var(--ThemeCtrl1);
-  border: 1px solid #333;
-  color: var(--text-color);
-  padding: 10px;
-  border-radius: 4px;
   box-sizing: border-box;
-  &:hover {
-    background-color: var(--ThemeCtrl2);
+  transition: box-shadow 0.15s;
+  &::placeholder {
+    color: var(--d1-LD);
+    opacity: 0.6;
   }
 }
 
@@ -56,7 +80,7 @@
   padding: 12px;
   border-bottom: 1px solid transparent;
   background: none;
-  color: #888;
+  color: var(--text-color-tone);
   cursor: pointer;
   font-size: 0.8rem;
   font-weight: bold;
@@ -71,13 +95,22 @@
    TOPIC SECTION
    ============================================================ */
 
+.TopicSection-detail {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
 .TopicSection-header {
   display: flex;
   justify-content: space-between;
-  padding: 0 10px 10px;
-  border-bottom: 1px solid #333;
+  padding-block: 10px 0;
   align-items: center;
   user-select: none;
+  & button {
+    padding: 0.6rem;
+  }
   & button:hover {
     background-color: var(--ThemeCtrl2);
   }
@@ -86,13 +119,62 @@
 .TopicSection-item {
   /* pointer-events: auto !important; */
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  padding: 8px 10px 3px;
-  border-bottom: 1px solid #252525;
+  gap: 10px;
   cursor: pointer;
   user-select: none;
+  color: var(--text-color-tone);
   &:hover {
-    background-color: var(--ThemeCtrl2);
+    background-color: var(--ThemeCtrl1);
+  }
+}
+
+/* Container for the description area */
+.TopicDescription-root {
+  margin: 10px 0;
+  padding: 0 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* The toggle button/label */
+.TopicDescription-toggle {
+  cursor: pointer;
+  color: var(--main-icon-text-color);
+  font-size: 0.85rem;
+  opacity: 0.9;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: opacity 0.2s;
+  user-select: none;
+}
+
+.TopicDescription-toggle:hover {
+  opacity: 1;
+}
+
+/* The Textarea */
+.TopicDescription-textarea {
+  min-height: 100px;
+  resize: vertical;
+
+  background: var(--controls-normal-button-wrapper-gradient);
+  border: none;
+  border-radius: 0.65rem;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.9rem;
+  font-family: "Georgia", serif;
+  color: var(--main-icon-text-color);
+  box-shadow: var(--controls-button-wrapper-neu-shadows);
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  transition: box-shadow 0.15s;
+  &::placeholder {
+    color: var(--main-icon-text-color);
+    opacity: 0.7;
   }
 }
 
@@ -128,15 +210,38 @@
   color: red;
 }
 
+/* Action Buttons Row */
+.TopicDescription-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  font-size: 0.8rem;
+  margin-top: 8px;
+}
+
 /* ============================================================
    GROUPED VERSE CARD
    ============================================================ */
 
 .Entry-card {
-  padding: 15px;
-  border-bottom: 1px solid #252525;
-  position: relative;
   user-select: none;
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  background: var(--main-cover-wrapper-gradient);
+  border-radius: 1rem;
+  box-shadow: var(--controls-button-wrapper-neu-shadows);
+  /* transition only for the non-drag translateY shifts applied by JS */
+  will-change: transform;
+  position: relative;
+}
+
+.Entry-item-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.75rem 0.9rem;
 }
 
 .GroupedVerse-row {
@@ -145,9 +250,18 @@
   user-select: none;
 }
 
+.Entry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.Entry-text {
+  color: var(--d1-LD);
+}
+
 /* Verse number */
 .Entry-verse-num {
-  color: var(--verseNo);
   margin-right: 6px;
   font-weight: bold;
 }
@@ -175,14 +289,14 @@
    ============================================================ */
 
 .DeleteBar {
-  background: var(--ThemeBaccent1);
-  border-bottom: 1px solid #444;
+  background: var(--header-button-wrapper-gradient);
+  border-radius: 0.5rem;
+  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.08);
   padding: 8px 12px;
   color: red;
   text-shadow: #333 1px 1px;
   font-size: 0.85rem;
   text-align: center;
-  border-radius: 4px;
   margin-bottom: 10px;
   opacity: 0.9;
   display: flex;
@@ -190,8 +304,7 @@
   gap: 20px;
   &:hover {
     opacity: 1;
-    background: var(--ThemeBaccent2);
-    cursor: pointer;
+    background: var(--controls-normal-button-wrapper-gradient);
   }
 }
 
@@ -209,104 +322,36 @@
    ============================================================ */
 
 .Entry-note {
-  background: var(--ThemeCtrl1);
-  padding: 8px;
-  border-radius: 4px;
-  border: 1px solid #272727;
   margin-top: 5px;
-  color: var(--text-color);
+  line-height: 1.4;
+  /* background: var(--controls-normal-button-wrapper-gradient); */
+  background: var(--header-button-wrapper-gradient);
+  border: none;
+  border-radius: 0.65rem;
+  padding: 6px 8px;
+  font-size: 0.9rem;
+  font-family: "Georgia", serif;
+  color: var(--main-icon-text-color);
+  /* box-shadow: var(--controls-button-wrapper-neu-shadows); */
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  transition: box-shadow 0.15s;
 }
 
 .Entry-note-textarea {
-  width: 100%;
-  background: var(--ThemeCtrl1);
-  border: 1px solid #444;
-  color: var(--text-color);
-  padding: 6px 8px;
-  border-radius: 4px;
-  resize: none;
-  font-size: 0.9rem;
-  line-height: 1.4;
-  box-sizing: border-box;
-}
-
-/* Topic drag */
-
-/* Container for the description area */
-.TopicDescription-root {
-  margin: 10px 0;
-  padding: 0 10px;
-  display: flex;
-  flex-direction: column;
-}
-
-/* The toggle button/label */
-.TopicDescription-toggle {
-  cursor: pointer;
-  color: var(--text-color);
-  font-size: 0.85rem;
-  opacity: 0.7;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  transition: opacity 0.2s;
-  user-select: none;
-}
-
-.TopicDescription-toggle:hover {
-  opacity: 1;
-}
-
-/* The Textarea */
-.TopicDescription-textarea {
-  width: 100%;
-  box-sizing: border-box; /* Fixes the overflow issue */
-  background: var(--ThemeCtrl0);
-  color: var(--text-color);
-  border: 1px solid #444;
-  border-radius: 4px;
-  padding: 12px;
-  min-height: 100px;
   resize: vertical;
-  font-family: inherit;
   line-height: 1.4;
+  background: var(--controls-normal-button-wrapper-gradient);
+  border: none;
+  border-radius: 0.65rem;
+  padding: 6px 8px;
+  font-size: 0.9rem;
+  font-family: "Georgia", serif;
+  color: var(--main-icon-text-color);
+  box-shadow: var(--controls-button-wrapper-neu-shadows);
   outline: none;
-  transition: border-color 0.2s;
-}
-
-.TopicDescription-textarea:focus {
-  border-color: var(--btn-border);
-}
-
-/* Action Buttons Row */
-.TopicDescription-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 15px;
-  font-size: 0.8rem;
-  margin-top: 8px;
-}
-
-.TopicDescription-btn {
-  cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 3px;
-  transition: background 0.2s;
-}
-
-.TopicDescription-btn.cancel {
-  color: #888;
-}
-
-.TopicDescription-btn.save {
-  color: var(--verseNo);
-  font-weight: bold;
-  opacity: 0.8;
-  &:hover {
-    opacity: 1;
-  }
-}
-
-.TopicDescription-btn:hover {
-  background: rgba(255, 255, 255, 0.05);
+  width: 100%;
+  box-sizing: border-box;
+  transition: box-shadow 0.15s;
 }

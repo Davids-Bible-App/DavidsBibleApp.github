@@ -138,10 +138,9 @@
 
 .SettingsPanel-saveBtn {
   margin-top: auto;
-  background-color: transparent;
   &:hover {
     border: 1px solid transparent;
-    background-color: transparent;
+    /* background-color: transparent; */
     color: var(--text-color);
   }
 }

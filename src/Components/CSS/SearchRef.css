@@ -15,19 +15,29 @@
 }
 
 .SearchRef-Input {
+  flex: 1;
   width: 100%;
-  padding: 12px 12px;
-  border-radius: 12px;
-  font-size: 14px;
-  box-sizing: border-box;
-  box-shadow: none;
+  background: var(--controls-normal-button-wrapper-gradient);
+  border: none;
+  border-radius: 0.6rem;
+  padding: 0.45rem 0.65rem;
+  font-size: 0.88rem;
+  color: var(--main-icon-text-color);
+  box-shadow: var(--controls-button-wrapper-neu-shadows);
   outline: none;
-  background-color: var(--ThemeBackgrounds1);
+  min-width: 0;
   &:hover {
     background-color: var(--ThemeBackgrounds1);
   }
   &:focus {
-    box-shadow: var(--header-pressed-button-inset-shadows);
+    box-shadow:
+      inset 1px 1px 3px rgba(0, 0, 0, 0.15),
+      inset -1px -1px 3px rgba(255, 255, 255, 0.1),
+      0 0 0 2px rgba(255, 94, 26, 0.25);
+  }
+  &::placeholder {
+    color: var(--main-icon-text-color);
+    opacity: 0.7;
   }
 }
 
@@ -44,7 +54,7 @@
   background: none;
   border: none;
   font-size: 18px;
-  color: var(--text-color-dimmed);
+  color: var(--text-color-tone);
   padding: 4px;
   cursor: pointer;
   box-shadow: none;
@@ -73,7 +83,7 @@
 /* Optional hover effect */
 .SearchRef-ClearBtn:hover,
 .SearchRef-GoBtn:hover {
-  color: var(--verseNo);
+  color: var(--text-color-tone);
   background-color: transparent;
 }
 
@@ -107,6 +117,7 @@ mark {
   width: 100%;
   justify-content: center;
   align-items: center;
+  color: var(--text-color-tone);
 }
 
 .SearchRef-RadioGroup {
@@ -188,7 +199,7 @@ mark {
   padding: 10px 15px;
   font-size: 14px;
   border-radius: 0.5rem;
-  color: var(--text-color-dimmed);
+  color: var(--text-color-tone);
   /* width: 100%; */
   cursor: pointer;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);

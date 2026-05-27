@@ -109,6 +109,33 @@ export default function MemeMaker() {
     setVerifiedFonts([...FONTS.filter((f) => f.hasBold), ...validOnlineFonts]);
   }
 
+  // onMount(async () => {
+  //   const onlineFonts = FONTS.filter((f) => !f.hasBold);
+  //   const validOnlineFonts = [];
+
+  //   // 2. Test each online font
+  //   for (const font of onlineFonts) {
+  //     try {
+  //       // Extract just the font name (e.g., "'Permanent Marker', cursive" -> "Permanent Marker")
+  //       const fontName = font.value.split(",")[0].replace(/['"]/g, "").trim();
+
+  //       // Attempt to load a sample size of the font
+  //       const loadedFonts = await document.fonts.load(`16px "${fontName}"`);
+
+  //       if (loadedFonts.length > 0) {
+  //         validOnlineFonts.push(font); // It works! Keep it.
+  //       } else {
+  //         console.warn(`Font unavailable, removing from list: ${font.label}`);
+  //       }
+  //     } catch (error) {
+  //       console.warn(`Font error: ${font.label}`, error);
+  //     }
+  //   }
+
+  //   // 3. Combine the local fonts with the successfully loaded online fonts
+  //   setVerifiedFonts([...FONTS.filter((f) => f.hasBold), ...validOnlineFonts]);
+  // });
+
   /* layers */
   const [layers, setLayers] = createSignal([
     {
@@ -124,7 +151,7 @@ export default function MemeMaker() {
       italic: false,
       color: "#eb8875",
       strokeColor: "#005876",
-      strokeWidth: 1,
+      strokeWidth: 0.3,
       shadow: true,
       shadowX: 4,
       shadowY: 6,
@@ -305,7 +332,7 @@ export default function MemeMaker() {
       italic: true,
       color: "#ffffff", // Standard meme white
       strokeColor: "#000000", // Standard meme black outline
-      strokeWidth: 0,
+      strokeWidth: 0.3,
       shadow: false,
       shadowX: 4,
       shadowY: 6,
@@ -627,7 +654,7 @@ export default function MemeMaker() {
       italic: false,
       color: "#eb8875",
       strokeColor: "#005876",
-      strokeWidth: 1.2,
+      strokeWidth: 0.3,
       shadow: false,
       shadowX: 4,
       shadowY: 6,
@@ -758,6 +785,14 @@ export default function MemeMaker() {
       pushHistory(); // This now automatically captures background moves!
     }
   }
+
+  // createEffect(() => {
+  //   images();
+  //   selectedImage();
+  //   saveToLocal();
+  // });
+
+  // Helper to resize and convert to WebP
 
   // Helper to resize and return a WebP blob
 

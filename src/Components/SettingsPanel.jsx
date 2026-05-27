@@ -1,4 +1,4 @@
-import { onMount, Show } from "solid-js";
+import { createSignal, createEffect, onMount, Show, onCleanup } from "solid-js";
 import { readFile, writeFile, BaseDirectory } from "@tauri-apps/plugin-fs";
 import { join, appDataDir } from "@tauri-apps/api/path";
 import { invoke } from "@tauri-apps/api/core";
@@ -11,6 +11,64 @@ export default function SettingsPanel(props) {
   onMount(() => {
     queueMicrotask(loadSettings);
   });
+
+  const [localHue, setLocalHue] = createSignal();
+  const [fineTune, setFineTune] = createSignal();
+  let isDragging = false;
+
+  const decomposeHue = (hue) => {
+    const coarse = Math.round(hue / 20) * 20; // e.g. 63 → 60
+    const fine = hue - coarse; // e.g. 63 - 60 = +3
+    return { coarse: Math.min(360, Math.max(0, coarse)), fine };
+  };
+
+  createEffect(() => {
+    const saved = settings.themeHue;
+    if (!isDragging) {
+      const { coarse, fine } = decomposeHue(saved);
+      setLocalHue(coarse);
+      setFineTune(fine);
+    }
+  });
+
+  let debounceTimer;
+  onCleanup(() => clearTimeout(debounceTimer));
+
+  const clamp = (v) => Math.min(360, Math.max(0, v));
+
+  const applyHue = (coarse, fine) => {
+    const effective = clamp(coarse + fine);
+    document.documentElement.style.setProperty("--hue", effective);
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => setSettings("themeHue", effective), 200);
+  };
+
+  const handleCoarse = (e) => {
+    isDragging = true;
+    const h = parseInt(e.target.value);
+    setLocalHue(h);
+    setFineTune(0);
+    applyHue(h, 0);
+  };
+
+  const handleCoarseCommit = (e) => {
+    clearTimeout(debounceTimer);
+    setSettings("themeHue", clamp(parseInt(e.target.value)));
+    isDragging = false;
+  };
+
+  const handleFine = (e) => {
+    isDragging = true;
+    const f = parseInt(e.target.value);
+    setFineTune(f);
+    applyHue(localHue(), f);
+  };
+
+  const handleFineCommit = (e) => {
+    clearTimeout(debounceTimer);
+    setSettings("themeHue", clamp(localHue() + parseInt(e.target.value)));
+    isDragging = false;
+  };
 
   const handleImport = async () => {
     try {
@@ -126,7 +184,12 @@ export default function SettingsPanel(props) {
         <h2 class="SettingsPanel-title">Settings</h2>
         <section class="SettingsPanel-header paper" classList={{ paperOverlay: activePaper() }}>
           <button
-            class="SettingsPanel-saveBtn"
+            class="SettingsPanel-saveBtn bkCol"
+            style={
+              !activePaper() && {
+                background: "linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)), var(--ThemeBackgrounds0)",
+              }
+            }
             onClick={() => {
               saveSettings();
             }}
@@ -141,19 +204,17 @@ export default function SettingsPanel(props) {
               <heading>Light-Mode Theme Tint</heading>
               <div style="width:100%;display:flex;justify-content:center;align-content:center;">
                 <group>
-                  <label>Hue ({settings.themeHue}°)</label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="360"
-                    step={5}
-                    value={settings.themeHue}
-                    onInput={(e) => {
-                      const h = parseInt(e.target.value);
-                      setSettings("themeHue", h);
-                      document.documentElement.style.setProperty("--hue", h);
-                    }}
-                  />
+                  <label>Hue ({clamp(localHue() + fineTune())}°)</label>
+
+                  {/* Coarse — full spectrum, big steps */}
+                  <input type="range" min="0" max="360" step={20} value={localHue()} onInput={handleCoarse} onChange={handleCoarseCommit} />
+
+                  {/* Fine — ±10 trim, resets on coarse move */}
+                  <label>
+                    Fine ({fineTune() > 0 ? "+" : ""}
+                    {fineTune()}°)
+                  </label>
+                  <input type="range" min="-10" max="10" step={1} value={fineTune()} onInput={handleFine} onChange={handleFineCommit} />
                 </group>
               </div>
             </section>
@@ -210,7 +271,7 @@ export default function SettingsPanel(props) {
           </section>
 
           <section class="SettingsPanel-section">
-            <heading>Leather Texture</heading>
+            <heading>Background Texture</heading>
             <center>
               <pre>
                 <small>May Impact Performance On Some Devices</small>

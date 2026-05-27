@@ -1,18 +1,12 @@
-import { createSignal, For, Show } from "solid-js";
+import { createSignal, createEffect, For, Show } from "solid-js";
 import { invoke } from "@tauri-apps/api/core";
 import { abbreviator, getBook } from "../lib/functions.js";
 import { toggleSheet, currentSheet, setSheetStep } from "../State/sheetStore";
+import { onSheetClose, activeSheet, getBaseStep } from "../State/sheetStore";
+
 import { executeJumpTo } from "../lib/navigationUtils";
 import "./CSS/SearchRef.css";
-import {
-  bible1,
-  setTrigger,
-  setTopicController,
-  setSelectedTopic,
-  setSelection,
-  wordHighlight,
-  setWordHighlight,
-} from "../State/globalSignals.js";
+import { bible1, setTrigger, setTopicController, setSelectedTopic, setSelection, wordHighlight, setWordHighlight } from "../State/globalSignals.js";
 import { setPendingVerses } from "../State/editorStore";
 
 export default function SearchRef(props) {
@@ -27,9 +21,7 @@ export default function SearchRef(props) {
   const [pageInput, setPageInput] = createSignal("");
   const [isDragging, setIsDragging] = createSignal(false);
   const [dragOffset, setDragOffset] = createSignal(0);
-  const [searchHistory, setSearchHistory] = createSignal(
-    JSON.parse(localStorage.getItem("bibleSearchHistory") || "[]"),
-  );
+  const [searchHistory, setSearchHistory] = createSignal(JSON.parse(localStorage.getItem("bibleSearchHistory") || "[]"));
   const [showDropdown, setShowDropdown] = createSignal(false);
   const [selectedVerses, setSelectedVerses] = createSignal([]);
 
@@ -38,6 +30,15 @@ export default function SearchRef(props) {
   let startY = 0;
   let isSwipe = false;
   const totalPages = () => Math.ceil((searchResults()?.total_count || 0) / perPage());
+
+  createEffect(() => {
+    if (activeSheet() === "search" && getBaseStep() === "Mid") {
+      setTimeout(() => {
+        searchInputRef?.focus();
+        searchInputRef?.select();
+      }, 150);
+    }
+  });
 
   const handlePointerDown = (e) => {
     startX = e.clientX;
@@ -130,8 +131,8 @@ export default function SearchRef(props) {
     setSearchResults([]);
     setIsReference(false);
     setSelectedVerses([]);
-    if (searchInputRef) searchInputRef.blur();
-    toggleSheet("search", "Min");
+    if (searchInputRef) searchInputRef.focus();
+    toggleSheet("search", "Mid");
   };
 
   const saveToHistory = (query) => {
@@ -285,7 +286,7 @@ export default function SearchRef(props) {
                   }}
                   style={`
                     background: ${searchScope() === option ? "var(--ThemeCtrl3)" : "transparent"};
-                    color: ${searchScope() === option ? "var(--text-color)" : "var(--text-color-dimmed)"};
+                    color: ${searchScope() === option ? "var(--text-color)" : "var(--text-color-tone)"};
                   `}
                 >
                   {option}
@@ -303,7 +304,7 @@ export default function SearchRef(props) {
               onClick={() => setWordHighlight(true)}
               style={`
                 background: ${wordHighlight() ? "var(--ThemeCtrl3)" : "transparent"};
-                color: ${wordHighlight() ? "var(--text-color)" : "var(--text-color-dimmed)"};`}
+                color: ${wordHighlight() ? "var(--text-color)" : "var(--text-color-tone)"};`}
             >
               On
             </button>
@@ -311,7 +312,7 @@ export default function SearchRef(props) {
               onClick={() => setWordHighlight(false)}
               style={`
                 background: ${!wordHighlight() ? "var(--ThemeCtrl3)" : "transparent"};
-                color: ${!wordHighlight() ? "var(--text-color)" : "var(--text-color-dimmed)"};`}
+                color: ${!wordHighlight() ? "var(--text-color)" : "var(--text-color-tone)"};`}
             >
               Off
             </button>
@@ -337,30 +338,13 @@ export default function SearchRef(props) {
         {searchInput().length > 0 && (
           <>
             <button class="SearchRef-ClearBtn" onClick={clearSearch}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                fill="currentColor"
-                class="bi bi-x"
-                viewBox="0 0 16 16"
-              >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
                 <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708" />
               </svg>
             </button>
             <button class="SearchRef-GoBtn" onClick={() => handleSearch(0)}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                fill="currentColor"
-                class="bi bi-arrow-return-left"
-                viewBox="0 0 16 16"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M14.5 1.5a.5.5 0 0 1 .5.5v4.8a2.5 2.5 0 0 1-2.5 2.5H2.707l3.347 3.346a.5.5 0 0 1-.708.708l-4.2-4.2a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 8.3H12.5A1.5 1.5 0 0 0 14 6.8V2a.5.5 0 0 1 .5-.5"
-                />
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-return-left" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M14.5 1.5a.5.5 0 0 1 .5.5v4.8a2.5 2.5 0 0 1-2.5 2.5H2.707l3.347 3.346a.5.5 0 0 1-.708.708l-4.2-4.2a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 8.3H12.5A1.5 1.5 0 0 0 14 6.8V2a.5.5 0 0 1 .5-.5" />
               </svg>
             </button>
           </>
@@ -424,14 +408,7 @@ export default function SearchRef(props) {
         </Show>
       </div>
 
-      <div
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-        onPointerCancel={handlePointerCancel}
-        class="SearchRef-Results scroll_Win"
-        style={{ "touch-action": "pan-y" }}
-      >
+      <div onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp} onPointerCancel={handlePointerCancel} class="SearchRef-Results scroll_Win" style={{ "touch-action": "pan-y" }}>
         <For each={searchResults().hits}>
           {(hit) => {
             const verseId = `${hit.book_id}-${hit.chapter}-${hit.verse}`;
@@ -462,7 +439,7 @@ export default function SearchRef(props) {
                   <style jsx>{`
                     mark {
                       color: var(--text-color-inverted);
-                      background: var(--wordsOfJesus);
+                      background: var(--verseNo);
                       border-radius: 5px;
                       padding: 0 5px;
                     }
@@ -483,11 +460,7 @@ export default function SearchRef(props) {
               <Show
                 when={isEditingPage()}
                 fallback={
-                  <code
-                    onClick={startEditingPage}
-                    style="cursor: pointer; user-select: none;"
-                    title="Click to jump to page"
-                  >
+                  <code onClick={startEditingPage} style="cursor: pointer; user-select: none;" title="Click to jump to page">
                     [ Page {page() + 1} of {totalPages()} ]
                   </code>
                 }

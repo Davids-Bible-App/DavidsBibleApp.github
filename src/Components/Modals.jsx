@@ -1,7 +1,7 @@
 import { Show, createEffect, createResource } from "solid-js";
 import { invoke } from "@tauri-apps/api/core";
-import { abbreviator } from "../lib/functions.js";
-import { activeNoteVerse, setActiveNoteVerse, book, chapterNo, bibleVersion } from "../State/globalSignals.js";
+import { abbreviator, getBook } from "../lib/functions.js";
+import { activeNoteVerse, setActiveNoteVerse, book, chapterNo, bibleVersion, targetVerse, setTargetVerse } from "../State/globalSignals.js";
 import "./CSS/Modals.css";
 
 export function NoteModal(props) {
@@ -29,7 +29,10 @@ export function NoteModal(props) {
   });
 
   createEffect(() => {
-    activeNoteVerse() == null && props.setNoteText("");
+    if (activeNoteVerse() == null) {
+      props.setNoteText("");
+      setTargetVerse("");
+    }
   });
 
   return (
@@ -37,10 +40,10 @@ export function NoteModal(props) {
       <div class="modal-overlay" onClick={() => setActiveNoteVerse(null)}>
         <div class="modal-card note-modal" onClick={(e) => e.stopPropagation()}>
           <h3>
-            Note for {book()} {chapterNo()}:{activeNoteVerse()} (&nbsp
+            Note for {getBook(book())} {chapterNo()}:{activeNoteVerse()} (&nbsp
             {abbreviator(bibleVersion())}&nbsp)
           </h3>
-          <p class="modal-verse">{selectedNote()?.text}</p>
+          <p class="modal-verse">{selectedNote()?.text || targetVerse()}</p>
           <textarea
             class="modal-textarea"
             placeholder="Write your study notes here..."
@@ -50,7 +53,7 @@ export function NoteModal(props) {
           />
           <div class="modal-actions">
             <button
-              class="secondary-btn"
+              class="BMModal-btn BMModal-btn--cancel"
               onClick={() => {
                 setActiveNoteVerse(null);
                 props.setNoteText("");
@@ -58,7 +61,7 @@ export function NoteModal(props) {
             >
               Cancel
             </button>
-            <button class="primary-btn" onClick={props.saveNoteSelection}>
+            <button class="BMModal-btn BMModal-btn--save" onClick={props.saveNoteSelection}>
               Save Note
             </button>
           </div>

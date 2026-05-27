@@ -1,0 +1,282 @@
+/* BookmarkModal.css */
+
+/* ── Backdrop ───────────────────────────────── */
+.BMModal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  animation: BMModal-fadeIn 0.15s ease;
+}
+
+/* ── Dialog ─────────────────────────────────── */
+.BMModal-dialog {
+  position: fixed;
+  z-index: 901;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(88vw, 360px);
+  background: var(--back-gradient);
+  border-radius: 1.4rem;
+  box-shadow: var(--main-cover-neu-shadows);
+  padding: 1.2rem 1.3rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  animation: BMModal-slideUp 0.18s ease;
+}
+
+/* ── Header ─────────────────────────────────── */
+.BMModal-header {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+.BMModal-icon {
+  font-size: 1.2rem;
+}
+.BMModal-heading {
+  flex: 1;
+  font-family: "Georgia", serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--main-icon-text-color);
+  letter-spacing: 0.02em;
+}
+.BMModal-close {
+  background: var(--header-button-wrapper-gradient);
+  border: none;
+  border-radius: 50%;
+  width: 1.9rem;
+  height: 1.9rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+  color: var(--main-icon-text-color);
+  box-shadow: var(--header-button-wrapper-neu-shadows);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.BMModal-close:active {
+  box-shadow: var(--header-pressed-button-inset-shadows);
+}
+
+/* ── Reference pill ─────────────────────────── */
+.BMModal-ref {
+  background: var(--header-button-wrapper-gradient);
+  border-radius: 0.55rem;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.78rem;
+  font-style: italic;
+  color: var(--main-icon-text-color);
+  opacity: 0.85;
+  box-shadow: var(--controls-button-wrapper-neu-shadows);
+  text-align: center;
+  letter-spacing: 0.03em;
+}
+
+/* ── Input wrapper (positions dropdown) ─────── */
+.BMModal-input-wrap {
+  position: relative;
+}
+
+/* ── Input ──────────────────────────────────── */
+.BMModal-input {
+  background: var(--controls-normal-button-wrapper-gradient);
+  border: none;
+  border-radius: 0.65rem;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.9rem;
+  font-family: "Georgia", serif;
+  color: var(--main-icon-text-color);
+  box-shadow: var(--controls-button-wrapper-neu-shadows);
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  transition: box-shadow 0.15s;
+}
+.BMModal-input:focus {
+  box-shadow:
+    inset 1px 1px 3px rgba(0, 0, 0, 0.15),
+    inset -1px -1px 3px rgba(255, 255, 255, 0.1),
+    0 0 0 2px rgba(255, 94, 26, 0.3);
+}
+.BMModal-input::placeholder {
+  color: var(--main-icon-text-color);
+  opacity: 0.5;
+}
+
+/* ── Dropdown ───────────────────────────────── */
+.BMModal-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 10;
+  background: var(--main-cover-wrapper-gradient);
+  border-radius: 0.75rem;
+  box-shadow: var(--main-cover-neu-shadows);
+  max-height: calc(5 * 3rem); /* exactly 5 items visible */
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--neu-light) transparent;
+  animation: BMModal-fadeIn 0.1s ease;
+}
+.BMModal-dropdown::-webkit-scrollbar {
+  width: 3px;
+}
+.BMModal-dropdown::-webkit-scrollbar-track {
+  background: transparent;
+}
+.BMModal-dropdown::-webkit-scrollbar-thumb {
+  background: var(--neu-light);
+  border-radius: 2px;
+}
+
+/* ── Suggestion row ─────────────────────────── */
+.BMModal-suggestion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.6rem 0.85rem;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  transition: background 0.12s;
+  min-height: 3rem;
+  box-sizing: border-box;
+}
+.BMModal-suggestion:last-child {
+  border-bottom: none;
+}
+.BMModal-suggestion:hover {
+  background: var(--header-button-wrapper-gradient);
+}
+.BMModal-suggestion--active {
+  background: var(--header-button-wrapper-gradient);
+  box-shadow: inset 2px 0 0 rgba(255, 94, 26, 0.7);
+}
+
+.BMModal-suggestion-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--main-icon-text-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+.BMModal-suggestion-ref {
+  font-size: 0.72rem;
+  color: var(--main-icon-text-color);
+  opacity: 0.5;
+  font-style: italic;
+  flex-shrink: 0;
+}
+
+/* ── Status pill ────────────────────────────── */
+.BMModal-status {
+  font-size: 0.76rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 0.5rem;
+  color: var(--main-icon-text-color);
+  box-shadow: var(--controls-button-wrapper-neu-shadows);
+  text-align: center;
+  transition:
+    background 0.2s,
+    box-shadow 0.2s;
+}
+.BMModal-status--new {
+  background: var(--controls-normal-button-wrapper-gradient);
+  opacity: 0.7;
+}
+.BMModal-status--overwrite {
+  background: var(--header-pressed-wrapper-gradient);
+  opacity: 1;
+  color: #fff;
+}
+.BMModal-status--overwrite em {
+  font-style: normal;
+  font-weight: 600;
+}
+
+/* ── Error ──────────────────────────────────── */
+.BMModal-error {
+  margin: 0;
+  font-size: 0.76rem;
+  color: #e05a2b;
+}
+
+/* ── Actions ────────────────────────────────── */
+.BMModal-actions {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: flex-end;
+}
+.BMModal-btn {
+  border: none;
+  border-radius: 0.6rem;
+  padding: 0.5rem 1.1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--controls-button-wrapper-neu-shadows);
+  transition:
+    background 0.15s,
+    box-shadow 0.15s,
+    color 0.15s;
+  &.sm {
+    padding: 0.1rem 0.7rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+}
+.BMModal-btn--cancel {
+  background: var(--controls-normal-button-wrapper-gradient);
+  color: var(--main-icon-text-color);
+}
+.BMModal-btn--cancel:active {
+  box-shadow: var(--controls-pressed-button-inset-shadows);
+}
+.BMModal-btn--save {
+  background: var(--header-pressed-wrapper-gradient);
+  color: #fff;
+}
+/* Overwrite state — slightly different shade to signal destructive-ish action */
+.BMModal-btn--overwrite {
+  background: var(--controls-pressed-button-wrapper-gradient);
+  color: #fff;
+}
+.BMModal-btn--save:disabled,
+.BMModal-btn--overwrite:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.BMModal-btn--save:not(:disabled):active,
+.BMModal-btn--overwrite:not(:disabled):active {
+  box-shadow: var(--controls-pressed-button-inset-shadows);
+}
+
+/* ── Animations ─────────────────────────────── */
+@keyframes BMModal-fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes BMModal-slideUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -46%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}

@@ -2,25 +2,29 @@
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: var(--glass1);
-  backdrop-filter: blur(4px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
+  z-index: 900;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  animation: BMModal-fadeIn 0.15s ease;
 }
 .modal-card {
-  background: var(--glass);
-  backdrop-filter: var(--glassBlur);
-  box-shadow: var(--glassShadow);
-  color: var(--text-color);
-  border: 1px solid var(--btn-border);
-  padding: 25px;
-  border-radius: 12px;
-  width: 350px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  position: fixed;
+  z-index: 901;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(88vw, 360px);
+  background: var(--back-gradient);
+  border-radius: 1.4rem;
+  /* box-shadow: var(--main-cover-neu-shadows); */
+  padding: 1.2rem 1.3rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  animation: BMModal-slideUp 0.18s ease;
   & h3 {
-    color: var(--ThemeAccent2);
+    color: var(--text-color-dimmed);
+    line-height: 0.5rem;
   }
 }
 .modal-verse {
@@ -29,7 +33,6 @@
   text-wrap: pretty;
   font-style: italic;
   width: 100%;
-  padding: 5px;
 }
 .modal-input {
   width: 100%;
@@ -70,17 +73,21 @@
 .modal-textarea {
   width: 100%;
   height: 200px;
-  padding: 12px;
-  box-sizing: border-box;
-  background-color: var(--bg-color);
-  border: 1px solid var(--btn-border);
-  border-radius: 8px;
-  font-family: inherit;
-  font-size: 1rem;
-  line-height: 1.5;
   resize: vertical;
   margin-bottom: 15px;
-  outline: 2px solid var(--ThemeAccent1);
+
+  background: var(--controls-normal-button-wrapper-gradient);
+  border: none;
+  border-radius: 0.65rem;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.9rem;
+  font-family: "Georgia", serif;
+  color: var(--main-icon-text-color);
+  box-shadow: var(--controls-button-wrapper-neu-shadows);
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  transition: box-shadow 0.15s;
 }
 .modal-actions {
   display: flex;
@@ -96,28 +103,4 @@
 .verse-ref {
   color: var(--text-color);
   font-family: monospace;
-}
-
-.primary-btn {
-  background: var(--ThemeAccent2);
-  color: var(--text-color-inverted);
-  border: none;
-  padding: 8px 20px;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-  &:hover {
-    background: var(--ThemeAccent1);
-  }
-}
-.secondary-btn {
-  background: transparent;
-  color: var(--text-color);
-  border: 1px solid var(--btn-border);
-  padding: 8px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-.primary-btn:hover {
-  filter: brightness(1.1);
 }

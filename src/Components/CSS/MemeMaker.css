@@ -427,6 +427,7 @@
 
 /* 3. Add transition to the input so it expands smoothly */
 .MemeMaker-layerInput {
+  /* ... keep your existing input styles ... */
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 

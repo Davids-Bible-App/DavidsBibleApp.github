@@ -1,3 +1,10 @@
+/* src/Components/CSS/CountdownTimer.css
+ *
+ * Uses global neumorphic CSS variables from your theme.
+ * Container is transparent so the wallpaper shows through.
+ * Scroll items use three explicit opacity tiers instead of
+ * gradient overlays, so they work over any background.
+ */
 
 /* ─── Container ──────────────────────────────────────────────────────────── */
 
@@ -8,6 +15,9 @@
   gap: 24px;
   padding: 24px 16px;
   background: transparent;
+
+  /* GPU Acceleration & Layout caching */
+  contain: layout paint;
 }
 
 .CountdownTimer-title {
@@ -64,6 +74,7 @@
   touch-action: none; /* let pointer events handle scrolling */
   -webkit-user-select: none;
   user-select: none;
+  contain: strict; /* tells the browser this subtree is layout-isolated */
 }
 
 /* ─── Centre-row highlight — inset neu style ─────────────────────────────── */
@@ -88,11 +99,9 @@
 /* ─── Scrolling list ─────────────────────────────────────────────────────── */
 
 .scroll-list {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
+  position: relative;
   will-change: transform;
+  backface-visibility: hidden; /* avoids composite layer promotion thrash */
 }
 
 /* Base item — hidden by default so only the three tiers below show */
@@ -143,6 +152,13 @@
   text-transform: uppercase;
 }
 
+/* ─── Neumorphic buttons ─────────────────────────────────────────────────── */
+/*
+ * Shape matches your existing controls: rounded rectangle, raised state
+ * using --controls-*-button-wrapper-gradient + --controls-button-wrapper-neu-shadows.
+ * Text colour alone differentiates the actions.
+ */
+
 .CountdownTimer-controls {
   display: flex;
   gap: 14px;
@@ -169,6 +185,11 @@
   transition:
     box-shadow 0.12s ease,
     transform 0.1s ease;
+
+  &:hover span {
+    filter: brightness(0.5);
+    /* filter: contrast(0.3); */
+  }
 }
 
 /* Front-face gloss layer */

@@ -45,11 +45,7 @@
   --hlClr7: oklch(from var(--Clr7) l c h / var(--alpha));
   --hlClr8: oklch(from var(--Clr8) l c h / var(--alpha));
 
-  --front-gradient: linear-gradient(
-    0deg,
-    light-dark(hsl(0, 0%, 85%), hsl(0, 0%, 15%)) 0%,
-    light-dark(hsl(0, 0%, 95%), hsl(0, 0%, 25%)) 100%
-  );
+  --front-gradient: linear-gradient(0deg, light-dark(hsl(0, 0%, 85%), hsl(0, 0%, 15%)) 0%, light-dark(hsl(0, 0%, 95%), hsl(0, 0%, 25%)) 100%);
 }
 
 /*? Main Root */
@@ -93,6 +89,7 @@
 
 /*? Main Scrolling */
 .scroll_Win {
+  overflow: auto;
   scrollbar-gutter: stable both-edges;
   scrollbar-width: thin;
   scrollbar-color: var(--ThemeScroll2) var(--ThemeScroll2);
@@ -120,17 +117,49 @@
 }
 
 /* JumpTo Links */
-.Entry-ref {
+.Entry-ref,
+.entry-ref {
   display: inline;
   font-size: 0.8rem;
   color: var(--ThemeAccent1);
-  margin-bottom: 5px;
+  font-style: italic;
   font-weight: bold;
-  cursor: pointer;
   user-select: none;
   &:hover {
     color: var(--ThemeAccent2);
   }
+  &:not(.entry-ref) {
+    cursor: pointer;
+    &:hover {
+      color: var(--verseNo);
+    }
+  }
+  &.bg {
+    font-size: 1.1rem;
+    font-style: normal;
+  }
+}
+
+/* ── Jump button ────────────────────────────── */
+.jump-btn {
+  background: var(--controls-normal-button-wrapper-gradient);
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--main-icon-text-color);
+  box-shadow: var(--controls-button-wrapper-neu-shadows);
+  transition:
+    background 0.15s,
+    box-shadow 0.15s,
+    color 0.15s;
+}
+.jump-btn:active {
+  background: var(--controls-pressed-button-wrapper-gradient);
+  box-shadow: var(--controls-pressed-button-inset-shadows);
+  color: #fff;
 }
 
 /*? Main Defaults */
@@ -167,7 +196,7 @@ button {
   font-size: 0.7em;
   font-weight: 700;
   font-family: inherit;
-  color: var(--text-color-dimmed);
+  color: var(--text-color-tone);
   transition: border-color 0.25s;
   box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
   box-sizing: border-box;

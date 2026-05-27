@@ -2,7 +2,6 @@ import { onMount, onCleanup, createSignal } from "solid-js";
 import { toggleSheet } from "../State/sheetStore";
 import { dbExists } from "../lib/functions.js";
 import { showToast } from "./Toast";
-import { setExpandAudio } from "../State/globalSignals.js";
 import "./CSS/MenuBtn.css";
 
 export default function MenuBtn(props) {
@@ -24,59 +23,26 @@ export default function MenuBtn(props) {
   return (
     <>
       <div class="MenuBtn-menu">
-        <button
-          onPointerDown={(e) => e.stopPropagation()}
-          class="MenuBtn-menu-toggle ctl-R"
-          id="MenuBtn-menu-toggle"
-          popovertarget="MenuBtn-menu-items"
-        >
+        <button class="neu-button MenuBtn-menu-toggle ctl-R" onPointerDown={(e) => e.stopPropagation()} id="MenuBtn-menu-toggle" popovertarget="MenuBtn-menu-items">
           <div style="margin-bottom: 2px;" aria-hidden="true">
-            <svg
-              width="16px"
-              height="16px"
-              viewBox="0 0 800 800"
-              version="1.1"
-              xmlns="http://www.w3.org/2000/svg"
-              xmlns:xlink="http://www.w3.org/1999/xlink"
-              xml:space="preserve"
-              xmlns:serif="http://www.serif.com/"
-              style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"
-            >
+            <svg width="16px" height="16px" viewBox="0 0 800 800" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
               <g transform="matrix(2.240443,0,0,1,-514.847514,384.479167)">
-                <path
-                  d="M545.833,175.521C545.833,188.456 541.146,198.958 535.372,198.958L281.294,198.958C275.521,198.958 270.833,188.456 270.833,175.521C270.833,162.585 275.521,152.083 281.294,152.083L535.372,152.083C541.146,152.083 545.833,162.585 545.833,175.521Z"
-                  fill="currentColor"
-                />
+                <path d="M545.833,175.521C545.833,188.456 541.146,198.958 535.372,198.958L281.294,198.958C275.521,198.958 270.833,188.456 270.833,175.521C270.833,162.585 275.521,152.083 281.294,152.083L535.372,152.083C541.146,152.083 545.833,162.585 545.833,175.521Z" fill="currentColor" />
               </g>
               <g transform="matrix(2.240443,0,0,1,-514.847514,64.479167)">
-                <path
-                  d="M545.833,175.521C545.833,188.456 541.146,198.958 535.372,198.958L281.294,198.958C275.521,198.958 270.833,188.456 270.833,175.521C270.833,162.585 275.521,152.083 281.294,152.083L535.372,152.083C541.146,152.083 545.833,162.585 545.833,175.521Z"
-                  fill="currentColor"
-                />
+                <path d="M545.833,175.521C545.833,188.456 541.146,198.958 535.372,198.958L281.294,198.958C275.521,198.958 270.833,188.456 270.833,175.521C270.833,162.585 275.521,152.083 281.294,152.083L535.372,152.083C541.146,152.083 545.833,162.585 545.833,175.521Z" fill="currentColor" />
               </g>
               <g transform="matrix(1.5662,0,0,1,-239.531857,-41.229167)">
-                <path
-                  d="M545.833,175.521C545.833,188.456 539.128,198.958 530.869,198.958L285.798,198.958C277.539,198.958 270.833,188.456 270.833,175.521C270.833,162.585 277.539,152.083 285.798,152.083L530.869,152.083C539.128,152.083 545.833,162.585 545.833,175.521Z"
-                  fill="currentColor"
-                />
+                <path d="M545.833,175.521C545.833,188.456 539.128,198.958 530.869,198.958L285.798,198.958C277.539,198.958 270.833,188.456 270.833,175.521C270.833,162.585 277.539,152.083 285.798,152.083L530.869,152.083C539.128,152.083 545.833,162.585 545.833,175.521Z" fill="currentColor" />
               </g>
               <g transform="matrix(1.5662,0,0,1,-239.531857,488.979167)">
-                <path
-                  d="M545.833,175.521C545.833,188.456 539.128,198.958 530.869,198.958L285.798,198.958C277.539,198.958 270.833,188.456 270.833,175.521C270.833,162.585 277.539,152.083 285.798,152.083L530.869,152.083C539.128,152.083 545.833,162.585 545.833,175.521Z"
-                  fill="currentColor"
-                />
+                <path d="M545.833,175.521C545.833,188.456 539.128,198.958 530.869,198.958L285.798,198.958C277.539,198.958 270.833,188.456 270.833,175.521C270.833,162.585 277.539,152.083 285.798,152.083L530.869,152.083C539.128,152.083 545.833,162.585 545.833,175.521Z" fill="currentColor" />
               </g>
               <g transform="matrix(2.545455,0,0,1,-639.393939,278.4375)">
-                <path
-                  d="M545.833,175.521C545.833,188.456 541.708,198.958 536.626,198.958L280.041,198.958C274.959,198.958 270.833,188.456 270.833,175.521C270.833,162.585 274.959,152.083 280.041,152.083L536.626,152.083C541.708,152.083 545.833,162.585 545.833,175.521Z"
-                  fill="currentColor"
-                />
+                <path d="M545.833,175.521C545.833,188.456 541.708,198.958 536.626,198.958L280.041,198.958C274.959,198.958 270.833,188.456 270.833,175.521C270.833,162.585 274.959,152.083 280.041,152.083L536.626,152.083C541.708,152.083 545.833,162.585 545.833,175.521Z" fill="currentColor" />
               </g>
               <g transform="matrix(2.545455,0,0,1,-639.393939,170.520833)">
-                <path
-                  d="M545.833,175.521C545.833,188.456 541.708,198.958 536.626,198.958L280.041,198.958C274.959,198.958 270.833,188.456 270.833,175.521C270.833,162.585 274.959,152.083 280.041,152.083L536.626,152.083C541.708,152.083 545.833,162.585 545.833,175.521Z"
-                  fill="currentColor"
-                />
+                <path d="M545.833,175.521C545.833,188.456 541.708,198.958 536.626,198.958L280.041,198.958C274.959,198.958 270.833,188.456 270.833,175.521C270.833,162.585 274.959,152.083 280.041,152.083L536.626,152.083C541.708,152.083 545.833,162.585 545.833,175.521Z" fill="currentColor" />
               </g>
             </svg>
           </div>
@@ -95,20 +61,10 @@ export default function MenuBtn(props) {
             }}
           >
             <li class="MenuBtn-item">
-              <button
-                onPointerDown={(e) => e.stopPropagation()}
-                onClick={() => toggleSheet("settings", "Min")}
-                popovertarget="MenuBtn-menu-items"
-                popovertargetaction="hide"
-              >
+              <button class="neu-button" onPointerDown={(e) => e.stopPropagation()} onClick={() => toggleSheet("settings", "Min")} popovertarget="MenuBtn-menu-items" popovertargetaction="hide">
                 <div aria-hidden="true">
                   <svg width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                      fill-rule="evenodd"
-                      clip-rule="evenodd"
-                      d="M12 8.25C9.92894 8.25 8.25 9.92893 8.25 12C8.25 14.0711 9.92894 15.75 12 15.75C14.0711 15.75 15.75 14.0711 15.75 12C15.75 9.92893 14.0711 8.25 12 8.25ZM9.75 12C9.75 10.7574 10.7574 9.75 12 9.75C13.2426 9.75 14.25 10.7574 14.25 12C14.25 13.2426 13.2426 14.25 12 14.25C10.7574 14.25 9.75 13.2426 9.75 12Z"
-                      fill="currentColor"
-                    />
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12 8.25C9.92894 8.25 8.25 9.92893 8.25 12C8.25 14.0711 9.92894 15.75 12 15.75C14.0711 15.75 15.75 14.0711 15.75 12C15.75 9.92893 14.0711 8.25 12 8.25ZM9.75 12C9.75 10.7574 10.7574 9.75 12 9.75C13.2426 9.75 14.25 10.7574 14.25 12C14.25 13.2426 13.2426 14.25 12 14.25C10.7574 14.25 9.75 13.2426 9.75 12Z" fill="currentColor" />
                     <path
                       fill-rule="evenodd"
                       clip-rule="evenodd"
@@ -121,14 +77,7 @@ export default function MenuBtn(props) {
               </button>
             </li>
             <li class="MenuBtn-item">
-              <button
-                onPointerDown={(e) => e.stopPropagation()}
-                onClick={() =>
-                  strongsExists()
-                    ? toggleSheet("strlook", "Max")
-                    : showToast("'strongs_kjv.db', Not Installed Yet!", "warning", 4000)
-                }
-              >
+              <button class="neu-button" onPointerDown={(e) => e.stopPropagation()} onClick={() => (strongsExists() ? toggleSheet("strlook", "Max") : showToast("'strongs_kjv.db', Not Installed Yet!", "warning", 4000))}>
                 <div aria-hidden="true">
                   <svg width="16px" height="16px" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <g transform="matrix(33.333333,0,0,33.333333,0,0)">
@@ -149,12 +98,7 @@ export default function MenuBtn(props) {
               </button>
             </li>
             <li class="MenuBtn-item">
-              <button
-                onPointerDown={(e) => e.stopPropagation()}
-                onClick={() => toggleSheet("meme", "Max")}
-                popovertarget="MenuBtn-menu-items"
-                popovertargetaction="hide"
-              >
+              <button class="neu-button" onPointerDown={(e) => e.stopPropagation()} onClick={() => toggleSheet("meme", "Max")} popovertarget="MenuBtn-menu-items" popovertargetaction="hide">
                 <div aria-hidden="true">
                   <svg width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
@@ -169,7 +113,7 @@ export default function MenuBtn(props) {
               </button>
             </li>
             <li class="MenuBtn-item">
-              <button onPointerDown={(e) => e.stopPropagation()} onClick={() => toggleSheet("editor", "Max")}>
+              <button class="neu-button" onPointerDown={(e) => e.stopPropagation()} onClick={() => toggleSheet("editor", "Max")}>
                 <div aria-hidden="true">
                   <svg width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
@@ -184,20 +128,10 @@ export default function MenuBtn(props) {
               </button>
             </li>
             <li class="MenuBtn-item">
-              <button onPointerDown={(e) => e.stopPropagation()} onClick={() => toggleSheet("audio", "Min")}>
+              <button class="neu-button" onPointerDown={(e) => e.stopPropagation()} onClick={() => toggleSheet("audio", "Min")}>
                 <div aria-hidden="true">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    fill="currentColor"
-                    class="bi bi-soundwave"
-                    viewBox="0 0 16 16"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      d="M8.5 2a.5.5 0 0 1 .5.5v11a.5.5 0 0 1-1 0v-11a.5.5 0 0 1 .5-.5m-2 2a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5m4 0a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5m-6 1.5A.5.5 0 0 1 5 6v4a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m8 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m-10 1A.5.5 0 0 1 3 7v2a.5.5 0 0 1-1 0V7a.5.5 0 0 1 .5-.5m12 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0V7a.5.5 0 0 1 .5-.5"
-                    />
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-soundwave" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M8.5 2a.5.5 0 0 1 .5.5v11a.5.5 0 0 1-1 0v-11a.5.5 0 0 1 .5-.5m-2 2a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5m4 0a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5m-6 1.5A.5.5 0 0 1 5 6v4a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m8 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m-10 1A.5.5 0 0 1 3 7v2a.5.5 0 0 1-1 0V7a.5.5 0 0 1 .5-.5m12 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0V7a.5.5 0 0 1 .5-.5" />
                   </svg>
                 </div>
                 <div class="MenuBtn-sr-only">Audio</div>
@@ -205,20 +139,14 @@ export default function MenuBtn(props) {
             </li>
             <li class="MenuBtn-item">
               <button
+                class="neu-button"
                 onPointerDown={(e) => e.stopPropagation()}
                 onClick={() => {
                   window.location.reload();
                 }}
               >
                 <div aria-hidden="true">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    fill="currentColor"
-                    class="bi bi-arrow-clockwise"
-                    viewBox="0 0 16 16"
-                  >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
                     <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z" />
                     <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466" />
                   </svg>

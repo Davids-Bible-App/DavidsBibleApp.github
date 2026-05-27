@@ -796,6 +796,62 @@ pub async fn copy_translation_file<R: Runtime>(
     Ok(())
 }
 
+#[derive(Deserialize)]
+pub struct FileCopyRequest {
+    #[serde(rename = "sourceUri")]
+    source_uri: String,
+    #[serde(rename = "fileName")]
+    file_name: String,
+}
+
+#[tauri::command]
+pub async fn copy_translation_files<R: Runtime>(
+    app: AppHandle<R>,
+    files: Vec<FileCopyRequest>,
+) -> Result<(), String> {
+    // 1. Prepare target directory once for all files
+    let app_dir    = app.path().app_data_dir().map_err(|e| e.to_string())?;
+    let target_dir = app_dir.join("databases");
+
+    if !target_dir.exists() {
+        fs::create_dir_all(&target_dir).map_err(|e| e.to_string())?;
+    }
+
+    // 2. Copy each file, collecting any errors instead of bailing on the first
+    let mut errors: Vec<String> = Vec::new();
+
+    for file in &files {
+        let target_path = target_dir.join(&file.file_name);
+
+        let result = (|| -> Result<(), String> {
+            let bytes = if file.source_uri.starts_with("content://")
+                || file.source_uri.starts_with("file://")
+            {
+                let url = Url::parse(&file.source_uri).map_err(|e| e.to_string())?;
+                app.fs().read(url)
+            } else {
+                let path = PathBuf::from(&file.source_uri);
+                app.fs().read(path)
+            }
+            .map_err(|e| e.to_string())?;
+
+            fs::write(&target_path, bytes).map_err(|e| e.to_string())?;
+            Ok(())
+        })();
+
+        if let Err(e) = result {
+            errors.push(format!("{}: {}", file.file_name, e));
+        }
+    }
+
+    // 3. Surface any per-file errors as one combined message
+    if errors.is_empty() {
+        Ok(())
+    } else {
+        Err(errors.join("\n"))
+    }
+}
+
 #[tauri::command]
 pub fn delete_db_file(dir: String, filename: String) -> Result<(), String> {
     let mut path = PathBuf::from(&dir);

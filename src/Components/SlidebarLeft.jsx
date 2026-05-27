@@ -109,7 +109,7 @@ export default function SlidebarLeft(props) {
     <aside class="SlidebarLeft-aside" ref={props.ref}>
       <div class="SlidebarLeft-SBcontentWrap">
         <div class="SlidebarLeft-votd">
-          <img src="/votd.webp" loading="lazy" /* Switch from eager to lazy if off-screen initially */ decoding="async" alt="Verse of the day background" class="SlidebarLeft-stackImg" classList={{ "SlidebarLeft-animate-image": trigger() === "left" }} />
+          <img src="/votd.webp" loading="lazy" decoding="async" alt="Verse of the day background" class="SlidebarLeft-stackImg" classList={{ "SlidebarLeft-animate-image": trigger() === "left" }} />
           <div class="SlidebarLeft-stackText">All things were made by him; and without him was not any thing made that was made.</div>
         </div>
 

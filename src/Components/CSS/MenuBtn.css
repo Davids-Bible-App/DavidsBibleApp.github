@@ -13,12 +13,17 @@
 .MenuBtn-menu-items {
   /* Create a hard CSS link to the anchor */
   position-anchor: --menu-btn-anchor;
+  /* place-self: anchor-center;
+  background: none;
+  border: 0;
+  inset: auto; */
 
   /* Use explicit coordinate functions instead of place-self. 
      This forces the browser to calculate the position relative to the button 
      even during the exit transition. */
   top: anchor(center);
   left: anchor(center);
+  /* transform: translate(-50%, -50%); */
   transform: translate(-30%, -50%);
 
   /* Keep the container alive long enough for all children to animate out. 
@@ -49,8 +54,7 @@
   --offset-x: calc(cos(var(--direction) + 90deg) * (var(--s) * var(--stagger)));
   --offset-y: calc(sin((var(--direction) + 90deg) * -1) * (var(--s) * var(--stagger)));
 
-  transform: translateX(calc(var(--dist-x) + var(--offset-x))) translateY(calc(var(--dist-y) + var(--offset-y)))
-    scale(1);
+  transform: translateX(calc(var(--dist-x) + var(--offset-x))) translateY(calc(var(--dist-y) + var(--offset-y))) scale(1);
 
   opacity: 0;
   transition:
@@ -152,7 +156,8 @@
   border-radius: 50%;
   aspect-ratio: 1/1;
   font-size: 1rem;
-  & svg {
-    margin: 1px 1px -3px 0.4px;
+  box-shadow: none;
+  & div:has(svg) {
+    display: flex;
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "davidsbible",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "",
   "type": "module",
   "scripts": {
@@ -19,7 +19,13 @@
     "cargo:clean": "./tauri-src/cargo clean",
     "cargo:update": "./tauri-src/cargo update",
     "cargo:upgrade": "./tauri-src/cargo upgrade --incompatible allow",
-    "adb:logcat": "adb logcat | grep 'davidsbible_lib' "
+    "adb:logcat": "adb logcat | grep 'davidsbible_lib' ",
+    "cssinfo:overview": "node ./src/lib/infoCSS.cjs -I ./src/Theme.css -O css-report.log  --root ./src -ov",
+    "cssinfo:byfileview": "node ./src/lib/infoCSS.cjs -I ./src/Theme.css -O css-report.log  --root ./src -bfv",
+    "cssinfo:withlinenumber": "node ./src/lib/infoCSS.cjs -I ./src/Theme.css -O css-report.log  --root ./src -wln",
+    "cssinfo:linenumbercode": "node ./src/lib/infoCSS.cjs -I ./src/Theme.css -O css-report.log  --root ./src -lnc",
+    "cssinfo:localizedonly": "node ./src/lib/infoCSS.cjs -I ./src/Theme.css -O css-report.log  --root ./src -lo",
+    "cssinfo:verbose": "node ./src/lib/infoCSS.cjs -I ./src/Theme.css -O css-report.log  --root ./src -vb"
   },
   "license": "MIT",
   "dependencies": {

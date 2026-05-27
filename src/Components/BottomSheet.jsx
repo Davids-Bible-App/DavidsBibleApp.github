@@ -6,8 +6,10 @@ import "./CSS/BottomSheet.css";
 function BottomSheet(props) {
   // states: "Hid", "Min", "Mid", "Max"
   const [isDragging, setIsDragging] = createSignal(false);
-  const [dragOffset, setDragOffset] = createSignal(0);
+  // const [dragOffset, setDragOffset] = createSignal(0);
   let startY = 0;
+  let currentDragOffset = 0;
+  let containerRef;
 
   // If store sends "Min", name is "Min", override is null
   // If store sends "Min:80px", name is "Min", override is "80px"
@@ -51,13 +53,37 @@ function BottomSheet(props) {
 
   const handlePointerDown = (e) => {
     startY = e.clientY;
+    currentDragOffset = 0;
     setIsDragging(true);
     e.target.setPointerCapture(e.pointerId);
   };
 
+  // Helper — computes the resting height for any named step
+  const computeSnapHeight = (stepName) => {
+    if (stepName === "Hid") return "0px";
+    const heightStr = config().heights[stepName] ?? "0px";
+    const safeMax = `(100vh - var(--edge2edge-top, 0px) - var(--edge2edge-bottom, 0px))`;
+    return `calc(min(${heightStr}, ${safeMax}))`;
+  };
+
   const handlePointerMove = (e) => {
     if (!isDragging()) return;
-    setDragOffset(e.clientY - startY);
+    currentDragOffset = e.clientY - startY;
+
+    const { name, overrideStr } = activeState();
+    const baseHeightStr = (overrideStr || config().heights[name]) ?? "0px";
+    const offsetVh = (currentDragOffset / -window.innerHeight) * 100;
+    const safeMax = `(100vh - var(--edge2edge-top, 0px) - var(--edge2edge-bottom, 0px))`;
+
+    if (containerRef) {
+      // Clamp between 0px and safeMax — prevents viewport overscroll on Android
+      containerRef.style.height = `calc(
+      min(
+        max(0px, min(${baseHeightStr}, ${safeMax}) + ${offsetVh}vh),
+        ${safeMax}
+      )
+    )`;
+    }
   };
 
   const handlePointerUp = (e) => {
@@ -66,67 +92,58 @@ function BottomSheet(props) {
 
     const threshold = 50;
     const { steps } = config();
-
     const currentIndex = steps.indexOf(activeState().name);
 
+    let nextStep = activeState().name; // logical step name
+    let targetStateStr = props.sheetState; // Preserve full string (e.g., "Mid:50%") if no change
+
     if (currentIndex === -1) {
-      if (dragOffset() < -threshold) {
-        // Dragged UP (Expand): Jump to the first declared open step (e.g., "Max")
-        props.setSheetState(steps[1] || "Hid");
-      } else if (dragOffset() > threshold) {
-        // Dragged DOWN (Shrink): Close the sheet
-        props.setSheetState("Hid");
+      if (currentDragOffset < -threshold) {
+        nextStep = steps[1] || "Hid";
+        targetStateStr = nextStep;
+      } else if (currentDragOffset > threshold) {
+        nextStep = "Hid";
+        targetStateStr = nextStep;
       }
     } else {
-      if (dragOffset() < -threshold) {
-        if (currentIndex < steps.length - 1) props.setSheetState(steps[currentIndex + 1]);
-      } else if (dragOffset() > threshold) {
-        if (currentIndex > 0) props.setSheetState(steps[currentIndex - 1]);
+      if (currentDragOffset < -threshold && currentIndex < steps.length - 1) {
+        nextStep = steps[currentIndex + 1];
+        targetStateStr = nextStep;
+      } else if (currentDragOffset > threshold && currentIndex > 0) {
+        nextStep = steps[currentIndex - 1];
+        targetStateStr = nextStep;
       }
     }
 
-    setDragOffset(0);
+    if (containerRef) {
+      // ✅ If we didn't change steps, use getSheetHeight() to preserve fallback overrides
+      if (nextStep === activeState().name) {
+        containerRef.style.height = getSheetHeight();
+      } else {
+        containerRef.style.height = computeSnapHeight(nextStep);
+      }
+    }
+
+    // ✅ Pass the preserved string back to the store
+    props.setSheetState(targetStateStr);
+    currentDragOffset = 0;
     e.target.releasePointerCapture(e.pointerId);
   };
 
   const getSheetHeight = () => {
     const { name, overrideStr } = activeState();
-
-    if (name === "Hid" && !isDragging()) return "0px";
-
-    // Use override height if it exists, otherwise use config height
+    if (name === "Hid") return "0px";
     const baseHeightStr = (overrideStr || config().heights[name]) ?? "0px";
-
-    // Convert current drag pixel offset into a vh offset
-    const offsetVh = isDragging() ? (dragOffset() / -window.innerHeight) * 100 : 0;
-
-    // The maximum possible height allowed by the OS
     const safeMax = `(100vh - var(--edge2edge-top, 0px) - var(--edge2edge-bottom, 0px))`;
-
-    return `calc( min( ${baseHeightStr}, ${safeMax}) + ${offsetVh}vh )`;
+    return `calc(min(${baseHeightStr}, ${safeMax}))`;
   };
 
   return (
     <>
-      <div
-        class={`BottomSheet-Overlay ${["Hid", "Min"].includes(activeState().name) ? "hidden" : ""}`}
-        onClick={() => props.setSheetState("Hid")}
-      />
+      <div class={`BottomSheet-Overlay ${["Hid", "Min"].includes(activeState().name) ? "hidden" : ""}`} onClick={() => props.setSheetState("Hid")} />
 
-      <div
-        class={`BottomSheet-Container paper`}
-        classList={{ dragging: isDragging(), paperOverlay: activePaper() }}
-        style={{ height: getSheetHeight() }}
-      >
-        <div
-          class="BottomSheet-HandleArea"
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-          onPointerCancel={handlePointerUp}
-          onDblClick={() => props.setSheetState("Hid")}
-          onDragStart={(e) => e.preventDefault()}
-        >
+      <div ref={containerRef} class={`BottomSheet-Container paper`} classList={{ dragging: isDragging(), paperOverlay: activePaper() }} style={{ height: getSheetHeight() }}>
+        <div class="BottomSheet-HandleArea" onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp} onPointerCancel={handlePointerUp} onDblClick={() => props.setSheetState("Hid")} onDragStart={(e) => e.preventDefault()}>
           <div class="BottomSheet-DragHandle"></div>
         </div>
 

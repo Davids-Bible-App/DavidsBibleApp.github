@@ -9,7 +9,10 @@ import Splitter from "./Splitter.jsx";
 import NavbarBottom from "./NavbarBottom";
 import SlidebarRight from "./SlidebarRight";
 
-// import MemeMaker from "./MemeMaker.jsx";
+import { Portal } from "solid-js/web";
+import BookmarkModal from "./BookmarkModal.jsx";
+import TopicModal from "./TopicModal.jsx";
+
 const DbTranslations = lazy(() => import("./DbTranslations"));
 const Audio = lazy(() => import("./Audio"));
 const SettingsPanel = lazy(() => import("./SettingsPanel"));
@@ -27,7 +30,6 @@ const StrongsVerse = lazy(() => import("./StrongsVerse"));
 const StrongsLookup = lazy(() => import("./StrongsLookup"));
 const Editor = lazy(() => import("./Editor"));
 const Help = lazy(() => import("./Help"));
-const helpMD = lazy(() => import("/helpMD.md?url&raw"));
 
 import { loadSessionState } from "../State/settingsStore.js";
 // prettier-ignore
@@ -168,9 +170,7 @@ export default function MainContent() {
   return (
     <div class="edge-to-edge">
       <div class="inset-wrapper">
-        {/* <Suspense fallback={<div style="display:none;">Loading Sidebar...</div>}> */}
         <SlidebarLeft ref={leftSB} psr={psr} ssr={ssr} books={books} frozen={isDragging} />
-        {/* </Suspense> */}
         <SlidebarRight ref={rightSB} />
         <main ref={mainContainer} class={`Main-Content ${trigger()}`}>
           <HandlerSidebarDrag touchActionRestored={touchActionRestored} leftSB={leftSB} rightSB={rightSB} mainContainer={mainContainer} rect={rect} insets={insets} orientation={orientation} setIsDragging={setIsDragging} />
@@ -185,9 +185,9 @@ export default function MainContent() {
           </Suspense>
         </main>
       </div>
-      <BottomSheet {...sheetProps("help")} steps={["Max:90%"]}>
+      <BottomSheet {...sheetProps("help")} steps={["Max:100"]}>
         <Suspense fallback={null}>
-          <Help data={helpMD} />
+          <Help />
         </Suspense>
       </BottomSheet>
       <BottomSheet {...sheetProps("crossref")} steps={["Min:100px", "Mid:50vh", "Max:100vh"]}>
@@ -225,16 +225,21 @@ export default function MainContent() {
           <StrongsVerse books={books} setActiveLookup={setActiveLookup} />
         </Suspense>
       </TopSheet>
-      <TopSheet {...sheetProps("strlook")} steps={["Max:100vh"]}>
+      <TopSheet {...sheetProps("strlook")} steps={["Max:90vh"]}>
         <Suspense fallback={null}>
           <StrongsLookup activeLookup={activeLookup} setActiveLookup={setActiveLookup} />
         </Suspense>
       </TopSheet>
-      <BottomSheet {...sheetProps("audio")} steps={["Min:295px", "Max:90%"]}>
+      <BottomSheet {...sheetProps("audio")} steps={["Min:305px", "Max:90%"]}>
         <Suspense fallback={null}>
           <Audio setTouchActionRestored={setTouchActionRestored} helpers={{ books, psr, ssr }} />
         </Suspense>
       </BottomSheet>
+
+      <Portal>
+        <BookmarkModal />
+        <TopicModal />
+      </Portal>
     </div>
   );
 }

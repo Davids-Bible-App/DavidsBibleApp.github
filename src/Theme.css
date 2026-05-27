@@ -1,3 +1,136 @@
+/* Light mode (Dynamic Hue & Saturation Neumorphic) */
+:root {
+  /* 🎛️ MASTER CONTROLS */
+  --hue: 250;
+  --chroma: 0.04; /* <-- INCREASE THIS TO CRANK UP THE SATURATION (e.g., 0.04, 0.06) */
+
+  /* --- Dynamic Base Shades --- */
+  /* Base background */
+  --main-dark: oklch(0.91 var(--chroma) var(--hue));
+  /* Highlights stay crisp pure white */
+  --neu-dark: #ffffff;
+  /* Dark shadow tone scales slightly higher for depth */
+  --neu-light: oklch(0.77 calc(var(--chroma) * 1.5) var(--hue));
+
+  /* --- Dynamic Gradients & Shadows --- */
+  --back-gradient: linear-gradient(180deg, oklch(0.95 calc(var(--chroma) * 0.5) var(--hue)) 0%, var(--main-dark) 100%);
+
+  --header-button-wrapper-gradient: linear-gradient(135deg, oklch(0.94 calc(var(--chroma) * 0.75) var(--hue)) 0%, oklch(0.86 calc(var(--chroma) * 1.25) var(--hue)) 100%);
+  --header-button-wrapper-neu-shadows: 0.3vw 0.3vw 0.8vw var(--neu-light), -0.3vw -0.3vw 0.8vw var(--neu-dark);
+
+  /* Brand Accents */
+  --header-pressed-wrapper-gradient: linear-gradient(135deg, #ff5e1a 0%, #e64a19 100%);
+  --header-pressed-button-front-gradient: linear-gradient(135deg, #ff7033 0%, #ff5e1a 100%);
+  --header-pressed-button-inset-shadows: inset 0.5vw 0.5vw 1vw rgba(0, 0, 0, 0.15), inset -0.5vw -0.5vw 1vw rgba(255, 255, 255, 0.2);
+
+  --header-normal-button-front-gradient: linear-gradient(135deg, var(--neu-dark) 0%, var(--main-dark) 100%);
+
+  --main-cover-wrapper-gradient: linear-gradient(135deg, oklch(0.92 calc(var(--chroma) * 0.75) var(--hue)) 0%, oklch(0.86 calc(var(--chroma) * 1.25) var(--hue)) 100%);
+  --main-cover-neu-shadows: 0.8vw 0.8vw 1.5vw var(--neu-light), -0.8vw -0.8vw 1.5vw var(--neu-dark);
+
+  --slider-track-gradient: linear-gradient(90deg, #ff5e1a 0%, #ffac2e 100%);
+
+  --controls-normal-button-wrapper-gradient: linear-gradient(135deg, oklch(0.92 calc(var(--chroma) * 0.75) var(--hue)) 0%, oklch(0.86 calc(var(--chroma) * 1.25) var(--hue)) 100%);
+  --controls-button-wrapper-neu-shadows: 1px 1px 2px var(--neu-light), -1px 0px 2px var(--neu-dark);
+
+  --controls-normal-button-front-gradient: linear-gradient(135deg, oklch(0.97 calc(var(--chroma) * 0.5) var(--hue)) 0%, var(--main-dark) 100%);
+  --controls-normal-button-inset-shadows: inset 0 0 0.5vw rgba(255, 255, 255, 0.5);
+
+  --controls-pressed-button-wrapper-gradient: linear-gradient(135deg, #e64a19 0%, #bf360c 100%);
+  --controls-pressed-button-front-gradient: linear-gradient(135deg, #ff5e1a 0%, #e64a19 100%);
+  --controls-pressed-button-inset-shadows: inset 4px 4px 8px rgba(0, 0, 0, 0.2);
+
+  /* Text scales higher so it remains highly readable and rich in the current theme hue */
+  --main-icon-text-color: oklch(0.45 calc(var(--chroma) * 2.5) var(--hue) / 0.7);
+}
+
+/* Dark mode Neumorphic override */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* 🎛️ MASTER CONTROLS FOR DARK MODE */
+    --bg-l: 0.28; /* <-- SLIDER: Increase to brighten dark mode (e.g., 0.22, 0.25, 0.28) */
+    --dark-chroma: 0; /* <-- Keeps dark mode sleekly tinted with your active theme hue */
+
+    /* --- Dynamic Base Shades --- */
+    /* Replaces #222222 (Original background layer) */
+    --main-dark: oklch(var(--bg-l) var(--dark-chroma) var(--hue));
+
+    /* Replaces #141414 (Dark shadow - drops down by 0.08) */
+    --neu-dark: oklch(calc(var(--bg-l) - 0.08) calc(var(--dark-chroma) * 0.8) var(--hue));
+
+    /* Replaces #303030 (Light shadow - steps up by 0.08) */
+    --neu-light: oklch(calc(var(--bg-l) + 0.08) calc(var(--dark-chroma) * 1.3) var(--hue));
+
+    /* --- Dynamic Gradients & Shadows --- */
+    /* #2a2a2a -> #1e1e1e */
+    --back-gradient: linear-gradient(180deg, oklch(calc(var(--bg-l) + 0.04) var(--dark-chroma) var(--hue)) 0%, oklch(calc(var(--bg-l) - 0.03) var(--dark-chroma) var(--hue)) 100%);
+
+    /* #2c2c2c -> #272727 */
+    --header-button-wrapper-gradient: linear-gradient(135deg, oklch(calc(var(--bg-l) + 0.05) var(--dark-chroma) var(--hue)) 0%, oklch(calc(var(--bg-l) + 0.01) var(--dark-chroma) var(--hue)) 100%);
+    --header-button-wrapper-neu-shadows: 0.2vw 0.2vw 0.7vw var(--neu-dark), -0.2vw -0.2vw 0.7vw var(--neu-light);
+
+    /* Kept original orange brand accent colors intact */
+    --header-pressed-wrapper-gradient: linear-gradient(135deg, rgba(218, 77, 12, 1) 0%, rgba(180, 54, 19, 1) 100%);
+    --header-pressed-button-front-gradient: linear-gradient(135deg, rgba(222, 57, 19, 1) 0%, rgba(234, 81, 14, 1) 100%);
+    --header-pressed-button-inset-shadows: inset 0.75vw 0.75vw 0.75vw rgba(0, 0, 0, 0.3);
+
+    /* #2a2a2a -> #1e1e1e */
+    --header-normal-button-front-gradient: linear-gradient(135deg, oklch(calc(var(--bg-l) + 0.04) var(--dark-chroma) var(--hue)) 0%, oklch(calc(var(--bg-l) - 0.03) var(--dark-chroma) var(--hue)) 100%);
+
+    /* #282828 -> #1e1e1e */
+    --main-cover-wrapper-gradient: linear-gradient(135deg, oklch(calc(var(--bg-l) + 0.03) var(--dark-chroma) var(--hue)) 0%, oklch(calc(var(--bg-l) - 0.03) var(--dark-chroma) var(--hue)) 100%);
+    --main-cover-neu-shadows: 0.5vw 0.5vw 0.5vw var(--neu-dark), -0.5vw -0.5vw 0.75vw var(--neu-light);
+
+    --slider-track-gradient: linear-gradient(90deg, rgba(217, 61, 7, 1) 0%, rgba(147, 113, 20, 1) 100%);
+
+    /* #272727 -> #1d1d1d */
+    --controls-normal-button-wrapper-gradient: linear-gradient(135deg, oklch(calc(var(--bg-l) + 0.01) var(--dark-chroma) var(--hue)) 0%, oklch(calc(var(--bg-l) - 0.04) var(--dark-chroma) var(--hue)) 100%);
+    --controls-button-wrapper-neu-shadows: 1px 1px 2px var(--neu-dark), -1px -1px 2px var(--neu-light);
+
+    /* #292929 -> #202020 */
+    --controls-normal-button-front-gradient: linear-gradient(135deg, oklch(calc(var(--bg-l) + 0.03) var(--dark-chroma) var(--hue)) 0%, oklch(calc(var(--bg-l) - 0.02) var(--dark-chroma) var(--hue)) 100%);
+    --controls-normal-button-inset-shadows: inset 0 0 0.3vw rgba(255, 255, 255, 0.06);
+
+    --controls-pressed-button-wrapper-gradient: linear-gradient(135deg, rgba(214, 78, 12, 1) 0%, rgba(166, 47, 19, 1) 100%);
+    --controls-pressed-button-front-gradient: linear-gradient(135deg, rgba(183, 29, 16, 1) 0%, rgba(236, 86, 12, 1) 100%);
+    --controls-pressed-button-inset-shadows: inset 0.75vw 0.75vw 0.75vw rgba(0, 0, 0, 0.2);
+
+    /* Replaces rgba(255, 255, 255, 0.5) with a highly readable text shade optimized for dark backgrounds */
+    --main-icon-text-color: oklch(0.85 var(--dark-chroma) var(--hue) / 0.8);
+    /* --main-op-text-color: oklch(from var(--main-icon-text-color) l c h / 1); */
+  }
+}
+:root {
+  /* Neumorphic Buttons */
+  .neu-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--controls-normal-button-wrapper-gradient);
+    border: none;
+    color: var(--main-icon-text-color);
+    box-shadow: var(--controls-button-wrapper-neu-shadows);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .neu-button:hover {
+    color: var(--text-active);
+    background: var(--controls-normal-button-front-gradient);
+    box-shadow:
+      0.4vw 0.4vw 0.8vw var(--neu-gray),
+      -0.4vw -0.4vw 0.8vw var(--neu-white);
+  }
+
+  .neu-button:active,
+  .neu-button.pressed {
+    background: var(--controls-pressed-button-front-gradient);
+    box-shadow: var(--controls-pressed-button-inset-shadows);
+    color: #fff;
+    transform: scale(0.95);
+  }
+}
+
 :root {
   /* --- THEME PALETTE --- */
 
@@ -41,13 +174,12 @@
   --clr-red-tint: rgba(175, 114, 114, 0.1);
 
   /** --- MAPPINGS --- */
-  /** --- MAPPINGS --- */
-  /** --- MAPPINGS --- */
 
   --wordsOfJesus: light-dark(var(--clr-red-dark), var(--clr-orange));
   --verseNo: light-dark(var(--clr-brown), var(--clr-gold-dim));
   --stitches: light-dark(var(--clr-brown-rich), var(--clr-gold));
   --text-color: light-dark(var(--clr-gray-900), var(--clr-gray-400));
+  --text-color-tone: light-dark(var(--d5), var(--clr-gray-500));
   --text-color-alt: light-dark(var(--t1), var(--clr-gray-800));
   --text-color-dimmed: light-dark(var(--clr-gray-800), var(--clr-gray-500));
   --text-color-dimmer: light-dark(var(--clr-gray-900), var(--clr-gray-600));
@@ -66,11 +198,7 @@
   --btn-border-hov: light-dark(rgb(var(--base-dark) / 0.2), rgb(var(--base-lite) / 0.2));
   --btn-borderInv: light-dark(rgb(var(--base-lite) / 0.5), rgb(var(--base-dark) / 0.1));
 
-  --front-gradient: linear-gradient(
-    0deg,
-    light-dark(hsl(0, 0%, 85%), var(--clr-gray-900)) 0%,
-    light-dark(var(--clr-gray-200), var(--clr-gray-800)) 100%
-  );
+  --front-gradient: linear-gradient(0deg, light-dark(hsl(0, 0%, 85%), var(--clr-gray-900)) 0%, light-dark(var(--clr-gray-200), var(--clr-gray-800)) 100%);
 
   --x-adjust: 0px;
   --inset-shadows: inset var(--x-adjust) 0px 6px 0px light-dark(rgb(var(--gray) / 0.5), var(--clr-gray-960));
@@ -93,10 +221,7 @@
   --bk-button-color1: light-dark(var(--t5), var(--clr-gray-850));
   --bk-button-hover-color: light-dark(var(--t8), var(--clr-gray-800));
 
-  --banner: --light-dark(
-    linear-gradient(to bottom, var(--t5), var(--t8)),
-    linear-gradient(0deg, var(--clr-gray-900) 0%, var(--clr-gray-800) 100%)
-  );
+  --banner: --light-dark(linear-gradient(to bottom, var(--t5), var(--t8)), linear-gradient(0deg, var(--clr-gray-900) 0%, var(--clr-gray-800) 100%));
 
   /* PaperOverlay */
   --combiLight: url("/light.webp"), linear-gradient(var(--t1));
@@ -108,9 +233,9 @@
 
   --select: light-dark(var(--t2), var(--clr-gray-850));
   --select2: light-dark(var(--t5), var(--clr-gray-850));
-  --JumpTo: light-dark(var(--t8), var(--clr-gold-dim));
-  --ThemeAccent1: light-dark(var(--s5), var(--clr-gold-dim));
-  --ThemeAccent2: light-dark(var(--d3), var(--clr-gold-dim));
+  --JumpTo: light-dark(var(--t8), var(--clr-gray-600));
+  --ThemeAccent1: light-dark(var(--s5), var(--clr-gray-600));
+  --ThemeAccent2: light-dark(var(--d3), var(--clr-gray-600));
   --ThemeBaccent1: light-dark(var(--s3), var(--clr-gray-960));
   --ThemeBaccent2: light-dark(var(--d1), var(--clr-gray-960));
   --ThemeBackgrounds0: light-dark(var(--t1), var(--clr-gray-900));
@@ -130,14 +255,5 @@
   --glassBlur: blur(12px);
   --glassShadow: 0 12px 40px rgb(var(--base-dark) / 0.4);
 
-  --backdropBtns: --light-dark(
-    radial-gradient(ellipse 250px 400px at 100% 100%, var(--t5), var(--t4), var(--t3), transparent),
-    radial-gradient(
-      ellipse 250px 400px at 100% 100%,
-      rgb(var(--gray) / 1),
-      rgb(var(--gray) / 0.9),
-      rgb(var(--gray) / 0.9),
-      transparent
-    )
-  );
+  --backdropBtns: --light-dark(radial-gradient(ellipse 250px 400px at 100% 100%, var(--t5), var(--t4), var(--t3), transparent), radial-gradient(ellipse 250px 400px at 100% 100%, rgb(var(--gray) / 1), rgb(var(--gray) / 0.9), rgb(var(--gray) / 0.9), transparent));
 }

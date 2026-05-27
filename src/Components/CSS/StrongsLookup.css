@@ -2,6 +2,7 @@
 
 .StrongsLookup-body {
   padding-inline: 0.5rem;
+  color: var(--text-color-tone);
 }
 
 .StrongsLookup-search-form {
@@ -17,7 +18,6 @@
   flex: 1;
   background: var(--ThemeBackgrounds1);
   border: 1px solid var(--btn-border);
-  color: var(--text-color);
   padding: 0.5rem 1rem;
   border-radius: 4px;
   font-size: 1rem;
@@ -40,7 +40,6 @@
   background: none;
   border: none;
   font-size: 18px;
-  color: var(--text-color-dimmed);
   padding: 4px;
   cursor: pointer;
   box-shadow: none;
@@ -70,7 +69,6 @@
 .StrongsLookup-btn {
   background: var(--ThemeBackgrounds2);
   border: 1px solid var(--btn-border);
-  color: var(--text-color);
   padding: 0.5rem 1rem;
   border-radius: 4px;
   cursor: pointer;
@@ -83,7 +81,6 @@
 }
 
 .StrongsLookup-section-title {
-  color: var(--text-color-dimmer);
   font-size: 0.9rem;
   font-weight: bold;
   letter-spacing: 0.05em;
@@ -94,7 +91,6 @@
   text-transform: lowercase;
   font-weight: normal;
   font-style: italic;
-  color: #888;
 }
 
 .StrongsLookup-hr {
@@ -131,6 +127,16 @@
   flex-shrink: 0;
   font-size: 0.9rem;
   padding-top: 0.1rem;
+}
+
+.StrongsVerse-container center,
+/* .StrongsVerse-dict-section, */
+/* .StrongsVerse-phonetics, */
+.StrongsVerse-lemma,
+/* .StrongsVerse-original-header, */
+/* .StrongsVerse-def-details, */
+.StrongsVerse-def-details strong {
+  color: var(--text-color-tone);
 }
 
 .StrongsLookup-verse-text {

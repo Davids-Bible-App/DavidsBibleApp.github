@@ -69,7 +69,7 @@ export async function loadSettings() {
       leatherTexture: res.leatherTexture != null ? res.leatherTexture === "true" : false,
       navTopSwipe1: res.navTopSwipe1 ?? "search:Min",
       navTopSwipe2: res.navTopSwipe2 ?? "editor:Max",
-      navTopDblClick: res.navTopDblClick ?? "meme:Min",
+      navTopDblClick: res.navTopDblClick ?? "help:Max",
       navTopLongPress: res.navTopLongPress ?? "settings:Mid",
       navBotSwipe1: res.navBotSwipe1 ?? "audio:Min",
       navBotSwipe2: res.navBotSwipe2 ?? "editor:Max",
