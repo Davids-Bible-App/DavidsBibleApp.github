@@ -8,7 +8,7 @@
   flex-direction: column;
   /* gap: 1.2rem; */
   min-width: 280px;
-  max-width: 480px;
+  /* max-width: 480px; */
   width: 100%;
   box-sizing: border-box;
   font-family: "Georgia", serif;
@@ -239,32 +239,4 @@
 .Bookmark-input::placeholder {
   color: var(--main-icon-text-color);
   opacity: 0.5;
-}
-
-/* ── Ghost (floating clone while dragging) ──── */
-/*
- * The ghost is appended to <body> and clones .Bookmark-item.
- * CSS variables are on :root so they work outside .Bookmark-panel.
- */
-.Bookmark-item--ghost {
-  background: var(--main-cover-wrapper-gradient) !important;
-  border-radius: 1rem;
-  box-shadow:
-    0 12px 32px rgba(0, 0, 0, 0.28),
-    0 4px 10px rgba(0, 0, 0, 0.18),
-    var(--controls-button-wrapper-neu-shadows) !important;
-  opacity: 0.96;
-  /* Slight scale-up so it clearly "lifts" off the list */
-  transform-origin: center center;
-  scale: 1.025;
-}
-
-.bookmark-underline {
-  text-decoration: underline;
-  text-decoration-color: rgba(255, 94, 26, 0.55); /* your accent orange */
-  text-decoration-color: var(--verseNo); /* your accent orange */
-  text-decoration-style: solid;
-  text-underline-offset: 3px;
-  text-decoration-thickness: 1.5px;
-  transition: text-decoration-color 0.3s ease;
 }

@@ -19,8 +19,15 @@ export const [keepInView, setKeepInView] = createSignal(true);
 
 // ================================================================================
 
+// lazy preload sidebars, show signals
+export const [rightbarContentLoaded, setRightbarContentLoaded] = createSignal(false);
+export const [leftbarContentLoaded, setLeftbarContentLoaded] = createSignal(false);
 // Passing sripture to the Mememaker Text Layer
 export const [injectedVerse, setInjectedVerse] = createSignal();
+// UniTopic Show/Hide
+export const [showUniTopic, setShowUniTopic] = createSignal(false);
+// UniCtrl Show/Hide
+export const [showUniCtrl, setShowUniCtrl] = createSignal(false);
 // DbTranslations expanded state
 export const [expanded, setExpanded] = createSignal(false);
 // Audio Controls Show/Hide
@@ -43,6 +50,8 @@ export const [showSelection, setShowSelection] = createSignal(false);
 export const [activeNoteVerse, setActiveNoteVerse] = createSignal(null);
 // PaperOverlay Class Trig
 export const [activePaper, setActivePaper] = createSignal(false);
+// For menubtn quick refresh no-delay
+export const [refresher, setRefresher] = createSignal(false);
 
 // ================================================================================
 

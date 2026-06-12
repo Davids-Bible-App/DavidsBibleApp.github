@@ -1,12 +1,5 @@
 import { closeAllSheets } from "./sheetStore";
-import {
-  setExpanded,
-  setExpandedCtl,
-  setTrigger,
-  setSelectedTopic,
-  setShowSelection,
-  setActiveNoteVerse,
-} from "./globalSignals.js";
+import { setExpanded, setExpandedCtl, setTrigger, setSelectedTopic, setShowSelection, setActiveNoteVerse, setShowUniTopic, setShowUniCtrl } from "./globalSignals.js";
 import { onBackButtonPress } from "@tauri-apps/api/app";
 import { exit } from "@tauri-apps/plugin-process";
 import { type } from "@tauri-apps/plugin-os";
@@ -17,13 +10,15 @@ let lastBackPress = 0;
 const DOUBLE_TAP_DELAY = 300;
 
 const handleCloseRequest = () => {
-  closeAllSheets(); // Top/Bottom Sheets
+  setShowUniCtrl(false); // UniVerse Controlbox
+  setShowUniTopic(false); // UniVerse Gallery
+  setShowSelection(false); // Compare Verses
   setExpandedCtl(0); // Controlbox
   setExpanded(false); // DbTranslations
+  closeAllSheets(); // Top/Bottom Sheets
   setSelectedTopic(null); // Topic List Item
-  setShowSelection(false); // Compare Verses
-  setTrigger(""); // Left/Right Slidebars
   setActiveNoteVerse(null); // Note Modal
+  setTrigger(""); // Left/Right Slidebars
 };
 
 // 2. Desktop: Escape Key (Always safe to register)

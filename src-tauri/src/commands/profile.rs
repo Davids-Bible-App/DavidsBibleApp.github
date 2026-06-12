@@ -873,7 +873,6 @@ pub async fn merge_external_profile_db(
     )
     .ok();
 
-    // Sync updated_at and sort orders if external is newer
     tx.execute(
         "
         UPDATE topics
@@ -901,7 +900,7 @@ pub async fn merge_external_profile_db(
         [],
     ).ok();
 
-    // 4. TOPIC METADATA: Insert missing, update if newer (NEW SECTION)
+    // 4. TOPIC METADATA: Insert missing, update if newer
     tx.execute(
         "
         INSERT OR IGNORE INTO topic_metadata
@@ -988,6 +987,122 @@ pub async fn merge_external_profile_db(
         INSERT OR IGNORE INTO context_history (query, timestamp)
         SELECT query, timestamp
         FROM external.context_history;
+        ",
+        [],
+    )
+    .ok();
+
+    // 7. READ HISTORY: Using composite key unique constraint
+    tx.execute(
+        "
+        INSERT OR IGNORE INTO read_history
+            (translation_id, book_id, chapter, verse_id, updated_at)
+        SELECT
+            translation_id, book_id, chapter, verse_id, updated_at
+        FROM external.read_history;
+        ",
+        [],
+    )
+    .ok();
+
+    tx.execute(
+        "
+        UPDATE read_history
+        SET
+            updated_at = (
+                SELECT e.updated_at FROM external.read_history e
+                WHERE e.translation_id = read_history.translation_id 
+                  AND e.book_id = read_history.book_id 
+                  AND e.chapter = read_history.chapter 
+                  AND e.verse_id = read_history.verse_id 
+                  AND e.updated_at > read_history.updated_at
+                LIMIT 1
+            )
+        WHERE EXISTS (
+            SELECT 1 FROM external.read_history e
+            WHERE e.translation_id = read_history.translation_id 
+              AND e.book_id = read_history.book_id 
+              AND e.chapter = read_history.chapter 
+              AND e.verse_id = read_history.verse_id 
+              AND e.updated_at > read_history.updated_at
+        );
+        ",
+        [],
+    )
+    .ok();
+
+    // 8. BOOKMARKS: Managed via unique 'title' constraint
+    tx.execute(
+        "
+        INSERT OR IGNORE INTO bookmarks
+            (title, verses, sort_order, updated_at)
+        SELECT
+            title, verses, sort_order, updated_at
+        FROM external.bookmarks;
+        ",
+        [],
+    )
+    .ok();
+
+    tx.execute(
+        "
+        UPDATE bookmarks
+        SET
+            verses = (
+                SELECT e.verses FROM external.bookmarks e 
+                WHERE e.title = bookmarks.title AND e.updated_at > bookmarks.updated_at LIMIT 1
+            ),
+            sort_order = (
+                SELECT e.sort_order FROM external.bookmarks e 
+                WHERE e.title = bookmarks.title AND e.updated_at > bookmarks.updated_at LIMIT 1
+            ),
+            updated_at = (
+                SELECT e.updated_at FROM external.bookmarks e 
+                WHERE e.title = bookmarks.title AND e.updated_at > bookmarks.updated_at LIMIT 1
+            )
+        WHERE EXISTS (
+            SELECT 1 FROM external.bookmarks e 
+            WHERE e.title = bookmarks.title AND e.updated_at > bookmarks.updated_at
+        );
+        ",
+        [],
+    )
+    .ok();
+
+    // 9. MEME TEMPLATES: No database unique constraint on title, handled logically via WHERE NOT EXISTS
+    tx.execute(
+        "
+        INSERT INTO MemeTemplates (title, thumbnail, payload, updated_at)
+        SELECT title, thumbnail, payload, updated_at
+        FROM external.MemeTemplates e
+        WHERE NOT EXISTS (
+            SELECT 1 FROM MemeTemplates m WHERE m.title = e.title
+        );
+        ",
+        [],
+    )
+    .ok();
+
+    tx.execute(
+        "
+        UPDATE MemeTemplates
+        SET
+            thumbnail = (
+                SELECT e.thumbnail FROM external.MemeTemplates e 
+                WHERE e.title = MemeTemplates.title AND e.updated_at > MemeTemplates.updated_at LIMIT 1
+            ),
+            payload = (
+                SELECT e.payload FROM external.MemeTemplates e 
+                WHERE e.title = MemeTemplates.title AND e.updated_at > MemeTemplates.updated_at LIMIT 1
+            ),
+            updated_at = (
+                SELECT e.updated_at FROM external.MemeTemplates e 
+                WHERE e.title = MemeTemplates.title AND e.updated_at > MemeTemplates.updated_at LIMIT 1
+            )
+        WHERE EXISTS (
+            SELECT 1 FROM external.MemeTemplates e 
+            WHERE e.title = MemeTemplates.title AND e.updated_at > MemeTemplates.updated_at
+        );
         ",
         [],
     )

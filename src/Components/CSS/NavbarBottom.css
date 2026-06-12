@@ -44,17 +44,18 @@
   border-radius: 50rem;
   width: 40px;
   height: 40px;
-  padding: 2px;
-  font-size: 28px;
-  background: var(--bk-button-color1);
+  font-size: 30px;
+
+  background: var(--controls-normal-button-wrapper-gradient);
+  color: var(--main-icon-text-color);
+  cursor: pointer;
   &:hover {
-    background: var(--bk-button-hover-color);
-  }
-  &.active,
-  &:active {
     background: var(--bk-button-pressed-color);
-    box-shadow: var(--header-pressed-button-inset-shadows);
-    transition: all 0.1s ease;
+    color: #fff;
+  }
+  &:active {
+    background: var(--controls-pressed-button-wrapper-gradient);
+    color: #fff;
   }
 }
 .NavbarBottom-pageDown {
@@ -66,27 +67,6 @@
 
 .NavbarBottom-txt {
   font-size: 25px;
-}
-
-.NavbarBottom-box {
-  --blkPad: 1.2rem;
-
-  /* box */
-  border-radius: calc(var(--blkPad) / 3);
-  corner-shape: scoop;
-  /* box-shadow: 0 0 0 1px var(--banClr), 0 1px 0 1px #585858; */
-
-  /* content */
-  display: flex;
-  place-content: center;
-  inline-size: fit-content;
-  padding-inline: calc(var(--blkPad) * 1.5);
-  padding-block: calc(var(--blkPad) / 4);
-
-  /* font */
-  font-size: var(--blkPad);
-  color: var(--banClr);
-  text-shadow: var(--banSdw);
 }
 
 .NavbarBottom-burnInText {

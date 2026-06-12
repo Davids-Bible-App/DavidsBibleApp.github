@@ -47,6 +47,8 @@
 
 .Audio-footer {
   width: 100%;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .Audio-info {
@@ -76,6 +78,7 @@
   flex-direction: column;
   justify-content: center;
   padding: 2rem 1rem 2.5rem;
+  contain: layout style paint;
 }
 
 .Audio-controls-wrapper {
@@ -123,6 +126,7 @@
     border-radius: 20px;
     outline: none;
     border: none;
+    transform: translateZ(0);
   }
   &::picker(select) {
     text-align: left;
@@ -151,6 +155,7 @@
   &:open {
     background: var(--controls-pressed-button-front-gradient);
     box-shadow: var(--controls-pressed-button-inset-shadows);
+    transform: translateZ(0);
     color: white;
   }
   &:disabled {
@@ -168,6 +173,7 @@
   background: var(--controls-normal-button-wrapper-gradient);
   color: var(--main-icon-text-color);
   box-shadow: var(--controls-button-wrapper-neu-shadows);
+  transform: translateZ(0);
   border-radius: 20px;
   outline: none;
   border: none;
@@ -216,6 +222,7 @@
   transform: rotate(-90deg);
   z-index: 1;
   pointer-events: none;
+  will-change: transform;
 }
 
 .Audio-progress-circle {
@@ -229,6 +236,7 @@
   display: flex;
   gap: 5px;
   width: 100%;
+  margin-top: -10px;
   max-width: 80%;
 
   color: var(--main-icon-text-color);
@@ -312,6 +320,7 @@ input[type="range"]:active::-webkit-slider-thumb {
   border: 1px solid var(--audio-dropdown-border);
   border-radius: 8px;
   box-shadow: 0 10px 20px var(--audio-glass-shadow);
+  transform: translateZ(0);
   display: flex;
   flex-direction: column;
   min-width: 180px;
@@ -373,6 +382,7 @@ input[type="range"]:active::-webkit-slider-thumb {
   height: 100%;
   background: var(--audio-progress-fill);
   transition: width 0.2s ease-out;
+  will-change: transform;
 }
 
 .Progress-text {

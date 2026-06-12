@@ -1,5 +1,5 @@
 // lib/navigationUtils.js
-import { batch } from "solid-js"; // ← ADD THIS
+import { batch } from "solid-js";
 import { dbaExists } from "./functions.js";
 import { showToast } from "../Components/Toast";
 import { updateAndLogScripture } from "../State/historyStore";
@@ -7,12 +7,12 @@ import { setBible1, setBook, setChapterNo, setTargetVerse, setChapterBtn, setTes
 
 export const executeJumpTo = async (rawHit, onSuccess, pulse = true) => {
   // 1. Normalize the Data
-  const rawTranslation = rawHit.translation_id || rawHit.translationId || rawHit.translation || "";
+  const rawTranslation = rawHit.translation_id || rawHit.translationId || rawHit.translation || rawHit.tr || "";
   const hit = {
     translation_id: rawTranslation.replace(/\.dba$/i, ""),
-    book_id: rawHit.book_id || rawHit.bookId,
-    chapter: parseInt(rawHit.chapter || rawHit.chapterNumber),
-    verse_id: parseInt(rawHit.verse_id || rawHit.verseNumber || rawHit.verse || 1),
+    book_id: rawHit.book_id || rawHit.bookId || rawHit.bk,
+    chapter: parseInt(rawHit.chapter || rawHit.chapterNumber || rawHit.ch),
+    verse_id: parseInt(rawHit.verse_id || rawHit.verseNumber || rawHit.verse || rawHit.vs || 1),
   };
 
   // 2. File Check
@@ -51,5 +51,5 @@ export const executeJumpTo = async (rawHit, onSuccess, pulse = true) => {
     }
 
     setTimeout(() => setTargetVerse(null), 2500);
-  }, 200);
+  }, 0);
 };

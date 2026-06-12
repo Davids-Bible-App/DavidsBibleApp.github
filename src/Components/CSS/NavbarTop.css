@@ -2,7 +2,18 @@
   position: absolute;
   top: 15px;
   z-index: 5;
-  padding: 4px 4px 0;
+  padding: 4px 4px 3px;
+  background: var(--controls-normal-button-wrapper-gradient);
+  color: var(--main-icon-text-color);
+  cursor: pointer;
+  &:hover {
+    background: var(--bk-button-pressed-color);
+    color: #fff;
+  }
+  &:active {
+    background: var(--controls-pressed-button-wrapper-gradient);
+    color: #fff;
+  }
   &.NavbarTop-sbGlyph {
     color: #555;
     text-shadow: #bbb;

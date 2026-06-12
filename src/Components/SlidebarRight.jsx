@@ -1,18 +1,13 @@
-import { createSignal } from "solid-js";
+import { createSignal, lazy, Suspense } from "solid-js";
 import { triggerRefetch } from "../State/settingsStore.js";
 import { NoteModal } from "./Modals";
-import GalleryManager from "./GalleryManager";
 import { invoke } from "@tauri-apps/api/core";
 import { executeJumpTo } from "../lib/navigationUtils";
-import {
-  book,
-  chapterNo,
-  bibleVersion,
-  activeNoteVerse,
-  setActiveNoteVerse,
-  setTrigger,
-} from "../State/globalSignals.js";
+import { book, chapterNo, bibleVersion, activeNoteVerse, setActiveNoteVerse, setTrigger } from "../State/globalSignals.js";
+import { rightbarContentLoaded } from "../State/globalSignals";
 import "./CSS/SlidebarRight.css";
+
+export const GalleryManager = lazy(() => import("./GalleryManager"));
 
 export default function SlidebarRight(props) {
   const [noteText, setNoteText] = createSignal("");
@@ -69,7 +64,11 @@ export default function SlidebarRight(props) {
       <aside class="SlidebarRight-aside" ref={props.ref}>
         <nav>
           <div class="SlidebarRight-safe-content">
-            <GalleryManager jumpTo={jumpTo} />
+            <Show when={rightbarContentLoaded()}>
+              <Suspense fallback={null}>
+                <GalleryManager jumpTo={jumpTo} />
+              </Suspense>
+            </Show>
           </div>
         </nav>
         <div class="SlidebarRight-topShadow"></div>

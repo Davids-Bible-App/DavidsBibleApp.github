@@ -1,5 +1,6 @@
 // sheetStore.jsx
 import { createSignal, createEffect } from "solid-js";
+import { preloadSheet } from "./sheetComponents";
 
 // --- DYNAMIC REGISTRY ---
 export const sheetRegistry = new Map();
@@ -48,6 +49,7 @@ export const [sheetStep, setSheetStep] = createSignal("Hid");
  * toggleSheet("search", "Mid", true);
  */
 export const toggleSheet = (id, step = "Mid", shouldToggle = false) => {
+  preloadSheet(id);
   const currentId = activeSheet();
   const currentStep = sheetStep();
 
@@ -175,3 +177,15 @@ export function onSheetClose(id, callback, delay = 300) {
     wasOpen = isOpen;
   });
 }
+
+/**
+ * Returns a signal that becomes true the first time a specific sheet opens.
+ * Use this in MainContent to gate lazy component rendering.
+ */
+export const createSheetReady = (id) => {
+  const [ready, setReady] = createSignal(false);
+  createEffect(() => {
+    if (currentSheet(id) !== "Hid") setReady(true);
+  });
+  return ready;
+};

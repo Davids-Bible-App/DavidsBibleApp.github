@@ -9,11 +9,12 @@
 }
 .inset-wrapper {
   /*  Android System Bars - Insets  */
-  margin-top: var(--edge2edge-top);
-  margin-bottom: var(--edge2edge-bottom);
-  margin-left: var(--edge2edge-left);
-  margin-right: var(--edge2edge-right);
+  padding-top: var(--edge2edge-top);
+  padding-bottom: var(--edge2edge-bottom);
+  padding-left: var(--edge2edge-left);
+  padding-right: var(--edge2edge-right);
   overflow: hidden; /* important */
+  transition: padding 0.15s ease;
 }
 
 .Main-Content {

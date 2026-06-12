@@ -1,9 +1,10 @@
-import { createEffect, createSignal, createResource, onMount } from "solid-js";
+import { createEffect, createSignal, createResource, onMount, onCleanup, Suspense, lazy } from "solid-js";
 // prettier-ignore
 import {
   bible1, expandedCtl, setExpandedCtl, setInjectedVerse, setSelectedTopic,
   selection, setSelection, showSelection, setShowSelection, setTrigger,
   setBibleVersion, setActiveNoteVerse, setTopicController, setTargetVerse,
+  showUniCtrl, setShowUniCtrl
 } from "../State/globalSignals.js";
 import { openBookmarkModal, openTopicModal } from "../State/modalStore.js";
 import { settings, triggerRefetch } from "../State/settingsStore.js";
@@ -11,15 +12,55 @@ import { groupConsecutiveVerses, dbExists, getBook } from "../lib/functions.js";
 import { toggleSheet, closeAllSheets } from "../State/sheetStore";
 import ToastStack, { showToast } from "./Toast";
 import { updateAndLogScripture } from "../State/historyStore";
-import CompareVerse from "./CompareVerse";
 import { shareText } from "@choochmeque/tauri-plugin-sharekit-api";
 import { type } from "@tauri-apps/plugin-os";
 import { invoke } from "@tauri-apps/api/core";
 import "./CSS/ControlBox.css";
 
+const CompareVerse = lazy(() => import("./CompareVerse"));
+const UniVerse = lazy(() => import("./UniVerse"));
+
 export default function ControlBox(props) {
   const [selectedVerses, setSelectedVerses] = createSignal([]);
   const [strongsExists, setStrongsExists] = createSignal(false);
+
+  // --- Pinch-zoom gesture (two-finger, touch only) ---
+  let _pinchStartDist = null;
+  let _pinchFired = false;
+
+  const _getTouchDist = (touches) => {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  };
+
+  const _onTouchStart = (e) => {
+    if (e.touches.length === 2) {
+      _pinchStartDist = _getTouchDist(e.touches);
+      _pinchFired = false;
+    }
+  };
+
+  const _onTouchMove = (e) => {
+    if (e.touches.length !== 2 || _pinchStartDist === null || _pinchFired) return;
+
+    const currentDist = _getTouchDist(e.touches);
+
+    // Calculate raw difference without Math.abs()
+    // Positive means expanding, negative means contracting
+    const delta = currentDist - _pinchStartDist;
+
+    // Only fire if they expanded outward by more than 55px
+    if (delta > 55) {
+      _pinchFired = true;
+      uniVerse();
+    }
+  };
+
+  const _onTouchEnd = () => {
+    _pinchStartDist = null;
+    _pinchFired = false;
+  };
 
   onMount(async () => {
     const result = await dbExists("strongs_kjv.db");
@@ -222,6 +263,18 @@ export default function ControlBox(props) {
     }
   };
 
+  const uniVerse = async () => {
+    try {
+      const data = await updateVerseSelection();
+      if (data) {
+        setShowUniCtrl(true);
+        addToHistory(data);
+      }
+    } catch (error) {
+      console.error("Controlbox UniVerse", error);
+    }
+  };
+
   const topicAddVerse = async () => {
     // 1. Get the selection data
     const data = await updateVerseSelection();
@@ -304,6 +357,24 @@ export default function ControlBox(props) {
   createEffect(() => {
     expandedCtl() && closeAllSheets();
     props.setTouchActionRestored(expandedCtl());
+  });
+
+  createEffect(() => {
+    if (expandedCtl()) {
+      document.addEventListener("touchstart", _onTouchStart, { passive: true });
+      document.addEventListener("touchmove", _onTouchMove, { passive: true });
+      document.addEventListener("touchend", _onTouchEnd, { passive: true });
+    } else {
+      document.removeEventListener("touchstart", _onTouchStart);
+      document.removeEventListener("touchmove", _onTouchMove);
+      document.removeEventListener("touchend", _onTouchEnd);
+    }
+  });
+
+  onCleanup(() => {
+    document.removeEventListener("touchstart", _onTouchStart);
+    document.removeEventListener("touchmove", _onTouchMove);
+    document.removeEventListener("touchend", _onTouchEnd);
   });
 
   return (
@@ -466,7 +537,15 @@ export default function ControlBox(props) {
         </nav>
       </footer>
       <Show when={showSelection()}>
-        <CompareVerse />
+        <Suspense>
+          <CompareVerse />
+        </Suspense>
+      </Show>
+
+      <Show when={showUniCtrl()}>
+        <Suspense>
+          <UniVerse />
+        </Suspense>
       </Show>
       <ToastStack expandedCtl={expandedCtl} />
     </>

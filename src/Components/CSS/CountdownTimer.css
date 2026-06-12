@@ -121,7 +121,7 @@
 /* Tier 1 — selected (centre) */
 .scroll-item-sel {
   opacity: 1;
-  font-weight: 700;
+  font-weight: 900;
   color: var(--main-icon-text-color);
   /* Slightly brighter than the variable for the active row */
   filter: brightness(1.6);
@@ -130,14 +130,14 @@
 /* Tier 2 — one step away */
 .scroll-item-near {
   opacity: 0.55;
-  font-weight: 400;
+  font-weight: 500;
   color: var(--main-icon-text-color);
 }
 
 /* Tier 3 — two steps away */
 .scroll-item-far {
   opacity: 0.22;
-  font-weight: 300;
+  font-weight: 100;
   color: var(--main-icon-text-color);
 }
 

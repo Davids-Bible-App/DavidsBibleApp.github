@@ -40,6 +40,19 @@ export default function SearchRef(props) {
     }
   });
 
+  // Android close keyboard by force blur
+  onSheetClose(
+    "search",
+    () => {
+      searchInputRef?.blur();
+      setSearchInput("");
+      setSearchResults([]);
+      setIsReference(false);
+      setSelectedVerses([]);
+    },
+    300,
+  );
+
   const handlePointerDown = (e) => {
     startX = e.clientX;
     startY = e.clientY;

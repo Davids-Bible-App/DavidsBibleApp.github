@@ -10,6 +10,7 @@
   min-height: 0;
   width: 100%;
   overflow: hidden;
+  font-family: "Georgia", serif;
 }
 
 /* Uni-wrap for inline padding - Style adjust for scroll-gutters stable */
@@ -79,15 +80,14 @@
   flex: 1;
   padding: 12px;
   border-bottom: 1px solid transparent;
-  background: none;
   color: var(--text-color-tone);
   cursor: pointer;
   font-size: 0.8rem;
   font-weight: bold;
   font-style: normal;
   transition: border-color 0.2s;
-  &:hover {
-    background-color: var(--bk-button-hover-color);
+  &.active {
+    color: var(--text-color-alllight);
   }
 }
 
@@ -122,6 +122,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+  padding-block: 0.3rem 0;
   cursor: pointer;
   user-select: none;
   color: var(--text-color-tone);
@@ -146,6 +147,7 @@
   opacity: 0.9;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 5px;
   transition: opacity 0.2s;
   user-select: none;

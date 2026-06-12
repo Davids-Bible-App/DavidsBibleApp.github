@@ -78,7 +78,7 @@ const TopicModal = () => {
       setError(msg);
     } finally {
       setSaving(false);
-      triggerRefetch("refetchTopics", "refetchTopicMetadata");
+      triggerRefetch("refetchTopics", "refetchTopicVerses", "refetchTopicMetadata");
     }
   };
 

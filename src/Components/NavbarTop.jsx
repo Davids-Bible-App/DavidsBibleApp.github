@@ -3,11 +3,22 @@ import RibbonVersion from "./RibbonVersion";
 import { toggleSheet } from "../State/sheetStore";
 import { settings } from "../State/settingsStore.js";
 import { createGesture } from "../lib/gestureHandler.js";
+import { preloadSheet } from "../State/sheetComponents";
 import "./CSS/NavbarTop.css";
 import { bible1, bible2, book, chapterNo, setTrigger } from "../State/globalSignals.js";
+import { SlidebarLeftContent } from "./SlidebarLeft";
+import { GalleryManager } from "./SlidebarRight";
+import { setLeftbarContentLoaded, setRightbarContentLoaded } from "../State/globalSignals";
 
 export default function NavbarTop(props) {
   const stitchPos = "top";
+
+  const preloadNavSheets = () => {
+    [settings.navBotSwipe1, settings.navBotSwipe2, settings.navBotDblClick, settings.navBotLongPress].forEach((pref) => {
+      const sheet = pref?.split(":")[0];
+      if (sheet && sheet !== "none") preloadSheet(sheet);
+    });
+  };
 
   const parseGesture = (prefString) => {
     const [sheet, size] = prefString.split(":");
@@ -36,14 +47,27 @@ export default function NavbarTop(props) {
   return (
     <>
       <header class="NavbarTop-header">
-        <nav {...navGestures}>
+        <nav
+          {...navGestures}
+          onPointerEnter={preloadNavSheets}
+          onPointerDown={(e) => {
+            preloadNavSheets();
+            navGestures.onPointerDown(e);
+          }}
+        >
           <RibbonBanner stitchPos={stitchPos}>
             <Show when={!props.isSecondaryVisible()}>
               <RibbonVersion getInfo={props.getInfo} />
             </Show>
             <content>
               <button
-                onPointerDown={(e) => e.stopPropagation()}
+                class="neu-button"
+                onPointerEnter={() => SlidebarLeftContent.preload()}
+                onPointerDown={(e) => {
+                  e.stopPropagation();
+                  setLeftbarContentLoaded(true);
+                  SlidebarLeftContent.preload();
+                }}
                 onClick={(e) => {
                   setTrigger((prev) => (prev === "left" ? "" : "left"));
                   e.stopPropagation();
@@ -62,8 +86,10 @@ export default function NavbarTop(props) {
                 </svg>
               </button>
               <button
+                style={"padding-block: 5px 2px"}
+                onPointerEnter={() => preloadSheet("search")}
                 onPointerDown={(e) => e.stopPropagation()}
-                class="NavbarTop-search"
+                class="NavbarTop-search neu-button"
                 onClick={(e) => {
                   e.stopPropagation();
                   toggleSheet("search", "Mid");
@@ -100,6 +126,7 @@ export default function NavbarTop(props) {
                 </Show>
               </div>
               <button
+                class="neu-button"
                 onPointerDown={(e) => e.stopPropagation()}
                 style={props.isSecondaryVisible() && props.orientation() === "horizontal" ? "right: unset" : "right: 2.5rem"}
                 onClick={(e) => {
@@ -140,7 +167,13 @@ export default function NavbarTop(props) {
                 </Show>
               </button>
               <button
-                onPointerDown={(e) => e.stopPropagation()}
+                class="neu-button"
+                onPointerEnter={() => GalleryManager.preload()}
+                onPointerDown={(e) => {
+                  e.stopPropagation();
+                  setRightbarContentLoaded(true);
+                  GalleryManager.preload();
+                }}
                 onClick={(e) => {
                   setTrigger((prev) => (prev === "right" ? "" : "right"));
                   e.stopPropagation();

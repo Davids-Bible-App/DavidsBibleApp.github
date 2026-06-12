@@ -170,9 +170,11 @@ export default function Audio(props) {
       const fetchedAuthors = await invoke("get_available_authors");
       setAuthors(fetchedAuthors);
 
-      // Auto-select the first author if one exists and none is currently selected
-      if (fetchedAuthors.length > 0 && !audioVersion()) {
-        setAudioVersion(fetchedAuthors[0]);
+      if (fetchedAuthors.length > 0) {
+        const saved = localStorage.getItem("audioVersion");
+        // Use saved value only if it still exists in the available authors list
+        const resolved = saved && fetchedAuthors.includes(saved) ? saved : fetchedAuthors[0];
+        if (!audioVersion()) setAudioVersion(resolved);
       }
     } catch (err) {
       console.error("Failed to load authors:", err);
@@ -360,7 +362,9 @@ export default function Audio(props) {
           }
 
           const list = playlist();
+
           if (list.length > 0 && untrack(isPlaying)) {
+            // Currently playing: jump to the new chapter immediately
             const track = list[activeChapter - 1];
             if (track) {
               play({
@@ -370,6 +374,12 @@ export default function Audio(props) {
                 album: track.name,
               }).catch((e) => console.warn("Interrupted play jump", e));
             }
+          } else if (list.length > 0) {
+            // Paused: wipe the plugin's internal cursor so the next play()
+            // call in togglePlay starts at the correct chapter, not the old one.
+            // stop()+clearPlayingQueue() resets state without triggering playback.
+            stop().catch((e) => console.warn("[EFFECT 2] stop on pause-chapter-change failed:", e));
+            clearPlayingQueue().catch((e) => console.warn("[EFFECT 2] clearPlayingQueue on pause-chapter-change failed:", e));
           }
         }
       },
@@ -682,7 +692,7 @@ export default function Audio(props) {
 
       await message(`${author} audio extracted successfully!`);
       await fetchAuthors();
-      setAudioVersion(author);
+      // setAudioVersion(author); // leave for saved author restore
     } catch (err) {
       setIsImporting(false);
       console.error("Import failed:", err);
@@ -725,19 +735,27 @@ export default function Audio(props) {
         <div class="Audio-content">
           <div class="Audio-controls-wrapper">
             <div class="Audio-header-row">
-              <select class="Audio-selectbox" value={audioVersion()} onChange={(e) => setAudioVersion(e.target.value)} disabled={authors().length === 0}>
+              <select
+                class="Audio-selectbox neu-button"
+                value={audioVersion()}
+                onChange={(e) => {
+                  setAudioVersion(e.target.value);
+                  localStorage.setItem("audioVersion", e.target.value);
+                }}
+                disabled={authors().length === 0}
+              >
                 <For each={authors()}>{(author) => <option value={author}>{author}</option>}</For>
               </select>
             </div>
             <div class="Audio-btn-row">
-              <button class={`Audio-scroll ${autoScroll() ? "active-scroll" : ""}`} onClick={() => setAutoScroll(!autoScroll())} style={autoScroll() ? "background: var(--controls-pressed-button-front-gradient); color: white;" : ""}>
+              <button class={`neu-button Audio-scroll ${autoScroll() ? "active-scroll" : ""}`} onClick={() => setAutoScroll(!autoScroll())} style={autoScroll() ? "background: var(--controls-pressed-button-front-gradient); color: white;" : ""}>
                 Scroll&nbsp;&nbsp;
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-mouse" viewBox="0 0 16 16">
                   <path d="M8 3a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 3m4 8a4 4 0 0 1-8 0V5a4 4 0 1 1 8 0zM8 0a5 5 0 0 0-5 5v6a5 5 0 0 0 10 0V5a5 5 0 0 0-5-5" />
                 </svg>
               </button>
 
-              <button class={`Audio-loop ${loopMode() !== "off" ? "loop-active" : ""}`} onClick={cycleLoopMode} style={loopMode() !== "off" ? "background: var(--controls-pressed-button-front-gradient); color: white;" : ""}>
+              <button class={`neu-button Audio-loop ${loopMode() !== "off" ? "loop-active" : ""}`} onClick={cycleLoopMode} style={loopMode() !== "off" ? "background: var(--controls-pressed-button-front-gradient); color: white;" : ""}>
                 {LOOP_LABELS[loopMode()]}&emsp;
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-repeat" viewBox="0 0 16 16">
                   <path d="M11 5.466V4H5a4 4 0 0 0-3.584 5.777.5.5 0 1 1-.896.446A5 5 0 0 1 5 3h6V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192m3.81.086a.5.5 0 0 1 .67.225A5 5 0 0 1 11 13H5v1.466a.25.25 0 0 1-.41.192l-2.36-1.966a.25.25 0 0 1 0-.384l2.36-1.966a.25.25 0 0 1 .41.192V12h6a4 4 0 0 0 3.585-5.777.5.5 0 0 1 .225-.67Z" />
@@ -834,23 +852,6 @@ export default function Audio(props) {
         </div>
       </nav>
       <CountdownTimer audioRef={audioRef} playableSrc={playableSrc} togglePlay={togglePlay} hasState={hasState} pause={pause} resume={resume} isPlaying={isPlaying} setIsPlaying={setIsPlaying} />
-      <div class="Audio-info">
-        {/*
-        <code>forcePageBk: {forcePageBk() ? "true" : "false"}</code>
-        <code>Raw Evaluate: {duration() - position() > 30000 ? "true" : "false"}</code>
-        <code>Track Remaining: {formatTime(duration() - position())}</code> */}
-        {/* <code>State: {hasState() ? "true" : "false"}</code>
-        <code>Track Progress: {Math.trunc(parseFloat(progress()) * 1e4) / 1e4}</code>
-        <code>Track Duration: {duration()}</code>
-        <code>artist/author: {audioVersion()}</code>
-        <code>activeBookId: {book()}</code>
-        <code>album: {getBook(book())}</code>
-        <code>activeChapter: {chapterNo()}</code>
-        <code>order: {bookOrderNo()}</code>
-        <code>Track ID: {JSON.stringify(track()?.id)}</code>
-        <code>Track Name: {JSON.stringify(track()?.name)}</code>
-        <code>Track URL: {track()?.url?.split("/").slice(-3).join("/") ?? ""}</code> */}
-      </div>
       <Portal>
         <Show when={isImporting()}>
           <div class="Import-modal-overlay">

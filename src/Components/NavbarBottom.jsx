@@ -4,10 +4,18 @@ import RibbonBanner from "./RibbonBanner";
 import { settings } from "../State/settingsStore.js";
 import { toggleSheet } from "../State/sheetStore";
 import { createGesture } from "../lib/gestureHandler.js";
+import { preloadSheet } from "../State/sheetComponents";
 import "./CSS/NavbarBottom.css";
 
 export default function NavbarBottom(props) {
   const stitchPos = "bottom";
+
+  const preloadNavSheets = () => {
+    [settings.navBotSwipe1, settings.navBotSwipe2, settings.navBotDblClick, settings.navBotLongPress].forEach((pref) => {
+      const sheet = pref?.split(":")[0];
+      if (sheet && sheet !== "none") preloadSheet(sheet);
+    });
+  };
 
   const parseGesture = (prefString) => {
     const [sheet, size] = prefString.split(":");
@@ -37,7 +45,14 @@ export default function NavbarBottom(props) {
     <>
       <footer class="NavbarBottom-footer">
         {/* Spread the gesture events onto the nav container */}
-        <nav {...navGestures}>
+        <nav
+          {...navGestures}
+          onPointerEnter={preloadNavSheets}
+          onPointerDown={(e) => {
+            preloadNavSheets();
+            navGestures.onPointerDown(e);
+          }}
+        >
           <RibbonBanner stitchPos={stitchPos}>
             <content>
               <button
@@ -56,6 +71,7 @@ export default function NavbarBottom(props) {
               </button>
               <button
                 class="ctl-L neu-button"
+                onPointerEnter={() => preloadSheet("history")}
                 onPointerDown={(e) => e.stopPropagation()}
                 onClick={(e) => {
                   e.stopPropagation(); // Prevents nav gestures from firing on this button click

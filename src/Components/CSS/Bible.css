@@ -106,7 +106,8 @@
 .VerseParts-inline-icon {
   cursor: pointer;
   pointer-events: auto;
-  margin-inline-start: -7px;
+  font-size: 0.95rem;
+  margin-inline-start: -5px;
   filter: drop-shadow(0 1px 0px rgba(0, 0, 0, 0.2)) drop-shadow(0 1px 1px rgba(0, 0, 0, 0.32));
 }
 
@@ -118,7 +119,6 @@
   text-overflow: ellipsis;
   font-size: 11px;
   color: --light-dark(#7e7e7e, #8b8b8b);
-  margin-left: 2px;
   line-height: 1;
   cursor: default;
   pointer-events: none;
@@ -238,6 +238,17 @@ list {
   }
 }
 
+.Bible-fallback {
+  padding: 3rem;
+  text-align: center;
+  text-wrap: pretty;
+
+  h3,
+  h4 {
+    color: tomato;
+  }
+}
+
 /* JumpTo Highlight Verse */
 @keyframes verse-glow {
   0% {
@@ -260,15 +271,4 @@ list {
 }
 .highlight-pulse {
   animation: verse-glow 2.5s 1s ease-out;
-}
-
-.Bible-fallback {
-  padding: 3rem;
-  text-align: center;
-  text-wrap: pretty;
-
-  h3,
-  h4 {
-    color: tomato;
-  }
 }

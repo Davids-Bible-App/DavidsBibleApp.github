@@ -36,6 +36,7 @@
     "background-service:default",
     "background-service:allow-is-running",
     "core:app:allow-register-listener",
+    "core:window:allow-set-fullscreen",
     "process:allow-exit",
     "music-notification:default",
     {

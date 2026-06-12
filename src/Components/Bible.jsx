@@ -386,8 +386,10 @@ function VerseParts(props) {
               setActiveNoteVerse(props.itemNo);
             }}
           >
-            <small class="VerseParts-inline-icon">📄</small>
-            <span class="VerseParts-note-abreviation">{props.verse.note}</span>
+            <span class="VerseParts-inline-icon">
+              📄
+              <span class="VerseParts-note-abreviation">{props.verse.note}</span>
+            </span>
           </span>
         </Show>
       </list>

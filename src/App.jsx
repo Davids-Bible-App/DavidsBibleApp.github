@@ -1,7 +1,10 @@
-import { createSignal, onMount, Show } from "solid-js";
+import { createSignal, onMount, Show, lazy } from "solid-js";
 import { invoke } from "@tauri-apps/api/core";
-import MainContent from "./Components/MainContent";
 import "./App.css";
+
+// Defers the module load — and every module-level invoke inside it —
+// until the component is actually rendered (i.e., after isDbReady = true)
+const MainContent = lazy(() => import("./Components/MainContent"));
 
 function App() {
   const [isDbReady, setIsDbReady] = createSignal(false);
@@ -10,19 +13,9 @@ function App() {
 
   onMount(async () => {
     try {
-      // 1. Initialize the DB first and wait for it to finish
-      await invoke("initialize_profile_db");
-
-      // 2. Tweakable 500ms delay to ensure backend SQLite file locks settle
-      // await new Promise((r) => setTimeout(r, 300));
-
-      // 3. Mount MainContent so it can safely start fetching its data
+      const isFirstRun = await invoke("initialize_profile_db");
       setIsDbReady(true);
-
-      // 4. Let the spinner run another 500ms while MainContent loads silently behind it
-      await new Promise((r) => setTimeout(r, 700));
-
-      // 5. Fade out the loader gracefully
+      await new Promise((r) => setTimeout(r, isFirstRun ? 1000 : 200));
       setIsLoaded(true);
     } catch (e) {
       console.error("Init Error:", e);
@@ -34,7 +27,8 @@ function App() {
     <>
       <Show when={errorMessage()}>
         <div style="position: fixed; z-index: 10000; inset: 0; background: #0f1114; color: red; padding: 20px;">
-          <h3>Database Error</h3> <p>{errorMessage()}</p>
+          <h3>Database Error</h3>
+          <p>{errorMessage()}</p>
           <button onClick={() => window.location.reload()}>Retry</button>
         </div>
       </Show>

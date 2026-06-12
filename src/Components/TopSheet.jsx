@@ -125,15 +125,7 @@ function TopSheet(props) {
       >
         <div class="TopSheet-Content">{props.children}</div>
 
-        <div
-          class="TopSheet-HandleArea"
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-          onPointerCancel={handlePointerUp}
-          onDblClick={() => props.setSheetState("Hid")}
-          onDragStart={(e) => e.preventDefault()}
-        >
+        <div class="TopSheet-HandleArea" onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp} onPointerCancel={handlePointerUp} onDblClick={() => props.setSheetState("Hid")} onDragStart={(e) => e.preventDefault()}>
           <div class="TopSheet-DragHandle"></div>
         </div>
       </div>

@@ -5,9 +5,18 @@ use tauri::Manager;
 use crate::commands::audio::{MyService, TimerState};
 
 #[tauri::command]
-async fn initialize_profile_db(app: tauri::AppHandle) -> Result<(), String> {
+async fn initialize_profile_db(app: tauri::AppHandle) -> Result<bool, String> {
+    // Snapshot first-run state BEFORE doing any work
+    let app_dir = app.path().app_data_dir().map_err(|e| e.to_string())?;
+    let is_first_run = !app_dir.join("databases").join("eng_kjv.dba").exists();
+
+    // Copy eng_kjv.dba on first run only (no-op if it already exists)
+    crate::db::setup_resources(&app).map_err(|e| e.to_string())?;
+
+    // Create / migrate profile.db (always idempotent)
     crate::db::init_db(&app).map_err(|e| e.to_string())?;
-    Ok(())
+
+    Ok(is_first_run) // frontend uses this to decide its delay strategy
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -35,7 +44,6 @@ pub fn run() {
         ))
         .setup(|app| {
             // First Run - Setup, Create, Initialise.
-            db::setup_resources(app.handle())?;
             let app_dir = app.path().app_data_dir().unwrap();
             let profile_path = app_dir.join("profile.db").to_string_lossy().into_owned();
             app.manage(crate::models::DbPaths {
@@ -51,15 +59,11 @@ pub fn run() {
         builder = builder.plugin(tauri_plugin_window_state::Builder::new().build());
         }
 
-    // #[cfg(target_os = "android")]
-    //     {
-    //         builder = builder.plugin(tauri_plugin_music_notification_api::init());
-    //     }
-
     // 2. Consolidated Invoke Handler
     builder
         .invoke_handler(tauri::generate_handler![
             initialize_profile_db,
+
             // From commands/audio.rs
             commands::audio::get_available_authors,
             commands::audio::import_audio_zip,
@@ -87,18 +91,10 @@ pub fn run() {
 
             // From commands/context.rs
             commands::context::parse_bible_reference,
-            // commands::context::save_context_history,
-            // commands::context::get_context_history,
-            // commands::context::clear_context_history,
-            // commands::context::delete_context_history_item,
 
             // From commands/search.rs
             commands::search::unified_search,
             commands::search::fts5_search_all_selected,
-            // commands::search::save_search_query,
-            // commands::search::get_search_history,
-            // commands::search::delete_search_history_item,
-            // commands::search::clear_all_search_history,
 
             // From commands/reader.rs
             commands::reader::copy_translation_file,
@@ -118,6 +114,7 @@ pub fn run() {
             commands::reader::get_chapterverse_data,
             commands::reader::get_verse,
             commands::reader::get_verses,
+            
             // From commands/profile.rs
             commands::profile::get_read_history,
             commands::profile::log_history_entry,

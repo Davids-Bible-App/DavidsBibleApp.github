@@ -5,11 +5,19 @@ use tauri::{path::BaseDirectory, AppHandle, Manager};
 use tauri_plugin_fs::FsExt;
 
 pub fn init_db(app_handle: &tauri::AppHandle) -> Result<(), String> {
-    let app_dir = app_handle.path().app_data_dir().expect("Failed dir");
-    std::fs::create_dir_all(&app_dir).ok();
-    let profile_path = app_dir.join("profile.db").to_string_lossy().into_owned();
+    let app_dir = app_handle
+        .path()
+        .app_data_dir()
+        .map_err(|e| format!("app_data_dir: {e}"))?;               // was .expect()
 
-    let conn = Connection::open(&profile_path).unwrap();
+    std::fs::create_dir_all(&app_dir)
+        .map_err(|e| format!("create_dir_all: {e}"))?;             // was .ok() (silent)
+
+    let profile_path = app_dir.join("profile.db");
+
+    let conn = Connection::open(&profile_path)
+        .map_err(|e| format!("Connection::open {profile_path:?}: {e}"))?; // was .unwrap()
+
     conn.execute("PRAGMA journal_mode=WAL;", []).ok();
 
     conn.execute_batch(

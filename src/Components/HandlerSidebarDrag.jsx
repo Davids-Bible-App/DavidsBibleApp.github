@@ -1,6 +1,7 @@
 /* HandlerSidebarDrag.jsx – 120fps direct-DOM mutation, no layout thrashing */
 import { createSignal, createEffect, onCleanup, onMount } from "solid-js";
 import { trigger, setTrigger } from "../State/globalSignals.js";
+import { setLeftbarContentLoaded, setRightbarContentLoaded } from "../State/globalSignals";
 
 const allSpeed = 0.2;
 const animTime = allSpeed;
@@ -57,10 +58,8 @@ export default function HandlerSidebarDrag(props) {
     },
   };
 
-  const getClientX = (e) =>
-    typeof e.clientX === "number" ? e.clientX : (e.touches?.[0]?.clientX ?? e.changedTouches?.[0]?.clientX ?? 0);
-  const getClientY = (e) =>
-    typeof e.clientY === "number" ? e.clientY : (e.touches?.[0]?.clientY ?? e.changedTouches?.[0]?.clientY ?? 0);
+  const getClientX = (e) => (typeof e.clientX === "number" ? e.clientX : (e.touches?.[0]?.clientX ?? e.changedTouches?.[0]?.clientX ?? 0));
+  const getClientY = (e) => (typeof e.clientY === "number" ? e.clientY : (e.touches?.[0]?.clientY ?? e.changedTouches?.[0]?.clientY ?? 0));
 
   createEffect(() => {
     const i = props.insets?.();
@@ -81,8 +80,7 @@ export default function HandlerSidebarDrag(props) {
 
     // Binary Visibility: Hides the inactive sidebar instantly without math-heavy alpha blending
     if (leftEl) {
-      const leftW =
-        cachedCw > 0 ? cachedCw * config.left.mainContainerPct : window.innerWidth * config.left.mainContainerPct;
+      const leftW = cachedCw > 0 ? cachedCw * config.left.mainContainerPct : window.innerWidth * config.left.mainContainerPct;
       leftEl.style.transition = transition;
       leftEl.style.transform = `translate3d(${-leftW / 3 + mainX / 3}px, 0, 0)`;
 
@@ -98,8 +96,7 @@ export default function HandlerSidebarDrag(props) {
     }
 
     if (rightEl) {
-      const rightW =
-        cachedCw > 0 ? cachedCw * config.right.mainContainerPct : window.innerWidth * config.right.mainContainerPct;
+      const rightW = cachedCw > 0 ? cachedCw * config.right.mainContainerPct : window.innerWidth * config.right.mainContainerPct;
       rightEl.style.transition = transition;
       rightEl.style.transform = `translate3d(${rightW / 3 + mainX / 3}px, 0, 0)`;
 
@@ -214,6 +211,8 @@ export default function HandlerSidebarDrag(props) {
     }
 
     if (!side) return;
+    side === "left" && setLeftbarContentLoaded(true);
+    side === "right" && setRightbarContentLoaded(true);
     if (e.cancelable) e.preventDefault();
 
     setActiveSide(side);
@@ -253,19 +252,11 @@ export default function HandlerSidebarDrag(props) {
       const threshold = globalDragConfig.visualStartThreshold;
       const effectiveDx = Math.abs(totalDx) > threshold ? totalDx - Math.sign(totalDx) * threshold : 0;
 
-      const baseOffset =
-        openSide() === "left"
-          ? cachedCw * config.left.mainContainerPct
-          : openSide() === "right"
-            ? -cachedCw * config.right.mainContainerPct
-            : 0;
+      const baseOffset = openSide() === "left" ? cachedCw * config.left.mainContainerPct : openSide() === "right" ? -cachedCw * config.right.mainContainerPct : 0;
 
       translateMainX = baseOffset + effectiveDx;
 
-      translateMainX = Math.max(
-        -cachedCw * config.right.mainContainerPct,
-        Math.min(translateMainX, cachedCw * config.left.mainContainerPct),
-      );
+      translateMainX = Math.max(-cachedCw * config.right.mainContainerPct, Math.min(translateMainX, cachedCw * config.left.mainContainerPct));
 
       // FASTEST UPDATE: Update inline styles directly. No rAF loop, no signal updates.
       applyTransforms(translateMainX, "none");

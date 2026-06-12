@@ -1,7 +1,9 @@
 // src/Components/Bookmark.jsx
 import { createSignal, createEffect, createResource, For, Show, onCleanup } from "solid-js";
 import { invoke } from "@tauri-apps/api/core";
-import { formatVerseRefs, parseVerses, executeBookmarkJumpTo } from "../lib/bookmarkUtils.js";
+import { ask } from "@tauri-apps/plugin-dialog";
+import { executeJumpTo } from "../lib/navigationUtils";
+import { formatVerseRefs, parseVerses } from "../lib/bookmarkUtils.js";
 import { triggerRefetch } from "../State/settingsStore.js";
 
 import { bms } from "../State/modalStore.js";
@@ -69,10 +71,12 @@ const Bookmark = (props) => {
       pointerEvents: "none",
       background: computed.background,
       backgroundColor: computed.backgroundColor,
-      borderRadius: computed.borderRadius,
+      borderRadius: "1rem",
       boxShadow: "0 14px 36px rgba(0,0,0,0.38), 0 4px 12px rgba(0,0,0,0.24)",
-      opacity: "0.97",
-      transform: "scale(1.03)",
+      opacity: "0.98",
+      fontSize: "0.9rem",
+      fontFamily: "Georgia",
+      transform: "scale(1.01)",
       transformOrigin: "center center",
       overflow: "hidden",
     });
@@ -87,7 +91,7 @@ const Bookmark = (props) => {
     if (!dragId) return;
     e.preventDefault();
 
-    ghostEl.style.transform = `scale(1.03) translateY(${e.clientY - startY}px)`;
+    ghostEl.style.transform = `scale(1.01) translateY(${e.clientY - startY}px)`;
 
     const ord = order();
     const fromIdx = ord.indexOf(dragId);
@@ -152,6 +156,8 @@ const Bookmark = (props) => {
   // ── CRUD ──────────────────────────────────────────────────────────────────
   const handleDelete = async (id) => {
     try {
+      const delBm = await ask("Delete Bookmark?", { title: "Delete", kind: "warning" });
+      if (!delBm) return;
       await invoke("delete_bookmark", { id });
       setOrder((o) => o.filter((x) => x !== id));
       triggerRefetch("refetchBookmarks");
@@ -183,7 +189,7 @@ const Bookmark = (props) => {
   const handleJumpTo = (bm) => {
     const verses = parseVerses(bm.verses);
     if (!verses.length) return;
-    executeBookmarkJumpTo(verses, () => setTrigger(""));
+    executeJumpTo(verses[0], () => setTrigger(""));
   };
 
   const formatDate = (unix) => (unix ? new Date(unix * 1000).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }) : "");

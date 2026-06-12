@@ -3,15 +3,11 @@ import { readFile, writeFile, BaseDirectory } from "@tauri-apps/plugin-fs";
 import { join, appDataDir } from "@tauri-apps/api/path";
 import { invoke } from "@tauri-apps/api/core";
 import { save, open, message, ask } from "@tauri-apps/plugin-dialog";
-import { settings, setSettings, loadSettings, saveSettings, triggerRefetch } from "../State/settingsStore.js";
+import { settings, setSettings, saveSettings, triggerRefetch } from "../State/settingsStore.js";
 import { isDarkMode, activePaper } from "../State/globalSignals.js";
 import "./CSS/SettingsPanel.css";
 
 export default function SettingsPanel(props) {
-  onMount(() => {
-    queueMicrotask(loadSettings);
-  });
-
   const [localHue, setLocalHue] = createSignal();
   const [fineTune, setFineTune] = createSignal();
   let isDragging = false;
@@ -221,6 +217,85 @@ export default function SettingsPanel(props) {
           </Show>
 
           <section class="SettingsPanel-section">
+            <heading>Keep Chapter Title InView</heading>
+
+            <div style="width:100%;display:flex;justify-content:center;align-content:center;">
+              <div style="display:flex;gap:12px;align-items:center;">
+                <label>
+                  <input
+                    type="radio"
+                    name="stickyH"
+                    value="false"
+                    checked={settings.titleView === false}
+                    onInput={() => {
+                      setSettings("titleView", false);
+                    }}
+                  />
+                  &nbsp;No
+                </label>
+
+                <label>
+                  <input
+                    type="radio"
+                    name="stickyH"
+                    value="true"
+                    checked={settings.titleView === true}
+                    onInput={() => {
+                      setSettings("titleView", true);
+                    }}
+                  />
+                  &nbsp;Yes
+                </label>
+              </div>
+            </div>
+          </section>
+
+          {/* <section class="SettingsPanel-section">
+            <heading>
+              Full Screen &emsp;
+              <small>
+                ( <i>Can interfere with gestures</i> )
+              </small>
+            </heading>
+            <div style="width:100%;display:flex;justify-content:center;align-content:center;">
+              <div style="display:flex;gap:12px;align-items:center;">
+                <div class="toggle-row">
+                  <span class="toggle-state" classList={{ active: !settings.fullScreenOn }}>
+                    Off
+                  </span>
+                  <label class="switch">
+                    <input type="checkbox" checked={settings.fullScreenOn} onChange={(e) => setSettings("fullScreenOn", e.target.checked)} />
+                    <span class="slider round"></span>
+                  </label>
+                  <span class="toggle-state" classList={{ active: settings.fullScreenOn }}>
+                    On
+                  </span>
+                </div>
+              </div>
+            </div>
+          </section> */}
+
+          <section class="SettingsPanel-section">
+            <heading>Keep Screen On</heading>
+            <div style="width:100%;display:flex;justify-content:center;align-content:center;">
+              <div style="display:flex;gap:12px;align-items:center;">
+                <div class="toggle-row">
+                  <span class="toggle-state" classList={{ active: !settings.keepScreenOn }}>
+                    Off
+                  </span>
+                  <label class="switch">
+                    <input type="checkbox" checked={settings.keepScreenOn} onChange={(e) => setSettings("keepScreenOn", e.target.checked)} />
+                    <span class="slider round"></span>
+                  </label>
+                  <span class="toggle-state" classList={{ active: settings.keepScreenOn }}>
+                    On
+                  </span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="SettingsPanel-section">
             <heading>First Letter Image</heading>
 
             <div style="width:100%;display:flex;justify-content:center;align-content:center;">
@@ -361,60 +436,6 @@ export default function SettingsPanel(props) {
               <div class="Opacity-slider-container">
                 <input type="range" class="vertical-range" min="0.2" max="1" step="0.01" value={settings[activeAlphaKey()]} onInput={(e) => setSettings(activeAlphaKey(), parseFloat(e.target.value))} />
                 <div class="Opacity-labels">Opacity</div>
-              </div>
-            </div>
-          </section>
-
-          <section class="SettingsPanel-section">
-            <heading>Keep Chapter Title InView</heading>
-
-            <div style="width:100%;display:flex;justify-content:center;align-content:center;">
-              <div style="display:flex;gap:12px;align-items:center;">
-                <label>
-                  <input
-                    type="radio"
-                    name="stickyH"
-                    value="false"
-                    checked={settings.titleView === false}
-                    onInput={() => {
-                      setSettings("titleView", false);
-                    }}
-                  />
-                  &nbsp;No
-                </label>
-
-                <label>
-                  <input
-                    type="radio"
-                    name="stickyH"
-                    value="true"
-                    checked={settings.titleView === true}
-                    onInput={() => {
-                      setSettings("titleView", true);
-                    }}
-                  />
-                  &nbsp;Yes
-                </label>
-              </div>
-            </div>
-          </section>
-
-          <section class="SettingsPanel-section">
-            <heading>Keep Screen On</heading>
-            <div style="width:100%;display:flex;justify-content:center;align-content:center;">
-              <div style="display:flex;gap:12px;align-items:center;">
-                <div class="toggle-row">
-                  <span class="toggle-state" classList={{ active: !settings.keepScreenOn }}>
-                    Off
-                  </span>
-                  <label class="switch">
-                    <input type="checkbox" checked={settings.keepScreenOn} onChange={(e) => setSettings("keepScreenOn", e.target.checked)} />
-                    <span class="slider round"></span>
-                  </label>
-                  <span class="toggle-state" classList={{ active: settings.keepScreenOn }}>
-                    On
-                  </span>
-                </div>
               </div>
             </div>
           </section>

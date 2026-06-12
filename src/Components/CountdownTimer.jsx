@@ -298,7 +298,7 @@ const CountdownTimer = (props) => {
 
       <div class="CountdownTimer-controls">
         {!isActive() ? (
-          <button class="CountdownTimer-btn start" onClick={handleBegin}>
+          <button class="CountdownTimer-btn start neu-button" onClick={handleBegin}>
             <span>{secondsLeft() > 0 ? "Resume" : "Start"}</span>
           </button>
         ) : (
@@ -319,7 +319,7 @@ const CountdownTimer = (props) => {
             <span>Stop</span>
           </button>
         )}
-        <button class="CountdownTimer-btn reset" onClick={resetTimer}>
+        <button class="CountdownTimer-btn reset neu-button" onClick={resetTimer}>
           Reset
         </button>
       </div>

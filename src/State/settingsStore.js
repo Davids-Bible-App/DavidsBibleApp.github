@@ -5,6 +5,7 @@ import { toggleSheet } from "./sheetStore";
 import { showToast } from "../Components/Toast";
 import { isDarkMode } from "../State/globalSignals.js";
 import { keepScreenOn } from "tauri-plugin-keep-screen-on-api";
+import { isFullscreen, setFullscreen } from "../state/fullscreen.js";
 
 // prettier-ignore
 import { 
@@ -25,6 +26,7 @@ export const [settings, setSettings] = createStore({
   alphaDarkSidelight: 0.8,
   alphaLightHighlight: 0.4,
   alphaLightSidelight: 1.0,
+  fullscreenOn: false,
   keepScreenOn: false,
   leatherTexture: false,
   navTopSwipe1: "search:Min",
@@ -37,59 +39,63 @@ export const [settings, setSettings] = createStore({
   navBotLongPress: "settings:Mid",
 });
 
+const SESSION_KEYS = ["bible1", "book", "chapterNo", "testamentBtn", "bookBtn", "chapterBtn", "wordHighlight"];
+// prettier-ignore
+const SETTINGS_KEYS = [
+  "firstName", "fontSize", "themeHue", "bgImage", "titleView",
+  "sideLightsLight", "sideLightsDark", "alphaDarkHighlight", "alphaDarkSidelight",
+  "alphaLightHighlight", "alphaLightSidelight", "fullscreenOn", "keepScreenOn", "leatherTexture",
+  "navTopSwipe1", "navTopSwipe2", "navTopDblClick", "navTopLongPress",
+  "navBotSwipe1", "navBotSwipe2", "navBotDblClick", "navBotLongPress",
+];
 // Load all settings from SQLite
-export async function loadSettings() {
+export async function loadAppState(scope = "all") {
+  const keys = scope === "session" ? SESSION_KEYS : scope === "settings" ? SETTINGS_KEYS : [...SESSION_KEYS, ...SETTINGS_KEYS];
   try {
-    // prettier-ignore
-    const keys = [
-      "firstName", "fontSize", "themeHue", "bgImage", "titleView",
-      "sideLightsLight", "sideLightsDark", "alphaDarkHighlight", "alphaDarkSidelight",
-      "alphaLightHighlight", "alphaLightSidelight", "keepScreenOn", "leatherTexture",
-      "navTopSwipe1", "navTopSwipe2", "navTopDblClick", "navTopLongPress",
-      "navBotSwipe1", "navBotSwipe2", "navBotDblClick", "navBotLongPress"
-    ];
-
     const res = await invoke("get_configs", { keys });
 
-    setSettings({
-      firstName: res.firstName ?? "David",
-      fontSize: res.fontSize ? parseFloat(res.fontSize) : 2,
-      themeHue: res.themeHue ? parseInt(res.themeHue, 10) : 250,
-      bgImage: res.bgImage ?? "none",
-      // Convert the string "true" back to a boolean true.
-      // If it's "false" or undefined, it becomes false.
-      sideLightsLight: res.sideLightsLight != null ? res.sideLightsLight === "true" : false,
-      sideLightsDark: res.sideLightsDark != null ? res.sideLightsDark === "true" : true,
-      titleView: res.titleView != null ? res.titleView === "true" : true,
-      alphaDarkHighlight: res.alphaDarkHighlight ? parseFloat(res.alphaDarkHighlight) : 0.55,
-      alphaDarkSidelight: res.alphaDarkSidelight ? parseFloat(res.alphaDarkSidelight) : 0.8,
-      alphaLightHighlight: res.alphaLightHighlight ? parseFloat(res.alphaLightHighlight) : 0.4,
-      alphaLightSidelight: res.alphaLightSidelight ? parseFloat(res.alphaLightSidelight) : 1.0,
-      keepScreenOn: res.keepScreenOn != null ? res.keepScreenOn === "true" : false,
-      leatherTexture: res.leatherTexture != null ? res.leatherTexture === "true" : false,
-      navTopSwipe1: res.navTopSwipe1 ?? "search:Min",
-      navTopSwipe2: res.navTopSwipe2 ?? "editor:Max",
-      navTopDblClick: res.navTopDblClick ?? "help:Max",
-      navTopLongPress: res.navTopLongPress ?? "settings:Mid",
-      navBotSwipe1: res.navBotSwipe1 ?? "audio:Min",
-      navBotSwipe2: res.navBotSwipe2 ?? "editor:Max",
-      navBotDblClick: res.navBotDblClick ?? "meme:Min",
-      navBotLongPress: res.navBotLongPress ?? "settings:Mid",
-    });
+    if (scope !== "settings") {
+      if (res.bible1) setBible1(res.bible1);
+      if (res.book) setBook(res.book);
+      if (res.chapterNo) setChapterNo(parseInt(res.chapterNo, 10));
+      if (res.testamentBtn) setTestamentBtn(res.testamentBtn);
+      if (res.bookBtn) setBookBtn(res.bookBtn);
+      if (res.chapterBtn) setChapterBtn(parseInt(res.chapterBtn, 10));
+      if (res.wordHighlight) setWordHighlight(res.wordHighlight === "true");
+    }
 
-    // Apply globals
-    document.documentElement.style.setProperty("--hue", settings.themeHue);
-    document.documentElement.style.setProperty("--reader-font-size", settings.fontSize + "rem");
+    if (scope !== "session") {
+      setSettings({
+        firstName: res.firstName ?? "David",
+        fontSize: res.fontSize ? parseFloat(res.fontSize) : 2,
+        themeHue: res.themeHue ? parseInt(res.themeHue, 10) : 250,
+        bgImage: res.bgImage ?? "none",
+        titleView: res.titleView != null ? res.titleView === "true" : true,
+        sideLightsLight: res.sideLightsLight != null ? res.sideLightsLight === "true" : false,
+        sideLightsDark: res.sideLightsDark != null ? res.sideLightsDark === "true" : true,
+        alphaDarkHighlight: res.alphaDarkHighlight ? parseFloat(res.alphaDarkHighlight) : 0.55,
+        alphaDarkSidelight: res.alphaDarkSidelight ? parseFloat(res.alphaDarkSidelight) : 0.8,
+        alphaLightHighlight: res.alphaLightHighlight ? parseFloat(res.alphaLightHighlight) : 0.4,
+        alphaLightSidelight: res.alphaLightSidelight ? parseFloat(res.alphaLightSidelight) : 1.0,
+        fullscreenOn: res.fullscreenOn != null ? res.fullscreenOn === "true" : false,
+        keepScreenOn: res.keepScreenOn != null ? res.keepScreenOn === "true" : false,
+        leatherTexture: res.leatherTexture != null ? res.leatherTexture === "true" : false,
+        navTopSwipe1: res.navTopSwipe1 ?? "search:Min",
+        navTopSwipe2: res.navTopSwipe2 ?? "history:Max",
+        navTopDblClick: res.navTopDblClick ?? "meme:Min",
+        navTopLongPress: res.navTopLongPress ?? "settings:Mid",
+        navBotSwipe1: res.navBotSwipe1 ?? "history:Mid",
+        navBotSwipe2: res.navBotSwipe2 ?? "search:Max",
+        navBotDblClick: res.navBotDblClick ?? "bookmarks:Min",
+        navBotLongPress: res.navBotLongPress ?? "settings:Mid",
+      });
 
-    if (settings.bgImage === "Oakleaf") {
-      document.documentElement.style.setProperty("--reader-bg-image", 'url("/oakleafacorn.svg")');
-    } else if (settings.bgImage === "Leaves") {
-      document.documentElement.style.setProperty("--reader-bg-image", 'url("/letterLeaf1.svg")');
-    } else {
-      document.documentElement.style.setProperty("--reader-bg-image", "none");
+      document.documentElement.style.setProperty("--hue", settings.themeHue);
+      document.documentElement.style.setProperty("--reader-font-size", settings.fontSize + "rem");
+      document.documentElement.style.setProperty("--reader-bg-image", settings.bgImage === "Oakleaf" ? 'url("/oakleafacorn.svg")' : settings.bgImage === "Leaves" ? 'url("/letterLeaf1.svg")' : "none");
     }
   } catch (error) {
-    console.log(`LOG[:33]: error: `, error);
+    console.error("Failed to load app state:", error);
   } finally {
     triggerRefetch("refetchChapters", "refetchHighlights");
   }
@@ -105,6 +111,7 @@ export async function saveSettings() {
         bgImage: String(settings.bgImage),
         themeHue: String(settings.themeHue),
         titleView: String(settings.titleView),
+        fullscreenOn: String(settings.fullscreenOn),
         keepScreenOn: String(settings.keepScreenOn),
         leatherTexture: String(settings.leatherTexture),
         sideLightsDark: String(settings.sideLightsDark),
@@ -133,23 +140,23 @@ export async function saveSettings() {
 }
 
 // The Load Function (Call this once when the app starts)
-export async function loadSessionState() {
-  try {
-    const keys = ["bible1", "book", "chapterNo", "testamentBtn", "bookBtn", "chapterBtn", "wordHighlight"];
-    const res = await invoke("get_configs", { keys });
+// export async function loadSessionState() {
+//   try {
+//     const keys = ["bible1", "book", "chapterNo", "testamentBtn", "bookBtn", "chapterBtn", "wordHighlight"];
+//     const res = await invoke("get_configs", { keys });
 
-    // Update signals only if the DB has a value, otherwise they keep their defaults
-    if (res.bible1) setBible1(res.bible1);
-    if (res.book) setBook(res.book);
-    if (res.chapterNo) setChapterNo(parseInt(res.chapterNo, 10));
-    if (res.testamentBtn) setTestamentBtn(res.testamentBtn);
-    if (res.bookBtn) setBookBtn(res.bookBtn);
-    if (res.chapterBtn) setChapterBtn(parseInt(res.chapterBtn, 10));
-    if (res.wordHighlight) setWordHighlight(res.wordHighlight != null ? res.wordHighlight === "true" : false);
-  } catch (error) {
-    console.error("Failed to load session state:", error);
-  }
-}
+//     // Update signals only if the DB has a value, otherwise they keep their defaults
+//     if (res.bible1) setBible1(res.bible1);
+//     if (res.book) setBook(res.book);
+//     if (res.chapterNo) setChapterNo(parseInt(res.chapterNo, 10));
+//     if (res.testamentBtn) setTestamentBtn(res.testamentBtn);
+//     if (res.bookBtn) setBookBtn(res.bookBtn);
+//     if (res.chapterBtn) setChapterBtn(parseInt(res.chapterBtn, 10));
+//     if (res.wordHighlight) setWordHighlight(res.wordHighlight != null ? res.wordHighlight === "true" : false);
+//   } catch (error) {
+//     console.error("Failed to load session state:", error);
+//   }
+// }
 
 // Use createRoot to provide a top-level owner
 createRoot(() => {
@@ -200,6 +207,29 @@ createRoot(() => {
 
     document.documentElement.style.setProperty("--alpha", activeAlpha);
   });
+
+  // let fullScreenOnFirstRun = true;
+  // createEffect(async () => {
+  //   console.log(`LOG[:210]: settings.fullScreenOn: `, settings.fullScreenOn);
+  //   if (fullScreenOnFirstRun) {
+  //     fullScreenOnFirstRun = false;
+  //     // Defer to idle so first paint isn't blocked
+  //     const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 500));
+  //     idle(async () => {
+  //       try {
+  //         setFullscreen(settings.fullScreenOn);
+  //       } catch (err) {
+  //         console.error("Failed to set full screen:", err);
+  //       }
+  //     });
+  //     return;
+  //   }
+  //   try {
+  //     setFullscreen(settings.fullScreenOn);
+  //   } catch (err) {
+  //     console.error("Failed to set full screen:", err);
+  //   }
+  // });
 
   let keepScreenOnFirstRun = true;
   createEffect(async () => {

@@ -1,0 +1,146 @@
+/* Component Root - defined by device dimensions */
+
+.UniVerse-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  z-index: 9999;
+
+  /* Support for modern CSS light-dark styling */
+  color-scheme: light dark;
+  background-color: light-dark(#fdfbf7, #1a1a1a);
+  color: light-dark(#222222, #e0e0e0);
+
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  user-select: none;
+
+  & * {
+    box-sizing: border-box;
+  }
+}
+
+/* * Portrait Visual Viewport - The fix for the Square text box
+ * In portrait, we define a screen with landscape dimensions, and rotate that.
+ */
+@media (orientation: portrait) {
+  .UniVerse-screen {
+    width: 100vh; /* Desired landscape width is the phone's height */
+    height: 100vw; /* Desired landscape height is the phone's width */
+    transform: rotate(90deg) translate(-50%, -50%);
+    transform-origin: 0 0;
+    top: 50%;
+    left: 50%;
+  }
+  .UniVerse-container {
+    padding-top: calc(var(--edge2edge-left) + 3%);
+    padding-bottom: calc(var(--edge2edge-right) + 3%);
+    padding-right: calc(var(--edge2edge-top) + 4%);
+    padding-left: calc(var(--edge2edge-bottom) + 4%);
+  }
+}
+
+/* No change needed for standard landscape */
+@media (orientation: landscape) {
+  .UniVerse-container {
+    width: 100vw;
+    height: 100vh;
+    padding-top: calc(var(--edge2edge-top) + 3%);
+    padding-bottom: calc(var(--edge2edge-bottom) + 3%);
+    padding-right: calc(var(--edge2edge-right) + 4%);
+    padding-left: calc(var(--edge2edge-left) + 4%);
+  }
+}
+
+/* Layout Inner Architecture - Uses percentages to work in all rotation states */
+.UniVerse-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header Elements - percentages */
+.UniVerse-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 12%;
+}
+
+.UniVerse-citation {
+  font-size: 1.8rem;
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.UniVerse-closeBtn {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.6;
+}
+
+/* Main presentation Viewport allocation */
+.UniVerse-main {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  height: 88%;
+  gap: 2%;
+}
+
+/* Navigation System */
+.UniVerse-navBtn {
+  background: none;
+  border: none;
+  font-size: 4.5rem;
+  font-weight: 200;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.5;
+  height: 100%;
+  &:hover {
+    background: none;
+  }
+}
+
+.UniVerse-navBtn:disabled {
+  opacity: 0.05;
+  cursor: not-allowed;
+}
+
+/* Text Box Area */
+.UniVerse-textWrapper {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.UniVerse-text {
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  line-height: 1.3;
+  font-weight: 400;
+  /* Handles line breaks correctly within the sizing logic */
+  white-space: break-spaces;
+  word-wrap: break-word;
+  width: 100%;
+}

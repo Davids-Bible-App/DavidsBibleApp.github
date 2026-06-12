@@ -1,6 +1,6 @@
 {
   "name": "davidsbible",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "",
   "type": "module",
   "scripts": {
@@ -12,7 +12,7 @@
     "build:android:apk": "npm run tauri android build --apk && node rename-builds.js",
     "build:android:aab": "npm run tauri android build && node rename-builds.js",
     "develope:android": "npm run tauri android dev",
-    "build:android:fast": "npm run tauri android build -- --apk true",
+    "build:android:fast": "npm run tauri android build -- --apk",
     "build:win:fast": "npm run tauri build -- --bundles nsis",
     "build:icons": "npm run tauri icon ./public/book.svg",
     "android:init": "npm run tauri android init",

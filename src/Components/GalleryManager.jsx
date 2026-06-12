@@ -1,4 +1,5 @@
-import { createSignal, createResource, createEffect, For, Show, createMemo, onCleanup } from "solid-js";
+import { createSignal, createResource, createEffect, For, Show, createMemo, onMount, onCleanup, Suspense, lazy } from "solid-js";
+import { Portal } from "solid-js/web";
 import { invoke } from "@tauri-apps/api/core";
 import { ask } from "@tauri-apps/plugin-dialog";
 import { type } from "@tauri-apps/plugin-os";
@@ -6,6 +7,8 @@ import { type } from "@tauri-apps/plugin-os";
 import {
   expandedCtl, setExpandedCtl, selectedTopic, setSelectedTopic,
   selection, setSelection, bibleVersion, topicController, setTopicController,
+  showUniTopic, setShowUniTopic,
+  trigger
 } from "../State/globalSignals.js";
 import Bookmark from "./Bookmark.jsx";
 import { registerRefetchers, triggerRefetch } from "../State/settingsStore.js";
@@ -14,6 +17,9 @@ import { abbreviator, clickOutside, groupConsecutiveVerses } from "../lib/functi
 import { pendingVerses, setPendingVerses } from "../State/editorStore";
 import { toggleSheet } from "../State/sheetStore";
 import "./CSS/GalleryManager.css";
+
+import ToastStack, { showToast } from "./Toast";
+const UniVerse = lazy(() => import("./UniVerse"));
 
 const [dataExport, setDataExport] = createSignal({ verses: {}, text: "" });
 
@@ -217,7 +223,8 @@ export default function GalleryManager(props) {
     await invoke("delete_gallery_entry", { entryType: type, ids });
 
     if (type === "topic") {
-      triggerRefetch("refetchTopics", "refetchTopicVerses");
+      triggerRefetch("refetchTopics", "refetchTopicVerses", "refetchTopicMetadata");
+      console.log(`LOG[:227]: `, "refetchTopicMetadata");
     }
 
     if (type === "note") {
@@ -234,12 +241,12 @@ export default function GalleryManager(props) {
 
   const handleRenameTopic = async (oldName, newName) => {
     await invoke("rename_topic", { oldTopic: oldName, newTopic: newName });
-    triggerRefetch("refetchTopics", "refetchTopicVerses");
+    triggerRefetch("refetchTopics", "refetchTopicVerses", "refetchTopicMetadata");
   };
 
   const handleDeleteTopicMeta = async (topicName) => {
     await invoke("delete_topic", { topic: topicName });
-    triggerRefetch("refetchTopics", "refetchTopicVerses");
+    triggerRefetch("refetchTopics", "refetchTopicVerses", "refetchTopicMetadata");
   };
 
   const handleResetTopicOrder = async (topicName) => {
@@ -255,7 +262,7 @@ export default function GalleryManager(props) {
     await invoke("update_verses_order", { orderedIds });
 
     // 3. Refresh UI
-    triggerRefetch("refetchTopicVerses");
+    triggerRefetch("refetchTopics", "refetchTopicVerses", "refetchTopicMetadata");
   };
 
   return (
@@ -314,19 +321,6 @@ function TopicSection(props) {
 
   const formatDate = (ts) => new Date(ts * 1000).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
 
-  const handleSave = async (topicName) => {
-    const target = topicName || props.searchText();
-    if (!topicController() || !target || !selection().length) return;
-    const verses = selection().map((v) => [`${v.tr}.dba` || `${bibleVersion()}.dba`, v.bk, parseInt(v.ch), parseInt(v.vs)]);
-    await invoke("save_verses_to_topic", { verses, topic: target });
-    props.setSearchText("");
-    refetchTopics();
-    setSelectedTopic(target);
-    setExpandedCtl(0);
-    setSelection([]);
-    setTopicController(false);
-  };
-
   // ── TOPICS drag ───────────────────────────────────────────────────────────────
   const topicItemRefs = new Map();
   let topicSnapRects = new Map();
@@ -367,10 +361,12 @@ function TopicSection(props) {
       pointerEvents: "none",
       background: computed.background,
       backgroundColor: computed.backgroundColor,
-      borderRadius: computed.borderRadius,
+      // borderRadius: "1rem",
       boxShadow: "0 14px 36px rgba(0,0,0,0.38), 0 4px 12px rgba(0,0,0,0.24)",
-      opacity: "0.97",
-      transform: "scale(1.03)",
+      opacity: "0.98",
+      fontSize: "0.9rem",
+      fontFamily: "Georgia",
+      transform: "scale(1.01)",
       transformOrigin: "center center",
       overflow: "hidden",
     });
@@ -385,7 +381,7 @@ function TopicSection(props) {
     if (!topicDragId) return;
     e.preventDefault();
 
-    topicGhostEl.style.transform = `scale(1.03) translateY(${e.clientY - topicStartY}px)`;
+    topicGhostEl.style.transform = `scale(1.01) translateY(${e.clientY - topicStartY}px)`;
 
     const ord = topicOrdSnap;
     const fromIdx = ord.indexOf(topicDragId);
@@ -486,10 +482,12 @@ function TopicSection(props) {
       pointerEvents: "none",
       background: computed.background,
       backgroundColor: computed.backgroundColor,
-      borderRadius: computed.borderRadius,
+      borderRadius: "1rem",
       boxShadow: "0 14px 36px rgba(0,0,0,0.38), 0 4px 12px rgba(0,0,0,0.24)",
-      opacity: "0.97",
-      transform: "scale(1.03)",
+      opacity: "0.98",
+      fontSize: "1rem",
+      fontFamily: "Georgia",
+      transform: "scale(1.01)",
       transformOrigin: "center center",
       overflow: "hidden",
     });
@@ -505,7 +503,7 @@ function TopicSection(props) {
     if (!groupDragId) return;
     e.preventDefault();
 
-    groupGhostEl.style.transform = `scale(1.03) translateY(${e.clientY - groupStartY}px)`;
+    groupGhostEl.style.transform = `scale(1.01) translateY(${e.clientY - groupStartY}px)`;
 
     const ord = groupOrdSnap;
     const fromIdx = ord.indexOf(groupDragId);
@@ -571,6 +569,57 @@ function TopicSection(props) {
     window.removeEventListener("pointercancel", onGroupDragEnd); // ← clean up
   };
 
+  const uniVerse = async () => {
+    if (topicVerses().length > 0) setShowUniTopic(true);
+  };
+
+  // ── TWO-FINGER EXPAND (pinch-out) → opens UniVerse ───────────────────────
+  let _pinchStartDist = null;
+  let _pinchFired = false;
+
+  const _getGalleryTouchDist = (touches) => {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  };
+
+  const _onGalleryPinchStart = (e) => {
+    if (topicDragId || groupDragId) return; // don't clash with an active drag
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      _pinchStartDist = _getGalleryTouchDist(e.touches);
+      _pinchFired = false;
+    }
+  };
+
+  const _onGalleryPinchMove = (e) => {
+    if (e.touches.length !== 2 || _pinchStartDist === null || _pinchFired) return;
+    if (topicDragId || groupDragId) return; // drag started after pinch began
+    e.preventDefault();
+    const delta = _getGalleryTouchDist(e.touches) - _pinchStartDist;
+    if (delta > 55) {
+      _pinchFired = true;
+      selectedTopic() && trigger() === "right" && uniVerse();
+    }
+  };
+
+  const _onGalleryPinchEnd = () => {
+    _pinchStartDist = null;
+    _pinchFired = false;
+  };
+
+  createEffect(() => {
+    if (selectedTopic()) {
+      document.addEventListener("touchstart", _onGalleryPinchStart, { passive: true });
+      document.addEventListener("touchmove", _onGalleryPinchMove, { passive: true });
+      document.addEventListener("touchend", _onGalleryPinchEnd, { passive: true });
+    } else {
+      document.removeEventListener("touchstart", _onGalleryPinchStart);
+      document.removeEventListener("touchmove", _onGalleryPinchMove);
+      document.removeEventListener("touchend", _onGalleryPinchEnd);
+    }
+  });
+
   // Safety cleanup if the component unmounts mid-drag
   onCleanup(() => {
     window.removeEventListener("pointermove", onTopicDragMove);
@@ -580,102 +629,115 @@ function TopicSection(props) {
     window.removeEventListener("pointercancel", onGroupDragEnd); // ← add
     topicGhostEl?.remove();
     groupGhostEl?.remove();
+    // ── pinch cleanup ──────────────────────────────────────────────
+    document.removeEventListener("touchstart", _onGalleryPinchStart);
+    document.removeEventListener("touchmove", _onGalleryPinchMove);
+    document.removeEventListener("touchend", _onGalleryPinchEnd);
   });
 
   return (
-    <Show
-      when={!selectedTopic()}
-      fallback={
-        <div class="TopicSection-detail">
-          <Show when={selectedTopic()}>
-            <div class="TopicSection-header" style={type() === "windows" && "padding-inline: 10px;"}>
-              <button onClick={() => setSelectedTopic(null)} class="jump-btn">
-                ↢ Back to Topics
-              </button>
-              <TopicActions topic={selectedTopic()} onResetOrder={props.onResetTopicOrder} />
-            </div>
-          </Show>
-          <TopicDescription topic={selectedTopic()} />
-          {/* Grouped Verses View (Draggable) */}
-          <div class="GalleryManager-card-wrap scroll_Win">
-            <For each={groupConsecutiveVerses(topicVerses() || [], false, true, false, false)}>
-              {(group) => {
-                const groupId = group[0].id;
-                return (
-                  <div
-                    ref={(el) => {
-                      groupItemRefs.set(groupId, el);
-                      el.addEventListener(
-                        "pointerdown",
-                        (e) => {
-                          capturedGroupPointer = e;
-                        },
-                        { capture: true },
-                      );
-                    }}
-                    style={{ "touch-action": "pan-y" }}
-                  >
-                    <GroupedVerseCard
-                      group={group}
-                      currentVerses={() => topicVerses() || []}
-                      onRefresh={() => refetchTopicVerses()}
-                      jumpTo={props.jumpTo}
-                      handleDelete={props.handleDelete}
-                      onNoteSave={props.onNoteSave}
-                      isDraggable={true}
-                      onHandleDown={() => {
-                        if (capturedGroupPointer) onGroupDragStart(capturedGroupPointer, groupId);
-                        capturedGroupPointer = null;
+    <>
+      <Show
+        when={!selectedTopic()}
+        fallback={
+          <div class="TopicSection-detail">
+            <Show when={selectedTopic()}>
+              <div class="TopicSection-header" style={type() === "windows" && "padding-inline: 10px;"}>
+                <button onClick={() => setSelectedTopic(null)} class="jump-btn">
+                  ↢ Back to Topics
+                </button>
+                <TopicActions topic={selectedTopic()} onResetOrder={props.onResetTopicOrder} />
+              </div>
+            </Show>
+            <TopicDescription topic={selectedTopic()} />
+            {/* Grouped Verses View (Draggable) */}
+            <div class="GalleryManager-card-wrap scroll_Win">
+              {/* <button onClick={() => uniVerse()}>uniVerse</button> */}
+              <For each={groupConsecutiveVerses(topicVerses() || [], false, true, false, false)}>
+                {(group) => {
+                  const groupId = group[0].id;
+                  return (
+                    <div
+                      ref={(el) => {
+                        groupItemRefs.set(groupId, el);
+                        el.addEventListener(
+                          "pointerdown",
+                          (e) => {
+                            capturedGroupPointer = e;
+                          },
+                          { capture: true },
+                        );
                       }}
-                    />
-                  </div>
-                );
-              }}
-            </For>
-          </div>
-        </div>
-      }
-    >
-      {/* Topics List (Draggable) */}
-      <For each={filteredMeta()}>
-        {(m) => {
-          const topicId = m.topic;
-          return (
-            <div class="TopicSection-item" ref={(el) => topicItemRefs.set(topicId, el)} onClick={() => setSelectedTopic(m.topic)} style={type() === "android" && "padding-inline: 5px;"}>
-              <div
-                class="TopicSection-drag-handle"
-                style={!props.searchText() ? "cursor: grab; touch-action: none; padding: 0 6px; color: var(--main-icon-text-color);" : "cursor: not-allowed; padding: 0 6px; color: #777"}
-                onPointerDown={(e) => {
-                  e.stopPropagation();
-                  onTopicDragStart(e, topicId);
+                      style={{ "touch-action": "pan-y" }}
+                    >
+                      <GroupedVerseCard
+                        group={group}
+                        currentVerses={() => topicVerses() || []}
+                        onRefresh={() => refetchTopicVerses()}
+                        jumpTo={props.jumpTo}
+                        handleDelete={props.handleDelete}
+                        onNoteSave={props.onNoteSave}
+                        isDraggable={true}
+                        onHandleDown={() => {
+                          if (capturedGroupPointer) onGroupDragStart(capturedGroupPointer, groupId);
+                          capturedGroupPointer = null;
+                        }}
+                      />
+                    </div>
+                  );
                 }}
-              >
-                <svg viewBox="0 0 10 16" fill="currentColor" style={{ width: "12px", height: "18px" }}>
-                  <circle cx="3" cy="3" r="1.2" />
-                  <circle cx="7" cy="3" r="1.2" />
-                  <circle cx="3" cy="8" r="1.2" />
-                  <circle cx="7" cy="8" r="1.2" />
-                  <circle cx="3" cy="13" r="1.2" />
-                  <circle cx="7" cy="13" r="1.2" />
-                </svg>
-              </div>
+              </For>
+            </div>
+          </div>
+        }
+      >
+        {/* Topics List (Draggable) */}
+        <For each={filteredMeta()} fallback={<p class="Bookmark-empty">No Topics Yet</p>}>
+          {(m) => {
+            const topicId = m.topic;
+            return (
+              <div class="TopicSection-item" ref={(el) => topicItemRefs.set(topicId, el)} onClick={() => setSelectedTopic(m.topic)} style={type() === "android" && "padding-inline: 5px;"}>
+                <div
+                  class="TopicSection-drag-handle"
+                  style={!props.searchText() ? "cursor: grab; touch-action: none; padding: 0 6px; color: var(--main-icon-text-color);" : "cursor: not-allowed; padding: 0 6px; color: #777"}
+                  onPointerDown={(e) => {
+                    e.stopPropagation();
+                    onTopicDragStart(e, topicId);
+                  }}
+                >
+                  <svg viewBox="0 0 10 16" fill="currentColor" style={{ width: "12px", height: "18px" }}>
+                    <circle cx="3" cy="3" r="1.2" />
+                    <circle cx="7" cy="3" r="1.2" />
+                    <circle cx="3" cy="8" r="1.2" />
+                    <circle cx="7" cy="8" r="1.2" />
+                    <circle cx="3" cy="13" r="1.2" />
+                    <circle cx="7" cy="13" r="1.2" />
+                  </svg>
+                </div>
 
-              <div style={{ flex: 1 }}>
-                <div style={{ "font-size": "1.1rem" }}>{m.topic}</div>
-                <div style={{ color: "var(--main-icon-text-color)", "font-size": "0.8rem" }}>verses: {m.count}</div>
-              </div>
-              <div style={{ display: "flex", "align-items": "center", gap: "10px" }}>
-                <div style={{ "text-align": "right", color: "var(--main-icon-text-color)", "font-size": "0.8rem" }}>
-                  <div>{formatDate(m.updated)}</div>
-                  <div style={{ "margin-top": "5px" }}>🏷️</div>
+                <div style="display:flex;flex-direction:column;width:100%;">
+                  <div style="font-size:1.1rem; flex:1;">🏷️ {m.topic}</div>
+
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                    <div style="color:var(--main-icon-text-color);font-size:0.8rem;opacity:0.6;">verses: {m.count}</div>
+                    <div style="color:var(--main-icon-text-color);font-size:0.8rem;opacity:0.6;">{formatDate(m.updated)}</div>
+                  </div>
                 </div>
                 <TopicActions topic={m.topic} onRename={props.onRenameTopic} onDeleteTopic={props.onDeleteTopicMeta} />
               </div>
-            </div>
-          );
-        }}
-      </For>
-    </Show>
+            );
+          }}
+        </For>
+      </Show>
+
+      <Portal>
+        <Show when={showUniTopic()}>
+          <Suspense>
+            <UniVerse uniTopic={topicVerses} />
+          </Suspense>
+        </Show>
+      </Portal>
+    </>
   );
 }
 
@@ -693,7 +755,7 @@ function NoteSection(props) {
 
   return (
     <div class="GalleryManager-card-wrap scroll_Win">
-      <For each={groupConsecutiveVerses(filtered(), false, true, false, false)}>
+      <For each={groupConsecutiveVerses(filtered(), false, true, false, false)} fallback={<p class="Bookmark-empty">No Notes Yet</p>}>
         {(group) => (
           <GroupedVerseCard
             group={group}
@@ -727,10 +789,16 @@ function GroupedVerseCard(props) {
   };
 
   let longPressTimer = null;
+
   const startLongPress = (e, id) => {
+    if (!e.isPrimary) {
+      cancelLongPress(); // ← also cancel if a second finger arrives mid-press
+      return;
+    }
     e.preventDefault();
     longPressTimer = setTimeout(() => toggleSelect(id), 450);
   };
+
   const cancelLongPress = () => clearTimeout(longPressTimer);
 
   const deleteSelected = async () => {
@@ -906,14 +974,19 @@ function GroupedVerseCard(props) {
             {refLabel()}
             <span>({abbreviator(first().translation_id)})</span>
           </div>
-          <button class="jump-btn" onClick={() => props.jumpTo(first())}>
+          <button
+            class="jump-btn"
+            onClick={() => {
+              props.jumpTo(first());
+            }}
+          >
             Go to Verse ↣
           </button>
         </div>
         <For each={props.group}>
           {(entry) => (
             <div class={`GroupedVerse-row ${selected().has(entry.id) ? "Verse-selected" : ""}`}>
-              <div class="Entry-text" style={{ "--color": entry.highlight }} onDblClick={() => toggleSelect(entry.id)} onPointerDown={(e) => startLongPress(e, entry.id)} onPointerUp={cancelLongPress} onPointerLeave={cancelLongPress}>
+              <div class="Entry-text" style={{ "--color": entry.highlight }} onPointerDown={(e) => startLongPress(e, entry.id)} onPointerUp={cancelLongPress} onPointerLeave={cancelLongPress} onPointerCancel={cancelLongPress} onDblClick={() => toggleSelect(entry.id)}>
                 <span class="Entry-verse-num">{entry.verse_id}.</span>
                 {entry.text}
               </div>
@@ -964,9 +1037,11 @@ function TopicDescription(props) {
     <div class="TopicDescription-root">
       <div class="TopicDescription-toggle" onClick={() => setExpanded(!expanded())}>
         <span class="entry-ref bg">🏷️ {selectedTopic()}</span>
-        &emsp;
-        <span>{expanded() ? "▼" : "▶"}</span>
-        <span style={{ "text-decoration": data() ? "none" : "underline" }}>{data() ? "Topic Description" : "Add description..."}</span>
+        <span>
+          <span>{expanded() ? "▼" : "▶"}</span>&nbsp;
+          <span style={{ color: data() ? "var(--text-color-highlights)" : "currentColor" }}>{data() ? "Described" : "Describe"}</span>
+          &emsp;
+        </span>
       </div>
 
       <Show when={expanded()}>
