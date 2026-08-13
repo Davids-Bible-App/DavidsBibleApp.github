@@ -13,6 +13,8 @@ const loadIntro = () => import("../help-docs/intro.md?raw").then((m) => m.defaul
 const loadContents = () => import("../help-docs/contents.md?raw").then((m) => m.default);
 const loadHistory = () => import("../help-docs/history.md?raw").then((m) => m.default);
 const loadSetup = () => import("../help-docs/setup.md?raw").then((m) => m.default);
+const loadAudio = () => import("../help-docs/audio.md?raw").then((m) => m.default);
+const loadMeme = () => import("../help-docs/meme.md?raw").then((m) => m.default);
 
 // ── Markdown section ──────────────────────────────────────────────────────────
 // `fetcher` is only called when `active` flips true — keeps idle sections inert
@@ -70,6 +72,8 @@ const Help = () => {
   const [activeContents, setActiveContents] = createSignal(false);
   const [activeHistory, setActiveHistory] = createSignal(false);
   const [activeSetup, setActiveSetup] = createSignal(false);
+  const [activeAudio, setActiveAudio] = createSignal(false);
+  const [activeMeme, setActiveMeme] = createSignal(false);
 
   onMount(() => {
     // First section: load right away so the page feels instant
@@ -81,6 +85,8 @@ const Help = () => {
       setActiveContents(true);
       setTimeout(() => setActiveHistory(true), 80);
       setTimeout(() => setActiveSetup(true), 160);
+      setTimeout(() => setActiveAudio(true), 240);
+      setTimeout(() => setActiveMeme(true), 320);
     });
   });
 
@@ -152,6 +158,16 @@ const Help = () => {
                   Setting up the Application
                 </a>
               </li>
+              <li>
+                <a href="#audio" class="Help-nav-link" onClick={close}>
+                  Using the Audio Bible Player
+                </a>
+              </li>
+              <li>
+                <a href="#meme" class="Help-nav-link" onClick={close}>
+                  Using the Meme Maker
+                </a>
+              </li>
             </ul>
           </nav>
         </aside>
@@ -173,6 +189,8 @@ const Help = () => {
           <MdSection id="contents" fetcher={loadContents} active={activeContents()} />
           <MdSection id="history" fetcher={loadHistory} active={activeHistory()} />
           <MdSection id="setup" fetcher={loadSetup} active={activeSetup()} />
+          <MdSection id="audio" fetcher={loadAudio} active={activeAudio()} />
+          <MdSection id="meme" fetcher={loadMeme} active={activeMeme()} />
         </main>
       </div>
     </div>

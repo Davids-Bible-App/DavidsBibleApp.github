@@ -1,0 +1,202 @@
+/* =========================================================
+   Theme — edit these to restyle the whole component
+   ========================================================= */
+.StreakBadge-class {
+  --streak-fg: var(--text-color);
+  --streak-fg-muted: var(--text-color-dimmed);
+  --streak-accent: var(--text-color);
+  --streak-accent-strong: var(--text-color);
+
+  --streak-btn-bg: transparent;
+  --streak-btn-bg-hover: rgba(255, 138, 61, 0.12);
+  --streak-btn-border: var(--btn-border);
+
+  --streak-popover-bg: var(--back-gradient);
+  --streak-popover-bg: var(--back-gradient);
+  --streak-popover-border: var(--btn-border);
+  --streak-popover-shadow: 0 12px 32px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.35);
+
+  --streak-row-bg: var(--controls-normal-button-wrapper-gradient);
+  --streak-row-hi-bg: var(--banner);
+
+  --streak-radius: 12px;
+  --streak-gap: 10px;
+  --streak-arrow-size: 10px;
+  --streak-anchor-gap: 10px;
+
+  --streak-font: 500 0.95rem/1.3 system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  position: absolute;
+  top: 0px;
+  right: 72px;
+  z-index: 5;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  color: var(--streak-fg);
+  font: var(--streak-font);
+}
+
+/* =========================================================
+   Trigger button — this is also the anchor
+   ========================================================= */
+.StreakBadge-button {
+  anchor-name: --streak-anchor;
+  min-width: 1.5rem;
+  min-height: 25px;
+}
+
+/* =========================================================
+   Popover — anchored to the button, right-edge aligned,
+   drops below with a small gap
+   ========================================================= */
+.StreakBadge-popover {
+  /* Anchor to the button */
+  position-anchor: --streak-anchor;
+  /* Right edge of popover aligned to right edge of anchor;
+     top of popover placed just below the anchor's bottom. */
+  position-area: bottom span-left;
+  margin-top: var(--streak-anchor-gap);
+
+  /* Reset native popover defaults */
+  margin: 0;
+  margin-top: var(--streak-anchor-gap);
+  padding: 14px 16px 16px;
+  border: 1px solid var(--streak-popover-border);
+  border-radius: var(--streak-radius);
+  background: var(--streak-popover-bg);
+  color: var(--streak-fg);
+  min-width: 240px;
+  max-width: min(320px, calc(100vw - 24px));
+  box-shadow: var(--streak-popover-shadow);
+
+  overflow: visible; /* let the arrow poke out */
+}
+
+/* Keep it inside the viewport if the anchor is near the edge */
+@supports (position-try-fallbacks: --flip-block) {
+  .StreakBadge-popover {
+    position-try-fallbacks:
+      flip-block,
+      flip-inline,
+      flip-block flip-inline;
+  }
+}
+
+/* =========================================================
+   Arrow — nudged between anchor and popover, near right edge
+   ========================================================= */
+.StreakBadge-arrow {
+  position: absolute;
+  top: calc(var(--streak-arrow-size) * -1);
+  right: 14px; /* horizontal offset from popover's right edge */
+  width: calc(var(--streak-arrow-size) * 2);
+  height: var(--streak-arrow-size);
+  overflow: hidden;
+  pointer-events: none;
+}
+.StreakBadge-arrow::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  top: 50%;
+  left: 50%;
+  width: calc(var(--streak-arrow-size) * 1.4);
+  height: calc(var(--streak-arrow-size) * 1.4);
+  background: var(--streak-popover-bg);
+  border-top: 1px solid var(--streak-popover-border);
+  border-left: 1px solid var(--streak-popover-border);
+  transform: translate(-50%, 0) rotate(45deg);
+}
+
+/* =========================================================
+   Content
+   ========================================================= */
+.StreakBadge-title {
+  margin: 0 0 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--streak-fg-muted);
+}
+
+.StreakBadge-stats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--streak-gap);
+  margin: 0;
+}
+
+.StreakBadge-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--streak-row-bg);
+}
+.StreakBadge-row-highlight {
+  background: var(--streak-row-hi-bg);
+}
+.StreakBadge-row dt {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--streak-fg-muted);
+  font-weight: 500;
+}
+.StreakBadge-row dd {
+  margin: 0;
+  font-size: 0.8rem;
+  /* font-weight: 700; */
+  color: var(--streak-fg);
+}
+.StreakBadge-row-highlight dd {
+  color: var(--streak-accent);
+}
+.StreakBadge-unit {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--streak-fg-muted);
+  margin-left: 2px;
+}
+
+.StreakBadge-row-range dd {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--streak-fg);
+}
+.StreakBadge-arrow-inline {
+  color: var(--streak-fg-muted);
+  margin: 0 2px;
+}
+
+.StreakBadge-divider {
+  height: 1px;
+  background: var(--streak-popover-border);
+  margin: 2px 0;
+}
+
+/* =========================================================
+   Popover open/close transitions (native popover)
+   ========================================================= */
+.StreakBadge-popover {
+  opacity: 0;
+  transform: translateY(-4px);
+  transition:
+    opacity 140ms ease,
+    transform 140ms ease,
+    overlay 140ms ease allow-discrete,
+    display 140ms ease allow-discrete;
+}
+.StreakBadge-popover:popover-open {
+  opacity: 1;
+  transform: translateY(0);
+}
+@starting-style {
+  .StreakBadge-popover:popover-open {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}

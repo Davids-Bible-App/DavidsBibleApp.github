@@ -7,21 +7,18 @@
   font-family: "Helvetica Neue", Helvetica, sans-serif;
   box-shadow: rgba(0, 0, 0, 0.3) 0px 6px 20px 0px;
   background: var(--banner);
+  will-change: opacity, transform;
+  transform: translateZ(0);
 
   & .RibbonBanner-ribbon-stitches {
     position: absolute;
     inset: 4px 0 4px 0;
     width: 100%;
-    background-image:
-      radial-gradient(50% 50% at 75% 75%, var(--stitches) 0%, var(--stitches) 20%, var(--background-color) 83%),
-      repeating-radial-gradient(
-        75% 75% at 50% 50%,
-        var(--background-color) 0%,
-        var(--background-color) 20%,
-        var(--stitches) 83%
-      );
+    background-image: radial-gradient(50% 50% at 75% 75%, var(--stitches) 0%, var(--stitches) 20%, var(--background-color) 83%), repeating-radial-gradient(75% 75% at 50% 50%, var(--background-color) 0%, var(--background-color) 20%, var(--stitches) 83%);
     background-size: 10px 3px; /** Length/spacing and thickness of stitches */
     background-repeat: repeat-x;
     opacity: 0.5; /** Brightness of stitches */
+    will-change: opacity, transform;
+    transform: translateZ(0);
   }
 }

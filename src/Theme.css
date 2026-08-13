@@ -43,7 +43,6 @@
   /* Text scales higher so it remains highly readable and rich in the current theme hue */
   --main-icon-text-color: oklch(0.45 calc(var(--chroma) * 2.5) var(--hue) / 0.7);
 }
-
 /* Dark mode Neumorphic override */
 @media (prefers-color-scheme: dark) {
   :root {
@@ -69,7 +68,7 @@
     --header-button-wrapper-gradient: linear-gradient(135deg, oklch(calc(var(--bg-l) + 0.05) var(--dark-chroma) var(--hue)) 0%, oklch(calc(var(--bg-l) + 0.01) var(--dark-chroma) var(--hue)) 100%);
     --header-button-wrapper-neu-shadows: 0.2vw 0.2vw 0.7vw var(--neu-dark), -0.2vw -0.2vw 0.7vw var(--neu-light);
 
-    /* Kept original orange brand accent colors intact */
+    /* Orange brand accent colors */
     --header-pressed-wrapper-gradient: linear-gradient(135deg, rgba(218, 77, 12, 1) 0%, rgba(180, 54, 19, 1) 100%);
     --header-pressed-button-front-gradient: linear-gradient(135deg, rgba(222, 57, 19, 1) 0%, rgba(234, 81, 14, 1) 100%);
     --header-pressed-button-inset-shadows: inset 0.75vw 0.75vw 0.75vw rgba(0, 0, 0, 0.3);

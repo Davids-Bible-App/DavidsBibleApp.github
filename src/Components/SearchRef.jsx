@@ -7,7 +7,9 @@ import { onSheetClose, activeSheet, getBaseStep } from "../State/sheetStore";
 import { executeJumpTo } from "../lib/navigationUtils";
 import "./CSS/SearchRef.css";
 import { bible1, setTrigger, setTopicController, setSelectedTopic, setSelection, wordHighlight, setWordHighlight } from "../State/globalSignals.js";
+import { openTopicModal } from "../State/modalStore.js";
 import { setPendingVerses } from "../State/editorStore";
+import { updateAndLogScripture } from "../State/historyStore";
 
 export default function SearchRef(props) {
   const [searchResults, setSearchResults] = createSignal([]);
@@ -32,10 +34,12 @@ export default function SearchRef(props) {
   const totalPages = () => Math.ceil((searchResults()?.total_count || 0) / perPage());
 
   createEffect(() => {
-    if (activeSheet() === "search" && getBaseStep() === "Mid") {
+    if (activeSheet() === "search" && (getBaseStep() !== "Hid" || getBaseStep() !== "Min")) {
       setTimeout(() => {
-        searchInputRef?.focus();
-        searchInputRef?.select();
+        if (searchResults().length === 0) {
+          searchInputRef?.focus();
+          searchInputRef?.select();
+        }
       }, 150);
     }
   });
@@ -45,9 +49,9 @@ export default function SearchRef(props) {
     "search",
     () => {
       searchInputRef?.blur();
-      setSearchInput("");
-      setSearchResults([]);
-      setIsReference(false);
+      // setSearchInput("");
+      // setSearchResults([]);
+      // setIsReference(false);
       setSelectedVerses([]);
     },
     300,
@@ -230,46 +234,45 @@ export default function SearchRef(props) {
     });
   };
 
+  const formatVersesForExport = () =>
+    selectedVerses().map((v) => ({
+      ed: abbreviator(v.translation),
+      tr: v.translation.replace(/\.dba$/i, ""),
+      bk: v.book_id,
+      ch: v.chapter,
+      vs: v.verse,
+      tx: v.text,
+    }));
+
+  const addToHistory = async (data) => {
+    if (data) {
+      updateAndLogScripture({
+        translation_id: data[0].tr,
+        book_id: data[0].bk,
+        chapter: parseInt(data[0].ch),
+        verse_id: parseInt(data[0].vs),
+      });
+    }
+  };
+
   const sendToEditor = () => {
-    // We already have the full verse objects stored!
-    const versesToExport = selectedVerses();
+    if (selectedVerses().length === 0) return;
+    const selectedObj = formatVersesForExport();
 
-    if (versesToExport.length === 0) return;
-
-    // Send data to the global queue (from Phase 2)
-    setPendingVerses(versesToExport);
-    // console.log("Sending to editor:", versesToExport);
-
-    // Clear local selection after sending
+    setPendingVerses(selectedVerses()); // raw objects preserved
+    addToHistory(selectedObj);
     setSelectedVerses([]);
-
     toggleSheet("editor", "Max");
   };
 
   const sendToTopic = () => {
     if (selectedVerses().length === 0) return;
+    const selectedObj = formatVersesForExport();
 
-    const selectedObj = [];
-    selectedVerses().forEach((v) => {
-      selectedObj.push({
-        ed: abbreviator(v.translation),
-        tr: v.translation.replace(/\.dba$/i, ""),
-        bk: v.book_id,
-        ch: v.chapter,
-        vs: v.verse,
-        tx: v.text,
-      });
-    });
-
-    // console.log("Sending to topic:", selectedObj);
-
-    setSelection(selectedObj);
+    openTopicModal(selectedObj);
+    addToHistory(selectedObj);
     setSelectedTopic(null);
     toggleSheet("search", "Hid");
-    setTrigger("right");
-    setTopicController(true);
-
-    // Clear local selection after sending
     setSelectedVerses([]);
   };
 
@@ -336,7 +339,7 @@ export default function SearchRef(props) {
         <input
           ref={searchInputRef}
           type="text"
-          placeholder="e.g. John1:1-4, jhn.1:1,3,4,2, jn2-4,5:2,1:1"
+          placeholder="e.g. John1:, jhn.1:1,3,4,2-5, jn2-4,5:2,1:1"
           value={searchInput()}
           onInput={(e) => setSearchInput(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -436,16 +439,21 @@ export default function SearchRef(props) {
                     toggleVerseSelection(hit, e);
                   }}
                 >
-                  <header
-                    class="Entry-ref"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (isSwipe) return;
-                      jumpTo(hit);
-                    }}
-                  >
-                    {getBook(hit.book_id)} {hit.chapter}:{hit.verse} ({abbreviator(hit?.translation)})
-                  </header>
+                  <div class="Entry-header">
+                    <div class="entry-ref">
+                      {getBook(hit.book_id)} {hit.chapter}:{hit.verse} ({abbreviator(hit?.translation)})
+                    </div>
+                    <button
+                      class={"jump-btn"}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (isSwipe) return;
+                        jumpTo(hit);
+                      }}
+                    >
+                      Go to Verse ↣
+                    </button>
+                  </div>
                   <p class="verse-text" innerHTML={hit.text} />
                 </div>
                 <Show when={wordHighlight()}>

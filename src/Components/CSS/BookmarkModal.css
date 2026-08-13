@@ -125,6 +125,9 @@
   scrollbar-width: thin;
   scrollbar-color: var(--neu-light) transparent;
   animation: BMModal-fadeIn 0.1s ease;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain; /* don't bubble to page */
+  touch-action: pan-y; /* let the browser handle vertical scrolling */
 }
 .BMModal-dropdown::-webkit-scrollbar {
   width: 3px;
@@ -149,6 +152,9 @@
   transition: background 0.12s;
   min-height: 3rem;
   box-sizing: border-box;
+  touch-action: pan-y; /* rows must NOT swallow the scroll gesture */
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 .BMModal-suggestion:last-child {
   border-bottom: none;

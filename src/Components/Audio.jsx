@@ -12,7 +12,7 @@ import { bookOrderNo, book, chapterNo, numberOfChapters, setChapterNo, setChapte
 import { play, pause, stop, resume, next, previous, seek, getState, setPlayingQueue, clearPlayingQueue, setPlayMode } from "tauri-plugin-music-notification-api";
 import { onPlay, onPause, onNext, onPrev, onQueueEnded, onPreviousAlbumNeeded } from "tauri-plugin-music-notification-api";
 import handlePageChange from "../lib/handlePageChange.js";
-import { stopService, isServiceRunning } from "tauri-plugin-background-service";
+import { startService, stopService, isServiceRunning } from "tauri-plugin-background-service";
 import "./CSS/Audio.css";
 
 export default function Audio(props) {
@@ -60,13 +60,32 @@ export default function Audio(props) {
 
         // Parallelize the 6 IPC round-trips
         const [unPlay, unPause, unNext, unPrev, unPrevAlbum, unQueueEnded] = await Promise.all([
-          onPlay((e) => {
+          onPlay(async (e) => {
             console.log("[onPlay] event received");
             setIsPlaying(true);
+
+            // Ensure background service is running when playback starts via media tray
+            try {
+              if (!(await isServiceRunning())) {
+                await startService();
+              }
+            } catch (err) {
+              console.warn("[onPlay] Failed to start background service:", err);
+            }
           }),
-          onPause(() => {
+
+          onPause(async () => {
             console.log("[onPause] event received");
             setIsPlaying(false);
+
+            // Stop background service when paused via media tray to save battery
+            try {
+              if (await isServiceRunning()) {
+                await stopService();
+              }
+            } catch (err) {
+              console.warn("[onPause] Failed to stop background service:", err);
+            }
           }),
           onNext((e) => {
             skipNativePlay = true;
@@ -152,11 +171,29 @@ export default function Audio(props) {
         console.log("[LISTENERS] Registered 6 event listeners");
 
         onCleanup(() => {
-          console.log("[LISTENERS] Cleaning up event listeners");
+          console.log("[Audio Teardown] Cleaning up listeners and background service");
+
           window.removeEventListener("visibilitychange", handleVisibility);
+
+          // Clean up registered IPC event listeners
           unlisteners.forEach((u) => {
             if (typeof u === "function") u();
           });
+
+          // Clear active timers
+          clearTimeout(playlistDebounceTimer);
+          clearTimeout(windowsDebounceTimer);
+
+          // Stop background service if component unmounts while running
+          (async () => {
+            try {
+              if (type() === "android" && (await isServiceRunning())) {
+                await stopService();
+              }
+            } catch (e) {
+              console.warn("[BG Service] stopService on cleanup failed:", e);
+            }
+          })();
         });
       }
       await fetchAuthors();
@@ -250,6 +287,11 @@ export default function Audio(props) {
         const shouldAutoPlay = untrack(isPlaying);
 
         if (shouldAutoPlay) {
+          // Ensure background service is running to prevent OS blocking the next play call
+          if (type() === "android" && !(await isServiceRunning())) {
+            await startService();
+          }
+
           // User is actively playing: clear old queue and set new one before continuing playback
           await stop().catch((e) => console.warn("Stop before queue clear failed:", e));
           await clearPlayingQueue().catch((e) => console.warn("Queue clear failed:", e));
@@ -530,11 +572,16 @@ export default function Audio(props) {
     }
     if (type() === "android") {
       const currentlyPlaying = isPlaying();
-      console.log("[togglePlay] Called. Currently playing:", currentlyPlaying, "Book:", book(), "Chapter:", chapterNo());
+      // console.log("[togglePlay] Called. Currently playing:", currentlyPlaying, "Book:", book(), "Chapter:", chapterNo());
 
       if (currentlyPlaying) {
         await pause().catch((e) => console.warn("[togglePlay] Pause failed:", e));
         setIsPlaying(false);
+
+        // Optional: Stop the service if they manually paused
+        if (await isServiceRunning()) {
+          await stopService();
+        }
       } else {
         const list = playlist();
         const currentIndex = chapterNo() - 1;
@@ -543,7 +590,12 @@ export default function Audio(props) {
           const track = list[currentIndex];
 
           try {
-            // CRITICAL: Set the queue BEFORE playing so MediaSession appears at the right time
+            // 1. KEEP WEBVIEW ALIVE: Start the background service before playing
+            if (!(await isServiceRunning())) {
+              await startService();
+            }
+
+            // 2. CRITICAL: Set the queue BEFORE playing so MediaSession appears at the right time
             await setPlayingQueue(
               {
                 songs: list,
@@ -736,7 +788,7 @@ export default function Audio(props) {
           <div class="Audio-controls-wrapper">
             <div class="Audio-header-row">
               <select
-                class="Audio-selectbox neu-button"
+                class="Audio-selectbox"
                 value={audioVersion()}
                 onChange={(e) => {
                   setAudioVersion(e.target.value);
@@ -748,14 +800,14 @@ export default function Audio(props) {
               </select>
             </div>
             <div class="Audio-btn-row">
-              <button class={`neu-button Audio-scroll ${autoScroll() ? "active-scroll" : ""}`} onClick={() => setAutoScroll(!autoScroll())} style={autoScroll() ? "background: var(--controls-pressed-button-front-gradient); color: white;" : ""}>
+              <button class={`Audio-scroll ${autoScroll() ? "active-scroll" : ""}`} onClick={() => setAutoScroll(!autoScroll())} style={autoScroll() ? "background: var(--controls-pressed-button-front-gradient); color: white;" : ""}>
                 Scroll&nbsp;&nbsp;
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-mouse" viewBox="0 0 16 16">
                   <path d="M8 3a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 3m4 8a4 4 0 0 1-8 0V5a4 4 0 1 1 8 0zM8 0a5 5 0 0 0-5 5v6a5 5 0 0 0 10 0V5a5 5 0 0 0-5-5" />
                 </svg>
               </button>
 
-              <button class={`neu-button Audio-loop ${loopMode() !== "off" ? "loop-active" : ""}`} onClick={cycleLoopMode} style={loopMode() !== "off" ? "background: var(--controls-pressed-button-front-gradient); color: white;" : ""}>
+              <button class={`Audio-loop ${loopMode() !== "off" ? "loop-active" : ""}`} onClick={cycleLoopMode} style={loopMode() !== "off" ? "background: var(--controls-pressed-button-front-gradient); color: white;" : ""}>
                 {LOOP_LABELS[loopMode()]}&emsp;
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-repeat" viewBox="0 0 16 16">
                   <path d="M11 5.466V4H5a4 4 0 0 0-3.584 5.777.5.5 0 1 1-.896.446A5 5 0 0 1 5 3h6V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192m3.81.086a.5.5 0 0 1 .67.225A5 5 0 0 1 11 13H5v1.466a.25.25 0 0 1-.41.192l-2.36-1.966a.25.25 0 0 1 0-.384l2.36-1.966a.25.25 0 0 1 .41.192V12h6a4 4 0 0 0 3.585-5.777.5.5 0 0 1 .225-.67Z" />
@@ -852,6 +904,23 @@ export default function Audio(props) {
         </div>
       </nav>
       <CountdownTimer audioRef={audioRef} playableSrc={playableSrc} togglePlay={togglePlay} hasState={hasState} pause={pause} resume={resume} isPlaying={isPlaying} setIsPlaying={setIsPlaying} />
+      <div class="Audio-info">
+        {/*
+        <code>forcePageBk: {forcePageBk() ? "true" : "false"}</code>
+        <code>Raw Evaluate: {duration() - position() > 30000 ? "true" : "false"}</code>
+        <code>Track Remaining: {formatTime(duration() - position())}</code> */}
+        {/* <code>State: {hasState() ? "true" : "false"}</code>
+        <code>Track Progress: {Math.trunc(parseFloat(progress()) * 1e4) / 1e4}</code>
+        <code>Track Duration: {duration()}</code>
+        <code>artist/author: {audioVersion()}</code>
+        <code>activeBookId: {book()}</code>
+        <code>album: {getBook(book())}</code>
+        <code>activeChapter: {chapterNo()}</code>
+        <code>order: {bookOrderNo()}</code>
+        <code>Track ID: {JSON.stringify(track()?.id)}</code>
+        <code>Track Name: {JSON.stringify(track()?.name)}</code>
+        <code>Track URL: {track()?.url?.split("/").slice(-3).join("/") ?? ""}</code> */}
+      </div>
       <Portal>
         <Show when={isImporting()}>
           <div class="Import-modal-overlay">

@@ -1,6 +1,6 @@
 {
   "name": "davidsbible",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "",
   "type": "module",
   "scripts": {
@@ -50,7 +50,7 @@
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2",
-    "vite": "^6.0.3",
+    "vite": "^8.0.16",
     "vite-plugin-solid": "^2.11.0"
   }
 }

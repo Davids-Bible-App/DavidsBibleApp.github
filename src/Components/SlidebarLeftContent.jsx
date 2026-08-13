@@ -1,10 +1,15 @@
-import { createSignal, createEffect, onMount, createMemo, on, For } from "solid-js";
+import { createSignal, createEffect, onMount, onCleanup, createMemo, on, For } from "solid-js";
 import { updateAndLogScripture } from "../State/historyStore";
 import { bible1, book, setBook, bookBtn, setBookBtn, chapterBtn, setChapterBtn, setChapterNo, numberOfChapters, setNumberOfChapters, testamentBtn, setTestamentBtn, trigger, setTrigger } from "../State/globalSignals.js";
+import { votd, votdText, votdData } from "../State/globalSignals.js";
 import "./CSS/SlidebarLeft.css";
+import VerseOfTheDay from "./VerseOfTheDay.jsx";
+import { fitText } from "../lib/fitText.js";
+import { executeJumpTo } from "../lib/navigationUtils";
 
 // Defaults
 const [preSelectBook, setPreSelectBook] = createSignal("JHN");
+const [count, setCount] = createSignal(0);
 
 // -----------------------------
 // DUMB COMPONENTS (No Effects, Just UI)
@@ -56,6 +61,20 @@ export default function SlidebarLeftContent(props) {
     });
   });
 
+  let votdContainerRef;
+  let votdTextRef;
+
+  onMount(() => {
+    const stop = fitText(votdContainerRef, {
+      textEl: votdTextRef, // explicit target
+      maxFontSize: 16,
+      minFontSize: 10,
+      padding: 16,
+      overflow: "clip",
+    });
+    onCleanup(stop);
+  });
+
   const filteredBooks = createMemo(() => {
     if (props.books.state !== "ready") return [];
     const books = props.books();
@@ -104,13 +123,28 @@ export default function SlidebarLeftContent(props) {
     });
   });
 
+  const jumpTo = () => {
+    const hit = {
+      tr: votdData()?.translation,
+      bk: votdData()?.bookIndex,
+      ch: votdData()?.chapter,
+      vs: votdData()?.verse,
+    };
+    executeJumpTo(hit, () => {
+      setTrigger("");
+    });
+  };
+
   return (
     <>
       <div class="SlidebarLeft-SBcontentWrap">
-        <div class="SlidebarLeft-votd">
+        <div ref={votdContainerRef} onClick={jumpTo} class="SlidebarLeft-votd">
           <img src="/votd.webp" fetchpriority="high" loading="eager" decoding="async" alt="Verse of the day background" class="SlidebarLeft-stackImg" classList={{ "SlidebarLeft-animate-image": trigger() === "left" }} />
-          <div class="SlidebarLeft-stackText">All things were made by him; and without him was not any thing made that was made.</div>
+          <div ref={votdTextRef} class="SlidebarLeft-stackText">
+            {votdText()}&nbsp;{votd()}
+          </div>
         </div>
+        <VerseOfTheDay autoGenerate={true} trigger={count} button={false} scope={"ot"} persistScope={true} />
 
         <div class="SlidebarLeft-selections">
           <div class="SlidebarLeft-col SlidebarLeft-dataBook">

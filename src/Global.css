@@ -6,6 +6,32 @@
   }
 }
 
+/* Pass in color & opacity: */
+@function --opacitate(--color, --alpha: 1) {
+  result: oklch(from var(--color) 1 c h / var(--alpha));
+
+  /* example
+  background-color: --opacitate(var(--Fav-Color), 0.1);
+  border: 1px solid --opacitate(var(--Fav-Color), 0.3); 
+  */
+}
+
+/* Brand Color, Pass in opacity: */
+/* 
+@function --transparent(--alpha: 0.2) {
+  result: oklch(from var(--brand-color) 1 c h / var(--alpha));
+
+  example
+  background-color: --transparent(0.1);
+  border: 1px solid --transparent(0.3);   
+}
+  */
+
+/* With Types: */
+/* @function --opacitate(--color <color>, --alpha type(<number> | <percentage>)) returns <color> {
+  result: oklch(from var(--color) 1 c h / var(--alpha));
+} */
+
 /*? Main Theme */
 :root {
   --navHeight: 3rem;
@@ -13,8 +39,6 @@
   --contentContainer: clamp(200px, 80%, 800px);
   --contentContainer2: clamp(200px, 95%, 800px);
   --verseNoEm: 700;
-
-  --header-pressed-button-inset-shadows: inset 0.75vw 0.75vw 0.75vw rgba(0, 0, 0, 0.3);
 
   --select: light-dark(hsla(0, 0%, 27%, 0.1), hsla(0, 0%, 73%, 0.2));
   --hlNone: transparent;
@@ -227,18 +251,13 @@ button {
   }
 }
 
-/* .neu-button:hover {
-    color: var(--text-active);
-    background: var(--controls-normal-button-front-gradient);
-    box-shadow: 0.4vw 0.4vw 0.8vw var(--neu-gray), -0.4vw -0.4vw 0.8vw var(--neu-white);
-} */
-
-@media (hover: hover) {
+/* @media (hover: hover) and (pointer: fine) {
   input,
   select,
   button {
     &:hover {
       background: var(--bk-button-hover-color);
+      background: var(--controls-normal-button-wrapper-gradient) !important;
     }
   }
 }
@@ -248,11 +267,10 @@ button {
   select,
   button {
     &:hover {
-      background: transparent !important;
-      background-color: transparent !important;
+      background: var(--controls-normal-button-wrapper-gradient) !important;
     }
   }
-}
+} */
 
 .row {
   display: flex;
@@ -307,4 +325,28 @@ Suspense Fallback Animation
   100% {
     background-position: -200% 0;
   }
+}
+
+/* JumpTo Highlight Verse */
+@keyframes verse-glow {
+  0% {
+    box-shadow: none;
+    background-color: inherit;
+    opacity: 1;
+  }
+  20% {
+    box-shadow:
+      20px 0 30px 15px var(--JumpTo),
+      -20px 0 30px 15px var(--JumpTo);
+    background-color: var(--JumpTo);
+    opacity: 0.7;
+  }
+  100% {
+    box-shadow: none;
+    background-color: inherit;
+    opacity: 1;
+  }
+}
+.highlight-pulse {
+  animation: verse-glow 2.5s 1s ease-out;
 }

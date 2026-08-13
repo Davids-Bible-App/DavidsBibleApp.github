@@ -5,7 +5,7 @@ import { toggleSheet } from "./sheetStore";
 import { showToast } from "../Components/Toast";
 import { isDarkMode } from "../State/globalSignals.js";
 import { keepScreenOn } from "tauri-plugin-keep-screen-on-api";
-import { isFullscreen, setFullscreen } from "../state/fullscreen.js";
+import { isFullscreen, setFullscreen } from "../State/fullscreen.js";
 
 // prettier-ignore
 import { 
@@ -208,74 +208,31 @@ createRoot(() => {
     document.documentElement.style.setProperty("--alpha", activeAlpha);
   });
 
-  // let fullScreenOnFirstRun = true;
-  // createEffect(async () => {
-  //   console.log(`LOG[:210]: settings.fullScreenOn: `, settings.fullScreenOn);
-  //   if (fullScreenOnFirstRun) {
-  //     fullScreenOnFirstRun = false;
-  //     // Defer to idle so first paint isn't blocked
-  //     const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 500));
-  //     idle(async () => {
-  //       try {
-  //         setFullscreen(settings.fullScreenOn);
-  //       } catch (err) {
-  //         console.error("Failed to set full screen:", err);
-  //       }
-  //     });
-  //     return;
-  //   }
-  //   try {
-  //     setFullscreen(settings.fullScreenOn);
-  //   } catch (err) {
-  //     console.error("Failed to set full screen:", err);
-  //   }
-  // });
-
-  let keepScreenOnFirstRun = true;
-  createEffect(async () => {
-    const shouldWakeLock = settings.keepScreenOn;
-    if (keepScreenOnFirstRun) {
-      keepScreenOnFirstRun = false;
-      // Defer to idle so first paint isn't blocked
-      const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 500));
-      idle(async () => {
+  // Runs `fn(value)` for every change after the first, deferred to idle.
+  // Skips the first run so initial DB-load doesn't race with defaults.
+  function deferredSyncEffect(read, fn) {
+    let firstRun = true;
+    createEffect(() => {
+      const value = read();
+      if (firstRun) {
+        firstRun = false;
+        return;
+      }
+      const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 0));
+      idle(() => {
         try {
-          await keepScreenOn(shouldWakeLock);
+          fn(value);
         } catch (err) {
-          console.error("Failed to set screen wake lock:", err);
+          console.error(err);
         }
       });
-      return;
-    }
-    try {
-      await keepScreenOn(shouldWakeLock);
-    } catch (err) {
-      console.error("Failed to set screen wake lock:", err);
-    }
-  });
+    });
+  }
 
-  let leatherTextureFirstRun = true;
-  createEffect(() => {
-    const changeTexture = settings.leatherTexture;
-    if (leatherTextureFirstRun) {
-      leatherTextureFirstRun = false;
-      // Defer to idle so first paint isn't blocked
-      const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 500));
-      idle(async () => {
-        try {
-          setActivePaper(changeTexture);
-        } catch (err) {
-          console.error("Failed to change Texture:", err);
-        }
-      });
-      return;
-    }
-    try {
-      setActivePaper(changeTexture);
-    } catch (err) {
-      console.error("Failed to change Texture:", err);
-    }
-  });
+  // Usage
+  deferredSyncEffect(() => settings.leatherTexture, setActivePaper);
+  deferredSyncEffect(() => settings.keepScreenOn, keepScreenOn);
+  // deferredSyncEffect(() => settings.fullscreenOn, setFullscreen);
 });
 
 export function handleFontResize(delta = 0) {

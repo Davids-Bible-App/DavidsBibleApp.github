@@ -114,6 +114,7 @@ pub fn run() {
             commands::reader::get_chapterverse_data,
             commands::reader::get_verse,
             commands::reader::get_verses,
+            commands::reader::get_verse_count,
             
             // From commands/profile.rs
             commands::profile::get_read_history,

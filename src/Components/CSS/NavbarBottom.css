@@ -72,6 +72,8 @@
 .NavbarBottom-burnInText {
   animation: NavbarBottom-burnin-text 6s forwards;
   font-size: clamp(0.8rem, 4vw, 1.2rem);
+  will-change: opacity, transform;
+  transform: translateZ(0);
 }
 @keyframes NavbarBottom-burnin-text {
   0% {

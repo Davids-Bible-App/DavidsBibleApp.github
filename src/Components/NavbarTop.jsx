@@ -8,8 +8,9 @@ import "./CSS/NavbarTop.css";
 import { bible1, bible2, book, chapterNo, setTrigger } from "../State/globalSignals.js";
 import { SlidebarLeftContent } from "./SlidebarLeft";
 import { GalleryManager } from "./SlidebarRight";
-import { setLeftbarContentLoaded, setRightbarContentLoaded } from "../State/globalSignals";
-
+import { setLeftbarContentLoaded, setRightbarContentLoaded, consecutiveDaysData } from "../State/globalSignals";
+import ConsecutiveDays from "./ConsecutiveDays.jsx";
+import StreakBadge from "./StreakBadge.jsx";
 export default function NavbarTop(props) {
   const stitchPos = "top";
 
@@ -56,6 +57,7 @@ export default function NavbarTop(props) {
           }}
         >
           <RibbonBanner stitchPos={stitchPos}>
+            <ConsecutiveDays onUpdate={(data) => /*console.log("[Streak update]", data) */ {}} />
             <Show when={!props.isSecondaryVisible()}>
               <RibbonVersion getInfo={props.getInfo} />
             </Show>
@@ -86,7 +88,6 @@ export default function NavbarTop(props) {
                 </svg>
               </button>
               <button
-                style={"padding-block: 5px 2px"}
                 onPointerEnter={() => preloadSheet("search")}
                 onPointerDown={(e) => e.stopPropagation()}
                 class="NavbarTop-search neu-button"
@@ -101,7 +102,7 @@ export default function NavbarTop(props) {
                 </svg>
               </button>
 
-              <Show when={props.isSecondaryVisible() || !settings.titleView}>
+              <Show when={(props.orientation() === "vertical" && props.isSecondaryVisible()) || !settings.titleView}>
                 <div class="NavbarTop-bookChap" style={!props.isSecondaryVisible() && !settings.titleView && "top: 23px;"}>
                   <b>
                     <span>{book()}</span>
@@ -125,6 +126,9 @@ export default function NavbarTop(props) {
                   </div>
                 </Show>
               </div>
+              <Show when={props.orientation() === "vertical" || !props.isSecondaryVisible()}>
+                <StreakBadge />
+              </Show>
               <button
                 class="neu-button"
                 onPointerDown={(e) => e.stopPropagation()}

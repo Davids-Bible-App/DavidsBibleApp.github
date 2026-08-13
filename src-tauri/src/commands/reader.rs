@@ -1006,3 +1006,32 @@ pub async fn get_verses(
 
     Ok(results)
 }
+
+#[tauri::command]
+pub async fn get_verse_count(
+    state: State<'_, DbPaths>,
+    t: String,
+    b: String,
+    c: i32,
+) -> Result<i32, String> {
+    let trans_path = state.base_path.join("databases").join(&t);
+    let conn = Connection::open_with_flags(trans_path, OpenFlags::SQLITE_OPEN_READ_ONLY)
+        .map_err(|e| e.to_string())?;
+
+    let translation_id = normalize_translation_id(&t);
+
+    let count: i32 = conn
+        .query_row(
+            "SELECT COUNT(*)
+               FROM ChapterVerse
+              WHERE translationId = ?1
+                AND bookId        = ?2
+                AND chapterNumber = ?3",
+            rusqlite::params![translation_id, b, c],
+            |row| row.get(0),
+        )
+        .map_err(|e| e.to_string())?;
+
+    Ok(count)
+}
+

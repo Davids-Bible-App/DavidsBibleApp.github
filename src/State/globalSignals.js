@@ -17,6 +17,23 @@ export const [activeCrossRef, setActiveCrossRef] = createSignal(null);
 export const [isSecondaryVisible, setSecondaryVisible] = createSignal(false);
 export const [keepInView, setKeepInView] = createSignal(true);
 
+// Full record of the current Verse-of-the-Day. Consumers can read any field.
+// { reference, text, bookIndex, bookName, chapter, verse, translation }
+export const [votdData, setVotdData] = createSignal(null);
+// Convenience accessor: reference string only (e.g. "John 3:16").
+// Kept as a plain function so existing `votd()` call sites keep working.
+export const votd = () => votdData()?.reference ?? "";
+// Convenience accessor: verse text only.
+export const votdText = () => votdData()?.text ?? "";
+export const [consecutiveDaysData, setConsecutiveDaysData] = createSignal({
+  firstDate: null,
+  currentDate: null,
+  currentStreak: 0,
+  longestStreak: 0,
+  longestStreakStartDate: null,
+  longestStreakEndDate: null,
+});
+
 // ================================================================================
 
 // lazy preload sidebars, show signals

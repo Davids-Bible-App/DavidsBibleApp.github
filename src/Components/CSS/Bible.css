@@ -112,13 +112,14 @@
 }
 
 .VerseParts-note-abreviation {
+  display: inline-block;
   min-width: 0;
   max-width: 10ch;
   overflow-x: clip;
   white-space: nowrap;
   text-overflow: ellipsis;
   font-size: 11px;
-  color: --light-dark(#7e7e7e, #8b8b8b);
+  color: light-dark(#7e7e7e, #8b8b8b);
   line-height: 1;
   cursor: default;
   pointer-events: none;
@@ -247,28 +248,4 @@ list {
   h4 {
     color: tomato;
   }
-}
-
-/* JumpTo Highlight Verse */
-@keyframes verse-glow {
-  0% {
-    box-shadow: none;
-    background-color: inherit;
-    opacity: 1;
-  }
-  20% {
-    box-shadow:
-      20px 0 30px 15px var(--JumpTo),
-      -20px 0 30px 15px var(--JumpTo);
-    background-color: var(--JumpTo);
-    opacity: 0.7;
-  }
-  100% {
-    box-shadow: none;
-    background-color: inherit;
-    opacity: 1;
-  }
-}
-.highlight-pulse {
-  animation: verse-glow 2.5s 1s ease-out;
 }

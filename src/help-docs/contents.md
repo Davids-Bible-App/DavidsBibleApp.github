@@ -6,5 +6,6 @@ This guide walks you through everything you need to get started:
 - **Installation** — step-by-step setup for Windows and Android
 - **Translations** — importing `.sqlite` Bible translation files
 - **Audio Bibles** — linking MP3/M4B audio packages
+- **Meme Maker** — design shareable scripture graphics with image backgrounds and text layers
 - **Navigation** — the main reader, search, and bookmarks
 - **Faqs** — keyboard shortcuts, offline mode, and known quirks
