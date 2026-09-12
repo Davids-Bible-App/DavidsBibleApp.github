@@ -4,6 +4,7 @@ import { lazy } from "solid-js";
 export const sheetComponents = {
   settings: lazy(() => import("../Components/SettingsPanel")),
   audio: lazy(() => import("../Components/Audio")),
+  chat: lazy(() => import("../Components/BibleChat")),
   history: lazy(() => import("../Components/History")),
   meme: lazy(() => import("../Components/MemeMaker")),
   search: lazy(() => import("../Components/SearchRef")),

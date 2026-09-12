@@ -5,17 +5,24 @@
   color: var(--text-color-tone);
 }
 
+.StrongsVerse-header {
+  display: flex;
+  justify-content: center;
+}
+
 .StrongsLookup-search-form {
   display: flex;
+  position: relative;
   gap: 0.5rem;
   width: 100%;
   max-width: 400px;
   margin-top: 0.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .StrongsLookup-input {
-  position: relative;
   flex: 1;
+  min-width: 0;
   background: var(--ThemeBackgrounds1);
   border: 1px solid var(--btn-border);
   padding: 0.5rem 1rem;
@@ -32,32 +39,22 @@
   padding-right: 80px; /* space for both buttons */
 }
 
+.StrongsLookup-InputWrapper button {
+  opacity: 1;
+}
+
 /* Shared button styles */
 .StrongsLookup-ClearBtn {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
   background: none;
   border: none;
   font-size: 18px;
   padding: 4px;
   cursor: pointer;
   box-shadow: none;
-}
-
-.StrongsLookup-ClearBtn {
-  /* opacity: 0; */
+  right: 90px;
+  top: 5px;
   transition: opacity 0.2s ease;
-}
-
-.StrongsLookup-InputWrapper button {
-  opacity: 1;
-}
-
-/* Clear button sits closest to the input text */
-.StrongsLookup-ClearBtn {
-  right: 100px;
-  top: 45px;
 }
 
 /* Optional hover effect */

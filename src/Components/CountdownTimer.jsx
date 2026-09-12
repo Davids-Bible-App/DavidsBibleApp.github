@@ -8,7 +8,11 @@ import "./CSS/CountdownTimer.css";
 
 // ─── Background-service helpers (unchanged) ────────────────────────────────
 
+// Only Android actually has this plugin registered.
+const isAndroid = () => type() === "android";
+
 const ensureServiceRunning = async () => {
+  if (!isAndroid()) return;
   try {
     if (!(await isServiceRunning())) {
       await startService({ serviceLabel: "Sleep timer" });
@@ -19,6 +23,7 @@ const ensureServiceRunning = async () => {
 };
 
 const ensureServiceStopped = async () => {
+  if (!isAndroid()) return;
   try {
     if (await isServiceRunning()) {
       await stopService();
@@ -164,6 +169,39 @@ const CountdownTimer = (props) => {
   let unlistenDone = null;
 
   const totalSeconds = createMemo(() => hours() * 3600 + minutes() * 60);
+  const isAndroid = () => type() === "android";
+
+  let pollId = null;
+
+  const stopPolling = () => {
+    if (pollId) {
+      clearInterval(pollId);
+      pollId = null;
+    }
+  };
+
+  const startPolling = () => {
+    if (isAndroid() || pollId) return; // Android gets real ticks from the service
+    pollId = setInterval(async () => {
+      try {
+        const remaining = Number(await invoke("timer_get_remaining"));
+        if (remaining <= 0) {
+          stopPolling();
+          setSecondsLeft(0);
+          setIsActive(false);
+          await handleBackendTrigger();
+          await ensureServiceStopped();
+        } else {
+          batch(() => {
+            setSecondsLeft(remaining);
+            setIsActive(true);
+          });
+        }
+      } catch (e) {
+        console.error("[Timer] poll failed", e);
+      }
+    }, 1000);
+  };
 
   // ── What the picker displays ──────────────────────────────────────────────
   //
@@ -209,11 +247,20 @@ const CountdownTimer = (props) => {
         await ensureServiceStopped();
       });
 
-      if (await isServiceRunning()) {
-        const remaining = await invoke("timer_get_remaining");
+      if (isAndroid()) {
+        if (await isServiceRunning()) {
+          const remaining = await invoke("timer_get_remaining");
+          if (remaining > 0) {
+            setSecondsLeft(Number(remaining));
+            setIsActive(true);
+          }
+        }
+      } else {
+        const remaining = Number(await invoke("timer_get_remaining"));
         if (remaining > 0) {
-          setSecondsLeft(Number(remaining));
+          setSecondsLeft(remaining);
           setIsActive(true);
+          startPolling();
         }
       }
     }, 0);
@@ -222,6 +269,7 @@ const CountdownTimer = (props) => {
   onCleanup(() => {
     unlistenTick && unlistenTick();
     unlistenDone && unlistenDone();
+    stopPolling();
   });
 
   // ── Timer actions (unchanged) ─────────────────────────────────────────────
@@ -234,10 +282,12 @@ const CountdownTimer = (props) => {
     await invoke("timer_start", { seconds: seed });
     setSecondsLeft(seed);
     setIsActive(true);
+    startPolling();
   };
 
   const stopTimer = async () => {
     setIsActive(false);
+    stopPolling();
     const remaining = await invoke("timer_pause");
     type() === "android" && (await props.pause());
     type() === "windows" && (await props.audioRef.pause());
@@ -247,6 +297,7 @@ const CountdownTimer = (props) => {
 
   const resetTimer = async () => {
     await invoke("timer_cancel");
+    stopPolling();
     // type() === "windows" && (await props.audioRef.pause());
     // props.setIsPlaying(false);
     setIsActive(false);

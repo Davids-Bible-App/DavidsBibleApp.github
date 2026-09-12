@@ -1,0 +1,443 @@
+.ModelManager-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  font-family: system-ui, sans-serif;
+}
+
+.ModelManager-panel {
+  width: clamp(200px, 90%, 500px);
+  height: clamp(200px, 90%, 650px);
+  margin-block: 1rem;
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+}
+
+.ModelManager-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
+  font-size: 16px;
+  color: #222;
+  margin-bottom: 8px;
+}
+
+.ModelManager-close {
+  border: none;
+  background: transparent;
+  font-size: 20px;
+  line-height: 1;
+  color: #666;
+  cursor: pointer;
+}
+
+.ModelManager-error {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #fdecea;
+  color: #b00020;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+.ModelManager-info {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #3373bd;
+  color: #fdecea;
+  font-size: 13px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.ModelManager-section-title {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #888;
+  margin: 14px 0 6px;
+}
+
+.ModelManager-empty {
+  font-size: 13px;
+  color: #888;
+  padding: 8px 0;
+}
+
+.ModelManager-row {
+  display: flex;
+  flex-direction: column; /* ← was a single horizontal row */
+  gap: 6px;
+  padding: 8px;
+  border-radius: 8px;
+  margin-bottom: 4px;
+}
+
+/* Top line: filename left, size right */
+.ModelManager-row-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* Bottom line: badges left, buttons right */
+.ModelManager-row-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ModelManager-row-badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.ModelManager-row--active {
+  background: #eef4f1;
+  border: 1px solid #3b6e5b;
+}
+
+.ModelManager-row-text {
+  min-width: 0;
+  flex: 1;
+  cursor: default;
+}
+
+.ModelManager-row-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #222;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0; /* allows the ellipsis to actually engage inside flex */
+}
+
+.ModelManager-row-size {
+  font-size: 12px;
+  color: #888;
+  flex-shrink: 0; /* size never gets squashed by a long filename */
+}
+
+.ModelManager-badge {
+  font-size: 10px;
+  font-weight: 600;
+  color: #fff;
+  background: #3b6e5b;
+  padding: 0px 6px;
+  border-radius: 10px;
+  text-transform: uppercase;
+}
+
+.ModelManager-row-sub {
+  display: flex;
+  gap: 10px;
+  font-size: 12px;
+  color: #888;
+  margin-top: 2px;
+}
+
+.ModelManager-badge--override {
+  background: #3b6e5b;
+}
+.ModelManager-badge--file {
+  background: #6b8f7a;
+}
+.ModelManager-badge--default {
+  background: #999;
+}
+
+.ModelManager-prompt-editor {
+  padding: 10px 8px 12px;
+  margin: -2px 0 6px;
+  border-left: 2px solid #3b6e5b;
+  padding-left: 10px;
+}
+
+.ModelManager-prompt-source {
+  font-size: 11px;
+  font-weight: bold;
+  color: #888;
+  margin-bottom: 6px;
+}
+
+.ModelManager-prompt-slider,
+.ModelManager-prompt-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.ModelManager-prompt-slider {
+  display: flex;
+  align-items: center;
+  margin-block: 0.5rem;
+  padding: 12px 10px;
+}
+
+.ModelManager-prompt-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.ModelManager-row-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.ModelManager-row-actions--right {
+  margin-left: auto;
+}
+
+.ModelManager-btn {
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #fff;
+  color: #222;
+  font-size: 12px;
+  cursor: pointer;
+  margin: 0;
+}
+
+.ModelManager-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.ModelManager-btn--danger {
+  color: #b00020;
+  border-color: #f0c8c8;
+}
+
+.ModelManager-upload-btn {
+  width: 100%;
+  padding: 8px;
+  margin-top: 8px;
+  border-radius: 8px;
+  border: 1px dashed #aaa;
+  background: transparent;
+  color: #3b6e5b;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.ModelManager-upload-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+@keyframes ModelManager-border-toggle {
+  0%,
+  25% {
+    border-style: solid;
+  }
+  50%,
+  65% {
+    border-style: dashed;
+  }
+  70%,
+  95% {
+    border-style: dotted;
+  }
+}
+:root {
+  --ModelManager-accent: #6b8afd;
+  --ModelManager-border-color: currentColor;
+}
+
+.ModelManager-upload-wrap {
+  position: relative;
+}
+.ModelManager-upload-btn--busy {
+  animation: ModelManager-border-toggle 2s steps(1) infinite;
+}
+
+.ModelManager-progress-track {
+  height: 4px;
+  border-radius: 2px;
+  background: #eee;
+  margin-top: 6px;
+  overflow: hidden;
+}
+
+.ModelManager-progress-fill {
+  height: 100%;
+  background: #3b6e5b;
+  transition: width 0.2s ease;
+}
+
+.ModelManager-rename-wrap {
+  display: inline-flex;
+  gap: 4px;
+  width: stretch;
+}
+
+.ModelManager-rename-input {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #222;
+  padding: 2px 6px;
+  border-radius: 6px;
+  border: 1px solid #3b6e5b;
+  font-family: inherit;
+}
+
+.ModelManager-row-title--editable {
+  cursor: pointer;
+}
+.ModelManager-row-title--editable:hover {
+  text-decoration: underline;
+}
+
+.ModelManager-rename-confirm {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border-radius: 6px;
+  border: 1px solid #3b6e5b;
+  background: #3b6e5b;
+  color: #fff;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+}
+.ModelManager-rename-confirm:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ── Catalog editor theme vars — move these into your top-of-file vars block ── */
+:root {
+  --ModelManager-input-bg: #1c1c22;
+  --ModelManager-input-border: #3a3a44;
+  --ModelManager-input-focus: #6b8afd;
+}
+
+.ModelManager-catalog-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  margin-top: 6px;
+}
+
+.ModelManager-catalog-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.8rem;
+  opacity: 0.85;
+}
+
+.ModelManager-catalog-input,
+.ModelManager-catalog-textarea {
+  flex: 1;
+  background: var(--ModelManager-input-bg);
+  border: 1px solid var(--ModelManager-input-border);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 0.85rem;
+  color: inherit;
+  font-family: inherit;
+  resize: vertical;
+}
+.ModelManager-catalog-url-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.ModelManager-catalog-input:focus,
+.ModelManager-catalog-textarea:focus {
+  outline: none;
+  border-color: var(--ModelManager-input-focus);
+}
+
+.ModelManager-add-catalog-btn {
+  margin-top: 8px;
+  width: 100%;
+}
+
+@media (prefers-color-scheme: dark) {
+  .ModelManager-rename-input {
+    background: #1f1f1f;
+    color: #e0e0e0;
+    border-color: #6b8f7a;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .ModelManager-panel {
+    background: #2a2a2a;
+  }
+  .ModelManager-header {
+    color: #e0e0e0;
+  }
+  .ModelManager-close {
+    color: #999;
+  }
+  .ModelManager-error {
+    background: #3b1a1a;
+    color: #f47272;
+  }
+  .ModelManager-section-title {
+    color: #999;
+  }
+  .ModelManager-empty {
+    color: #999;
+  }
+  .ModelManager-row--active {
+    background: #24352d;
+  }
+  .ModelManager-row-title {
+    color: #e0e0e0;
+  }
+  .ModelManager-row-sub {
+    color: #999;
+  }
+  .ModelManager-btn {
+    background: #2a2a2a;
+    border-color: #555;
+    color: #e0e0e0;
+  }
+  .ModelManager-btn--danger {
+    color: #f47272;
+    border-color: #5a3333;
+  }
+  .ModelManager-progress-track {
+    background: #444;
+  }
+  .ModelManager-prompt-source {
+    color: #999999;
+  }
+  .ModelManager-prompt-slider,
+  .ModelManager-prompt-textarea {
+    background: #1f1f1f;
+    color: #e0e0e0;
+    border-color: #555;
+  }
+}

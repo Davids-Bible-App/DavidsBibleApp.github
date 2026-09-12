@@ -152,6 +152,40 @@ function TopicActions(props) {
     toggleSheet("editor", "Max");
   };
 
+  const copyToClipboard = async () => {
+    const versesToExport = dataExport().verses;
+    if (versesToExport.length === 0) return;
+
+    const selectedObj = [];
+
+    // Keep newlines; just clean trailing spaces per line and blank edges
+    const description = (dataExport()?.text || "Not Available").replace(/[ \t]+$/gm, "").trim();
+
+    const Topicical = [
+      `Topic: ${dataExport()?.topic ?? ""}`,
+      `Description: ${description}`,
+      "----------------------------",
+      "", // exactly one blank line before the verses
+    ].join("\n");
+
+    versesToExport.forEach((v) => {
+      selectedObj.push({
+        ed: abbreviator(v.translation_id),
+        translation: v.translation_id.replace(/\.dba$/i, ""),
+        book_id: v.book_id,
+        chapter: v.chapter,
+        verse: v.verse_id,
+        text: v.text,
+      });
+    });
+
+    const formattedText = groupConsecutiveVerses(selectedObj, true);
+
+    await navigator.clipboard.writeText(`${Topicical}\n${formattedText}`);
+
+    showToast("Topical Verses - Copied to Clipboard!", "none", 5000, true, true);
+  };
+
   return (
     <div style={{ position: "relative" }}>
       <span
@@ -169,6 +203,9 @@ function TopicActions(props) {
           <Show when={dataExport().verses?.length > 0}>
             <div class="TopicActions-item" onClick={sendToEditor}>
               Export To Editor
+            </div>
+            <div class="TopicActions-item" onClick={copyToClipboard}>
+              Copy To Clipboard
             </div>
           </Show>
           <Show when={props.onRename}>

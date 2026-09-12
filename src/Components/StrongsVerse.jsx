@@ -41,28 +41,26 @@ const fetchStudyData = async ([bookId, chapter, verse]) => {
 
 export default function StrongsVerse(props) {
   // 1. The Latch: Capture and hold the last valid selection
-  const lastValidSelection = createMemo(
-    (prev) => {
-      const current = selection()[0];
+  const lastValidSelection = createMemo((prev) => {
+    const current = selection()[0];
 
-      // If the selection has data (e.g., the object isn't empty), return the new data.
-      if (current && Object.keys(current).length > 0) {
-        return current;
-      }
+    // If the selection has data (e.g., the object isn't empty), return the new data.
+    if (current && Object.keys(current).length > 0) {
+      return current;
+    }
 
-      // If the selection was cleared out, return the PREVIOUS saved data.
-      return prev;
-    },
-    { bk: "GEN", ch: 1, vs: 1 },
-  ); // <-- The second argument is the initial starting state
+    // If the selection was cleared out, return the PREVIOUS saved data.
+    return prev;
+  });
 
   // 2. The Formatter: Derive your final UI state based on the latched data
   const ref = createMemo(
     (prev) => {
       // Read from your new latched memo, NOT directly from selection() anymore
       const selected = lastValidSelection();
+      if (!selected) return undefined; // nothing valid selected yet
 
-      const bkId = selected.bk || "GEN";
+      const bkId = selected.bk;
       let displayName = bkId;
 
       // Track the resource unconditionally
@@ -78,8 +76,8 @@ export default function StrongsVerse(props) {
       return {
         bk: bkId,
         bookName: displayName,
-        ch: parseInt(selected.ch) || 1,
-        vs: parseInt(selected.vs) || 1,
+        ch: parseInt(selected.ch),
+        vs: parseInt(selected.vs),
       };
     },
     undefined,
@@ -102,9 +100,11 @@ export default function StrongsVerse(props) {
       <br />
 
       <div class="StrongsVerse-header paper" classList={{ paperOverlay: activePaper() }}>
-        <span>
-          {ref().bookName} {ref().ch}:{ref().vs} (KJV)
-        </span>
+        <Show when={ref()} fallback={<span>Oops somthing went wrong? Please Try Again</span>}>
+          <span>
+            {ref().bookName} {ref().ch}:{ref().vs} (KJV)
+          </span>
+        </Show>
       </div>
 
       <Show when={words.loading}>

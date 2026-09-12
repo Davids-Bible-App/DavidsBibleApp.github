@@ -156,6 +156,7 @@ export default function SettingsPanel(props) {
           <select class="SettingsPanel-input select-sm" value={getParts()[0]} onInput={(e) => setSettings(rowProps.settingKey, `${e.target.value}:${getParts()[1]}`)}>
             <option value="none">None</option>
             <option value="audio">Audio</option>
+            <option value="chat">Chat</option>
             <option value="editor">Editor</option>
             <option value="help">Help</option>
             <option value="history">History</option>

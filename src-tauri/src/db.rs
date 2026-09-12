@@ -182,6 +182,22 @@ pub fn init_db(app_handle: &tauri::AppHandle) -> Result<(), String> {
         );
         
         CREATE INDEX IF NOT EXISTS idx_bm_time ON bookmarks(updated_at DESC);
+
+        CREATE TABLE IF NOT EXISTS bible_chat_conversations (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL DEFAULT 'New conversation',
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS bible_chat_messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            conversation_id INTEGER NOT NULL REFERENCES bible_chat_conversations(id) ON DELETE CASCADE,
+            role TEXT NOT NULL,
+            content TEXT NOT NULL,
+            created_at INTEGER NOT NULL
+        );
+        CREATE INDEX IF NOT EXISTS idx_bcm_conv ON bible_chat_messages(conversation_id);
     ",
     )
     .map_err(|e| e.to_string())?;

@@ -1,0 +1,28 @@
+{
+  "models": [
+    {
+      "id": "bibleai-history-theology-q8",
+      "name": "BibleAI — History & Theology (Q8)",
+      "filename": "final_merged.Q8_0.gguf",
+      "url": "https://archive.org/download/dba_20260831/llms/final_merged.Q8_0.gguf ",
+      "size_bytes": 8300000000,
+      "description": "8-bit quantized model tuned on church history and theology sources. Good balance of quality and size."
+    },
+    {
+      "id": "bibleai-history-theology-q16",
+      "name": "BibleAI — History & Theology (Q16)",
+      "filename": "final_merged.BF16.gguf",
+      "url": "https://archive.org/download/dba_20260831/llms/final_merged.BF16.gguf",
+      "size_bytes": 15100000000,
+      "description": "Full-precision (BF16) version of the History & Theology model. Highest quality, largest download."
+    },
+    {
+      "id": "gemmabible-bsb-scripture-q5",
+      "name": "GemmaBible — BSB Scripture (Q5)",
+      "filename": "merged.Q5_K_M.gguf",
+      "url": "https://archive.org/download/dba_20260831/llms/merged.Q5_K_M.gguf",
+      "size_bytes": 5760000000,
+      "description": "Gemma-based model focused on Berean Standard Bible scripture recall. Smallest download of the three."
+    }
+  ]
+}

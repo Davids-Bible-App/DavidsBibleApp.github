@@ -1,9 +1,9 @@
-use async_trait::async_trait;
+// use async_trait::async_trait;
 use std::sync::Arc;
 use tauri::{Runtime, Emitter, State};
 use tokio::sync::Mutex;
 use tokio::time::{Duration, Instant};
-use tauri_plugin_background_service::{BackgroundService, ServiceContext, ServiceError};
+// use tauri_plugin_background_service::{BackgroundService, ServiceContext, ServiceError};
 
 use std::fs;
 use std::io;
@@ -22,54 +22,67 @@ pub struct TimerState {
     pub remaining_on_pause: Arc<Mutex<Option<Duration>>>,
 }
 
-pub struct MyService {
-    state: TimerState,
-}
+#[cfg(any(target_os = "android", target_os = "ios"))]
+mod service {
+    use super::TimerState;
+    use async_trait::async_trait;
+    use tauri::{Emitter, Runtime};
+    use tokio::time::Duration;
+    use tokio::time::Instant;
+    use tauri_plugin_background_service::{BackgroundService, ServiceContext, ServiceError};
 
-impl MyService {
-    pub fn new(state: TimerState) -> Self {
-        Self { state }
-    }
-}
-
-#[async_trait]
-impl<R: Runtime> BackgroundService<R> for MyService {
-    async fn init(&mut self, _ctx: &ServiceContext<R>) -> Result<(), ServiceError> {
-        Ok(())
+    pub struct MyService {
+        state: TimerState,
     }
 
-    async fn run(&mut self, ctx: &ServiceContext<R>) -> Result<(), ServiceError> {
-        let mut interval = tokio::time::interval(Duration::from_secs(1));
+    impl MyService {
+        pub fn new(state: TimerState) -> Self {
+            Self { state }
+        }
+    }
 
-        loop {
-            tokio::select! {
-                _ = ctx.shutdown.cancelled() => break,
-                _ = interval.tick() => {
-                    let deadline_opt = {
-                        let guard = self.state.deadline.lock().await;
-                        *guard
-                    };
+    #[async_trait]
+    impl<R: Runtime> BackgroundService<R> for MyService {
+        async fn init(&mut self, _ctx: &ServiceContext<R>) -> Result<(), ServiceError> {
+            Ok(())
+        }
 
-                    if let Some(deadline) = deadline_opt {
-                        let now = Instant::now();
-                        if now >= deadline {
-                            {
-                                let mut guard = self.state.deadline.lock().await;
-                                *guard = None;
+        async fn run(&mut self, ctx: &ServiceContext<R>) -> Result<(), ServiceError> {
+            let mut interval = tokio::time::interval(Duration::from_secs(1));
+
+            loop {
+                tokio::select! {
+                    _ = ctx.shutdown.cancelled() => break,
+                    _ = interval.tick() => {
+                        let deadline_opt = {
+                            let guard = self.state.deadline.lock().await;
+                            *guard
+                        };
+
+                        if let Some(deadline) = deadline_opt {
+                            let now = Instant::now();
+                            if now >= deadline {
+                                {
+                                    let mut guard = self.state.deadline.lock().await;
+                                    *guard = None;
+                                }
+                                let _ = ctx.app.emit("my-service://timer-done", ());
+                            } else {
+                                let remaining = deadline.saturating_duration_since(now).as_secs();
+                                let _ = ctx.app.emit("my-service://timer-tick", remaining);
                             }
-                            let _ = ctx.app.emit("my-service://timer-done", ());
-                        } else {
-                            let remaining = deadline.saturating_duration_since(now).as_secs();
-                            let _ = ctx.app.emit("my-service://timer-tick", remaining);
                         }
                     }
                 }
             }
-        }
 
-        Ok(())
+            Ok(())
+        }
     }
 }
+
+#[cfg(any(target_os = "android", target_os = "ios"))]
+pub use service::MyService;
 
 // ─── Timer Commands ──────────────────────────────────────────────────────
 

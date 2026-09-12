@@ -81,39 +81,21 @@ export default function StrongsLookup(props) {
       <br />
 
       <div class="StrongsLookup-body">
-        <div
-          class="StrongsVerse-header paper"
-          style="flex-direction: column; align-items: center; gap: 0.5rem;"
-          classList={{ paperOverlay: activePaper() }}
-        >
+        <div class="StrongsVerse-header paper" classList={{ paperOverlay: activePaper() }}>
           <form onSubmit={handleSearch} class="StrongsLookup-search-form">
-            <input
-              ref={inputRef}
-              type="text"
-              placeholder="e.g. G746, H1254, or God"
-              value={searchInput()}
-              onInput={(e) => setSearchInput(e.target.value)}
-              class="StrongsLookup-input"
-            />
+            <input ref={inputRef} type="text" placeholder="e.g. G746, H1254, or God" value={searchInput()} onInput={(e) => setSearchInput(e.target.value)} class="StrongsLookup-input" />
 
             <button type="submit" class="StrongsLookup-btn">
               Search
             </button>
+            {searchInput().length > 0 && (
+              <button class="StrongsLookup-ClearBtn" onClick={clearSearch}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                  <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708" />
+                </svg>
+              </button>
+            )}
           </form>
-          {searchInput().length > 0 && (
-            <button class="StrongsLookup-ClearBtn" onClick={clearSearch}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                fill="currentColor"
-                class="bi bi-x"
-                viewBox="0 0 16 16"
-              >
-                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708" />
-              </svg>
-            </button>
-          )}
         </div>
 
         <Show when={data.loading}>
@@ -133,17 +115,11 @@ export default function StrongsLookup(props) {
             </div>
 
             {/* Dictionary Definitions Section (Now iterates over multiple) */}
-            <Show
-              when={data().dictionaries && data().dictionaries.length > 0}
-              fallback={<div class="StrongsVerse-loading">No dictionary definition found.</div>}
-            >
+            <Show when={data().dictionaries && data().dictionaries.length > 0} fallback={<div class="StrongsVerse-loading">No dictionary definition found.</div>}>
               <div class="StrongsVerse-card" style="flex-direction: column;">
                 <For each={data().dictionaries}>
                   {(dict) => (
-                    <div
-                      class="StrongsVerse-dict-section"
-                      style="width: 100%; border-bottom: 1px solid var(--btn-border); padding-bottom: 1rem;"
-                    >
+                    <div class="StrongsVerse-dict-section" style="width: 100%; border-bottom: 1px solid var(--btn-border); padding-bottom: 1rem;">
                       <div class="StrongsVerse-dict-entry">
                         <div class="StrongsVerse-strongs-tag">{dict.strongsId}</div>
 
@@ -180,10 +156,7 @@ export default function StrongsLookup(props) {
               <hr class="StrongsLookup-hr" />
             </div>
 
-            <Show
-              when={data().verses && data().verses.length > 0}
-              fallback={<div class="StrongsVerse-loading">No verses found containing this search.</div>}
-            >
+            <Show when={data().verses && data().verses.length > 0} fallback={<div class="StrongsVerse-loading">No verses found containing this search.</div>}>
               <div class="StrongsLookup-verses-container">
                 <For each={data().verses}>
                   {(verse) => (

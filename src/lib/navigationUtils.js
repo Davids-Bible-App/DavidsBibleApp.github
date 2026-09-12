@@ -1,5 +1,5 @@
 import { batch } from "solid-js";
-import { dbaExists } from "./functions.js";
+import { dbaExists, getBookNo } from "./functions.js";
 import { showToast } from "../Components/Toast";
 import { updateAndLogScripture } from "../State/historyStore";
 import { setBible1, setBook, setChapterNo, setTargetVerse, setChapterBtn, setTestamentBtn, bookOrderNo } from "../State/globalSignals.js";
@@ -62,11 +62,9 @@ export const executeJumpTo = async (rawHit, onSuccess, pulse = true) => {
   // 3. Commit signals atomically.
   //    Flip testament BEFORE the batch so the sidebar/nav updates in the same frame
   //    as the verse list — otherwise the OT→NT layout shift happens AFTER we scroll.
-  if (typeof hit.book_id === "number" || !isNaN(parseInt(hit.book_id))) {
-    const bookNum = parseInt(hit.book_id);
-    if (!isNaN(bookNum)) {
-      setTestamentBtn(bookNum <= 39 ? "ot" : "nt");
-    }
+  const bookNum = parseInt(getBookNo(hit.book_id));
+  if (!isNaN(bookNum)) {
+    setTestamentBtn(bookNum <= 39 ? "ot" : "nt");
   }
 
   batch(() => {

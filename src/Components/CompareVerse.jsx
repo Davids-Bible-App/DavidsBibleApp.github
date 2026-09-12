@@ -166,6 +166,7 @@ const Verse = (props) => {
   createEffect(() => {
     if (verseOne.state === "ready") {
       setEdition(props.edition);
+      // console.log(`LOG[:42]: bookId(): `, bookId());
     }
   });
 
@@ -200,6 +201,7 @@ const Verses = (props) => {
   createEffect(() => {
     if (verseMany.state === "ready") {
       setEdition(props.edition);
+      // console.log(`LOG[:42]: Many bookId(): `, bookId());
     }
   });
 

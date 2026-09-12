@@ -302,7 +302,13 @@ export default function Editor(props) {
     if (topicMeta) {
       let headerText = "";
       if (topicMeta.topic) headerText += `<h3>Topic : ${topicMeta.topic}</h3>`;
-      if (topicMeta.description) headerText += `<p><small><u><b>Topic Description</b></u> : <em>${topicMeta.description}</em></small></p>`;
+      if (topicMeta.description) {
+        const descHtml = topicMeta.description
+          .replace(/\r\n/g, "\n") // normalize CRLF
+          .replace(/\n/g, "<br/>") // preserve line breaks in HTML
+          .trim();
+        headerText += `<p><small><u><b>Topic Description</b></u> : <em>${descHtml}</em></small></p>`;
+      }
       topicHtml = `<p class="editor-topic-block">${headerText}</p>`;
     }
 

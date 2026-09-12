@@ -1,8 +1,11 @@
 mod commands;
 mod db;
 mod models; // Points to commands/mod.rs
-use tauri::Manager;
-use crate::commands::audio::{MyService, TimerState};
+use tauri::{Manager};
+use crate::commands::audio::TimerState;
+
+#[cfg(any(target_os = "android", target_os = "ios"))]
+use crate::commands::audio::MyService;
 
 #[tauri::command]
 async fn initialize_profile_db(app: tauri::AppHandle) -> Result<bool, String> {
@@ -22,11 +25,16 @@ async fn initialize_profile_db(app: tauri::AppHandle) -> Result<bool, String> {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let timer_state = TimerState::default();
+
+    #[cfg(any(target_os = "android", target_os = "ios"))]
     let timer_state_for_service = timer_state.clone();
 
     #[allow(unused_mut)]
     let mut builder = tauri::Builder::default()
         .manage(timer_state)
+        .manage(commands::bible_llm::ModelState::new())
+        .manage(commands::llm_models::DownloadState::new())
+        .manage(commands::llm_models::ActiveModelState::new())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_sql::Builder::new().build())
         .plugin(tauri_plugin_dialog::init())
@@ -39,25 +47,42 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_music_notification_api::init())
         .plugin(tauri_plugin_notification::init())
-        .plugin(tauri_plugin_background_service::init_with_service(
-            move || MyService::new(timer_state_for_service.clone()),
-        ))
         .setup(|app| {
-            // First Run - Setup, Create, Initialise.
+            #[cfg(not(target_os = "android"))]
+            {
+                use tracing_subscriber::prelude::*;
+
+                let handle = app.handle().clone();
+                tracing_subscriber::registry()
+                    .with(commands::bible_llm::BufferSizeLayer { app: handle })
+                    .with(tracing_subscriber::fmt::layer())
+                    .init();
+                llama_cpp_2::send_logs_to_tracing(llama_cpp_2::LogOptions::default());
+            }
+
             let app_dir = app.path().app_data_dir().unwrap();
             let profile_path = app_dir.join("profile.db").to_string_lossy().into_owned();
             app.manage(crate::models::DbPaths {
-                base_path: app_dir,
+                base_path: app_dir.clone(),
                 profile_path,
             });
+
             Ok(())
         });
 
-    // 1. Handle OS-specific Plugins
+    // 1. Handle OS-specific plugins
+
+    #[cfg(any(target_os = "android", target_os = "ios"))]
+    {
+        builder = builder.plugin(tauri_plugin_background_service::init_with_service(
+            move || MyService::new(timer_state_for_service.clone()),
+        ));
+    }
+
     #[cfg(target_os = "windows")]
-        {
+    {
         builder = builder.plugin(tauri_plugin_window_state::Builder::new().build());
-        }
+    }
 
     // 2. Consolidated Invoke Handler
     builder
@@ -147,6 +172,40 @@ pub fn run() {
             commands::profile::get_config,
             commands::profile::set_configs,
             commands::profile::get_configs,
+            
+            // From commands/bible_llm.rs
+            commands::bible_llm::load_model,
+            commands::bible_llm::is_model_loaded,
+            commands::bible_llm::chat,
+            commands::bible_llm::cancel_chat,
+            commands::bible_llm::get_active_model_layer_count,
+            commands::bible_llm::get_gpu_vram_mib,
+
+            // From commands/bible_chat_history.rs
+            commands::bible_chat_history::list_bible_conversations,
+            commands::bible_chat_history::get_bible_conversation_messages,
+            commands::bible_chat_history::create_bible_conversation,
+            commands::bible_chat_history::delete_bible_conversation,
+            commands::bible_chat_history::append_bible_message,
+
+            // From commands/llm_models.rs
+            commands::llm_models::list_local_models,
+            commands::llm_models::select_llm_model,
+            commands::llm_models::probe_download_size,
+            commands::llm_models::delete_local_model,
+            commands::llm_models::import_local_model,
+            commands::llm_models::get_llm_catalog,
+            commands::llm_models::upsert_catalog_entry,
+            commands::llm_models::delete_catalog_entry,
+            commands::llm_models::download_llm_model,
+            commands::llm_models::get_effective_prompt,
+            commands::llm_models::set_prompt_override,
+            commands::llm_models::delete_prompt_override,
+            commands::llm_models::cancel_download,
+            commands::llm_models::set_local_model_display_name,
+            commands::llm_models::unload_llm_model,
+            commands::llm_models::get_gpu_layers,
+            commands::llm_models::set_gpu_layers,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

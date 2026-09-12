@@ -32,6 +32,7 @@
 
   --controls-normal-button-wrapper-gradient: linear-gradient(135deg, oklch(0.92 calc(var(--chroma) * 0.75) var(--hue)) 0%, oklch(0.86 calc(var(--chroma) * 1.25) var(--hue)) 100%);
   --controls-button-wrapper-neu-shadows: 1px 1px 2px var(--neu-light), -1px 0px 2px var(--neu-dark);
+  --controls-button-wrapper-neu-shadows: 0.5px 0.5px 0px var(--neu-light), 0px -0.5px 0px var(--neu-dark);
 
   --controls-normal-button-front-gradient: linear-gradient(135deg, oklch(0.97 calc(var(--chroma) * 0.5) var(--hue)) 0%, var(--main-dark) 100%);
   --controls-normal-button-inset-shadows: inset 0 0 0.5vw rgba(255, 255, 255, 0.5);
@@ -85,6 +86,7 @@
     /* #272727 -> #1d1d1d */
     --controls-normal-button-wrapper-gradient: linear-gradient(135deg, oklch(calc(var(--bg-l) + 0.01) var(--dark-chroma) var(--hue)) 0%, oklch(calc(var(--bg-l) - 0.04) var(--dark-chroma) var(--hue)) 100%);
     --controls-button-wrapper-neu-shadows: 1px 1px 2px var(--neu-dark), -1px -1px 2px var(--neu-light);
+    --controls-button-wrapper-neu-shadows: 0.5px 0.5px 2.6px var(--neu-dark), -1.5px -1.5px 0.5px var(--neu-light);
 
     /* #292929 -> #202020 */
     --controls-normal-button-front-gradient: linear-gradient(135deg, oklch(calc(var(--bg-l) + 0.03) var(--dark-chroma) var(--hue)) 0%, oklch(calc(var(--bg-l) - 0.02) var(--dark-chroma) var(--hue)) 100%);
@@ -99,35 +101,34 @@
     /* --main-op-text-color: oklch(from var(--main-icon-text-color) l c h / 1); */
   }
 }
-:root {
-  /* Neumorphic Buttons */
-  .neu-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--controls-normal-button-wrapper-gradient);
-    border: none;
-    color: var(--main-icon-text-color);
-    box-shadow: var(--controls-button-wrapper-neu-shadows);
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-  }
 
-  .neu-button:hover {
-    color: var(--text-active);
-    background: var(--controls-normal-button-front-gradient);
-    box-shadow:
-      0.4vw 0.4vw 0.8vw var(--neu-gray),
-      -0.4vw -0.4vw 0.8vw var(--neu-white);
-  }
+/* Neumorphic Buttons */
+.neu-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--controls-normal-button-wrapper-gradient);
+  border: none;
+  color: var(--main-icon-text-color);
+  box-shadow: var(--controls-button-wrapper-neu-shadows);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
 
-  .neu-button:active,
-  .neu-button.pressed {
-    background: var(--controls-pressed-button-front-gradient);
-    box-shadow: var(--controls-pressed-button-inset-shadows);
-    color: #fff;
-    transform: scale(0.95);
-  }
+.neu-button:hover {
+  color: var(--text-active);
+  background: var(--controls-normal-button-front-gradient);
+  box-shadow:
+    0.4vw 0.4vw 0.8vw var(--neu-gray),
+    -0.4vw -0.4vw 0.8vw var(--neu-white);
+}
+
+.neu-button:active,
+.neu-button.pressed {
+  background: var(--controls-pressed-button-front-gradient);
+  box-shadow: var(--controls-pressed-button-inset-shadows);
+  color: #fff;
+  transform: scale(0.95);
 }
 
 :root {

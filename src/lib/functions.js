@@ -92,8 +92,13 @@ export function groupConsecutiveVerses(entries = [], wrap = false, returnAsArray
 // book_id to english_name, JAS to James
 export const getBook = (bookId) => {
   const match = books()?.find((b) => b.id === bookId);
-
   if (match) return match.english_name;
+};
+
+// book_id to OrderNo, JOB to 18
+export const getBookNo = (bookId) => {
+  const match = books()?.find((b) => b.id === bookId);
+  if (match) return match.order;
 };
 
 export const dbaExists = async (exist) => {

@@ -201,7 +201,7 @@ export default function ControlBox(props) {
     if (data?.selectedObj) openBookmarkModal(data.selectedObj);
     addToHistory(data);
     setExpandedCtl(0);
-    setSelection([]);
+    // setSelection([]);
   };
 
   const copyVerse = async () => {
@@ -243,7 +243,7 @@ export default function ControlBox(props) {
       if (data) {
         toggleSheet("strongs", "Mid");
         setExpandedCtl(0);
-        setSelection([]);
+        // setSelection([]);
         addToHistory(data);
       }
     } catch (error) {
@@ -256,6 +256,7 @@ export default function ControlBox(props) {
       const data = await updateVerseSelection();
       if (data) {
         setShowSelection(true);
+        setExpandedCtl(0);
         addToHistory(data);
       }
     } catch (error) {
@@ -283,13 +284,6 @@ export default function ControlBox(props) {
     addToHistory(data);
     setExpandedCtl(0);
     setSelection([]);
-
-    // if (data) {
-    // setSelectedTopic(null);
-    // setTrigger("right");
-    // setTopicController(true);
-    // addToHistory(data);
-    // }
   };
 
   const verseAddNote = async () => {
@@ -311,7 +305,7 @@ export default function ControlBox(props) {
 
       toggleSheet("meme", "Max");
       setExpandedCtl(0);
-      setSelection([]);
+      // setSelection([]);
       addToHistory(data);
     }
   };

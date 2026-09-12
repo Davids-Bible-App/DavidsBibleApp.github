@@ -12,7 +12,6 @@ import SlidebarRight from "./SlidebarRight";
 import { sheetProps, createSheetReady } from "../State/sheetStore";
 import TopSheet from "./TopSheet.jsx";
 import BottomSheet from "./BottomSheet.jsx";
-import { sheetComponents } from "../State/sheetComponents";
 
 // prettier-ignore
 import { 
@@ -33,6 +32,7 @@ const TopicModal = lazy(() => import("./TopicModal"));
 
 const SettingsPanel = lazy(() => import("./SettingsPanel"));
 const Audio = lazy(() => import("./Audio"));
+const BibleChat = lazy(() => import("./BibleChat"));
 const History = lazy(() => import("./History"));
 const MemeMaker = lazy(() => import("./MemeMaker"));
 const SearchRef = lazy(() => import("./SearchRef"));
@@ -46,6 +46,7 @@ export default function MainContent() {
   // Each signal only flips true when THAT sheet first opens — never before
   const settingsReady = createSheetReady("settings");
   const audioReady = createSheetReady("audio");
+  const chatReady = createSheetReady("chat");
   const historyReady = createSheetReady("history");
   const memeReady = createSheetReady("meme");
   const searchReady = createSheetReady("search");
@@ -289,6 +290,20 @@ export default function MainContent() {
             }
           >
             <MemeMaker />
+          </Suspense>
+        </Show>
+      </BottomSheet>
+
+      <BottomSheet {...sheetProps("chat")} steps={["Max:100"]}>
+        <Show when={chatReady()}>
+          <Suspense
+            fallback={
+              <div class="loading-pulse">
+                <span />
+              </div>
+            }
+          >
+            <BibleChat />
           </Suspense>
         </Show>
       </BottomSheet>

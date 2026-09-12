@@ -1,4 +1,4 @@
-import { createEffect, createSignal, onCleanup, onMount, For, untrack, on } from "solid-js";
+import { createEffect, createSignal, onCleanup, onMount, For, untrack, batch, on } from "solid-js";
 import { Portal } from "solid-js/web";
 import { invoke } from "@tauri-apps/api/core";
 import { open, message } from "@tauri-apps/plugin-dialog";
@@ -8,7 +8,9 @@ import { type } from "@tauri-apps/plugin-os";
 import CountdownTimer from "./CountdownTimer.jsx";
 
 import { getBook, clickOutside } from "../lib/functions";
-import { bookOrderNo, book, chapterNo, numberOfChapters, setChapterNo, setChapterBtn } from "../State/globalSignals.js";
+
+import { books } from "../State/globalResource.js";
+import { bookOrderNo, setBookOrderNo, book, setBook, chapterNo, numberOfChapters, setChapterNo, setChapterBtn } from "../State/globalSignals.js";
 import { play, pause, stop, resume, next, previous, seek, getState, setPlayingQueue, clearPlayingQueue, setPlayMode } from "tauri-plugin-music-notification-api";
 import { onPlay, onPause, onNext, onPrev, onQueueEnded, onPreviousAlbumNeeded } from "tauri-plugin-music-notification-api";
 import handlePageChange from "../lib/handlePageChange.js";
@@ -36,6 +38,15 @@ export default function Audio(props) {
   const [loopMode, setLoopMode] = createSignal("off"); // "off" | "chapter" | "book"
   const [hasMounted, setHasMounted] = createSignal(false);
 
+  // === NEW SIGNALS FOR LAZY MEDIA TRAY & SYNC CONTROL ===
+  const [trayActive, setTrayActive] = createSignal(false); // Keeps track of whether Android media session is initialized
+  const [syncWithReader, setSyncWithReader] = createSignal(true); // Toggle to decouple reading book from playing audio
+
+  // Local copies of the audio book & chapter context to support decoupled browsing
+  const [activeAudioBook, setActiveAudioBook] = createSignal("");
+  const [activeAudioBookOrder, setActiveAudioBookOrder] = createSignal(1);
+  const [activeAudioChapter, setActiveAudioChapter] = createSignal(1);
+
   let audioRef;
   let skipNativePlay = false;
   let queueTransitioning = false;
@@ -47,6 +58,38 @@ export default function Audio(props) {
   let windowsDebounceTimer;
   const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   const [isScreenUnlocked, setIsScreenUnlocked] = createSignal(document.visibilityState === "visible");
+
+  const copyReaderToAudio = (b, o, c) =>
+    batch(() => {
+      setActiveAudioBook(b);
+      setActiveAudioBookOrder(o);
+      setActiveAudioChapter(c);
+    });
+
+  const copyAudioToReader = (b, o, c) =>
+    batch(() => {
+      setBook(b);
+      setBookOrderNo(o);
+      setChapterNo(c);
+      setChapterBtn(c);
+    });
+
+  createEffect(
+    on([syncWithReader, book, bookOrderNo, chapterNo, activeAudioBook, activeAudioBookOrder, activeAudioChapter], ([synced, rBook, rOrder, rChapter, aBook, aOrder, aChapter], prev) => {
+      if (!synced) return;
+
+      const isInitial = prev === undefined;
+      const justEnabled = prev?.[0] === false;
+
+      if (isInitial) {
+        copyReaderToAudio(rBook, rOrder, rChapter); // load: reader wins
+      } else if (justEnabled) {
+        copyAudioToReader(aBook, aOrder, aChapter); // re-sync: audio wins once
+      } else {
+        copyReaderToAudio(rBook, rOrder, rChapter); // synced: reader governs
+      }
+    }),
+  );
 
   // ===== EVENT LISTENERS SETUP =====
   onMount(() => {
@@ -63,6 +106,7 @@ export default function Audio(props) {
           onPlay(async (e) => {
             console.log("[onPlay] event received");
             setIsPlaying(true);
+            setTrayActive(true);
 
             // Ensure background service is running when playback starts via media tray
             try {
@@ -96,7 +140,7 @@ export default function Audio(props) {
               // Plugin still fires onNext at end-of-track even in loop mode.
               // Replay the current chapter in JS instead of advancing.
               const list = untrack(playlist);
-              const currentTrack = list?.[untrack(chapterNo) - 1];
+              const currentTrack = list?.[untrack(activeAudioChapter) - 1];
               const author = audioVersion();
 
               if (currentTrack) {
@@ -111,12 +155,12 @@ export default function Audio(props) {
               return;
             }
 
-            handlePageChange(1, props.helpers);
+            handleAudioPageChange(1, props.helpers);
           }),
           onPrev((e) => {
             skipNativePlay = true;
             console.log("[onPrev] event received");
-            handlePageChange(-1, props.helpers);
+            handleAudioPageChange(-1, props.helpers);
           }),
           onPreviousAlbumNeeded(async (event) => {
             console.log("[EVENT] onPreviousAlbumNeeded received. Going to previous book's last chapter.");
@@ -124,7 +168,8 @@ export default function Audio(props) {
             queueEndedTrigger = true;
             queueTransitioning = true;
             setIsPlaying(true);
-            handlePageChange(-1, props.helpers);
+            setTrayActive(true);
+            handleAudioPageChange(-1, props.helpers);
           }),
           onQueueEnded(async (event) => {
             console.log("[EVENT] onQueueEnded received. loopMode:", loopMode(), "advanceMode:", advanceMode());
@@ -134,7 +179,7 @@ export default function Audio(props) {
               // Last chapter ended — replay it, same as the onNext intercept does
               // for all other chapters.
               const list = untrack(playlist);
-              const currentTrack = list?.[untrack(chapterNo) - 1];
+              const currentTrack = list?.[untrack(activeAudioChapter) - 1];
               const author = audioVersion();
               if (currentTrack) {
                 await play({
@@ -154,11 +199,12 @@ export default function Audio(props) {
               if (advanceMode() === "books") {
                 // Auto-advance (books mode) OR user deliberately pressed Next on last chapter
                 setIsPlaying(true);
-                handlePageChange(1, props.helpers);
+                handleAudioPageChange(1, props.helpers);
               } else {
                 setIsPlaying(false);
                 setProgress(0);
                 await stop().catch((e) => console.warn("[EVENT] Stop after queue end (book mode) failed:", e));
+                setTrayActive(false); // Dismiss tray when playlist ends naturally
 
                 queueTransitioning = false;
                 queueEndedTrigger = false;
@@ -218,13 +264,54 @@ export default function Audio(props) {
     }
   };
 
-  // === EFFECT 1: Build Android Playlist (Runs ONLY when Book/Author changes) ===
+  const getBookList = () => Object.values(books());
 
+  const handleAudioPageChange = (direction) => {
+    if (syncWithReader()) {
+      handlePageChange(direction, props.helpers);
+      return;
+    }
+
+    const bookList = getBookList();
+    const currentIndex = bookList.findIndex((b) => b.id === activeAudioBook());
+    if (currentIndex === -1) return;
+
+    const currentChapterCount = bookList[currentIndex].chapter_count;
+    let nextChapter = activeAudioChapter() + direction;
+
+    if (nextChapter < 1) {
+      const prevBook = bookList[currentIndex - 1];
+      if (!prevBook) {
+        setActiveAudioChapter(1);
+        return;
+      } // Genesis 1, nothing earlier
+      setActiveAudioBook(prevBook.id);
+      setActiveAudioBookOrder(prevBook.order);
+      setActiveAudioChapter(prevBook.chapter_count);
+      return;
+    }
+
+    if (nextChapter > currentChapterCount) {
+      const nextBook = bookList[currentIndex + 1];
+      if (!nextBook) {
+        setActiveAudioChapter(currentChapterCount);
+        return;
+      } // Revelation's end
+      setActiveAudioBook(nextBook.id);
+      setActiveAudioBookOrder(nextBook.order);
+      setActiveAudioChapter(1);
+      return;
+    }
+
+    setActiveAudioChapter(nextChapter);
+  };
+
+  // === EFFECT 1: Build Android Playlist (Runs ONLY when Audio Book/Author changes) ===
   createEffect(() => {
     if (type() !== "android") return;
 
-    const activeBookId = book();
-    const order = bookOrderNo();
+    const activeBookId = activeAudioBook();
+    const order = activeAudioBookOrder();
     const author = audioVersion();
 
     if (!activeBookId || !author) return;
@@ -233,9 +320,6 @@ export default function Audio(props) {
 
     // Clear the playlist instantly so EFFECT 2 doesn't try to play the old book
     setPlaylist([]);
-
-    // Untrack chapterNo so normal track progression doesn't destroy the queue!
-    let initialChapter = untrack(chapterNo);
 
     clearTimeout(playlistDebounceTimer);
 
@@ -270,61 +354,71 @@ export default function Audio(props) {
           coverUrl: "",
         }));
 
+        // Untrack chapterNo so normal track progression doesn't destroy the queue!
+        let initialChapter = untrack(activeAudioChapter);
+
         // If we were asked to start at the last chapter (previous-album path),
         // override the initialChapter to the final track of this new book.
         if (startAtLast && formattedPlaylist.length > 0) {
           initialChapter = formattedPlaylist.length;
           // Sync the global chapter signal so the UI reflects the last chapter.
-          setChapterNo(initialChapter);
-          setChapterBtn(initialChapter);
-          console.log("[EFFECT 1] Previous-album path: starting at last chapter =", initialChapter);
+          setActiveAudioChapter(initialChapter);
+          if (syncWithReader()) {
+            setChapterNo(initialChapter);
+            setChapterBtn(initialChapter);
+            console.log("[EFFECT 1] Previous-album path: starting at last chapter =", initialChapter);
+          }
         }
 
         setPlaylist(formattedPlaylist);
 
-        // CRITICAL: Only manage MediaSession queue if user is already playing.
-        // This prevents the media tray from appearing on app startup.
-        const shouldAutoPlay = untrack(isPlaying);
+        // LAZY ENGAGEMENT GUARD:
+        // We only talk to the native Media Session API if the tray has been engaged/activated!
+        if (trayActive()) {
+          const shouldAutoPlay = untrack(isPlaying);
 
-        if (shouldAutoPlay) {
-          // Ensure background service is running to prevent OS blocking the next play call
-          if (type() === "android" && !(await isServiceRunning())) {
-            await startService();
-          }
+          if (shouldAutoPlay) {
+            // Ensure background service is running to prevent OS blocking the next play call
+            if (type() === "android" && !(await isServiceRunning())) {
+              await startService();
+            }
 
-          // User is actively playing: clear old queue and set new one before continuing playback
-          await stop().catch((e) => console.warn("Stop before queue clear failed:", e));
-          await clearPlayingQueue().catch((e) => console.warn("Queue clear failed:", e));
+            // User is actively playing: clear old queue and set new one before continuing playback
+            await stop().catch((e) => console.warn("Stop before queue clear failed:", e));
+            await clearPlayingQueue().catch((e) => console.warn("Queue clear failed:", e));
 
-          if (isScreenUnlocked()) {
-            // Small delay to allow MediaSession to reset
-            await wait(100);
-          }
+            if (isScreenUnlocked()) {
+              // Small delay to allow MediaSession to reset
+              await wait(100);
+            }
 
-          await setPlayingQueue(
-            {
-              songs: formattedPlaylist,
-              currentIndex: initialChapter > 0 ? initialChapter - 1 : 0,
-            },
-            "sequential",
-          ).catch((err) => console.error("Failed to set playing queue:", err));
+            await setPlayingQueue(
+              {
+                songs: formattedPlaylist,
+                currentIndex: initialChapter > 0 ? initialChapter - 1 : 0,
+              },
+              "sequential",
+            ).catch((err) => console.error("Failed to set playing queue:", err));
 
-          if (formattedPlaylist.length > 0) {
-            const startIndex = initialChapter > 0 ? initialChapter - 1 : 0;
-            const firstTrack = formattedPlaylist[startIndex];
+            if (formattedPlaylist.length > 0) {
+              const startIndex = initialChapter > 0 ? initialChapter - 1 : 0;
+              const firstTrack = formattedPlaylist[startIndex];
 
-            await play({
-              url: firstTrack.url,
-              title: firstTrack.name,
-              artist: author,
-              album: firstTrack.name,
-            }).catch((err) => console.error("[EFFECT 1] Auto-play failed:", err));
+              await play({
+                url: firstTrack.url,
+                title: firstTrack.name,
+                artist: author,
+                album: firstTrack.name,
+              }).catch((err) => console.error("[EFFECT 1] Auto-play failed:", err));
+            }
+          } else {
+            // User is not playing: don't show media tray, just prepare internally
+            // Stop any residual playback and clear queue without notifying MediaSession
+            await stop().catch((e) => console.warn("Stop failed:", e));
+            await clearPlayingQueue().catch((e) => console.warn("Queue clear failed:", e));
           }
         } else {
-          // User is not playing: don't show media tray, just prepare internally
-          // Stop any residual playback and clear queue without notifying MediaSession
-          await stop().catch((e) => console.warn("Stop failed:", e));
-          await clearPlayingQueue().catch((e) => console.warn("Queue clear failed:", e));
+          console.log("[EFFECT 1] Paused & tray inactive. Skipping Android MediaSession initialization.");
         }
       } catch (err) {
         console.error("Error loading book playlist:", err);
@@ -347,7 +441,7 @@ export default function Audio(props) {
   // === EFFECT 2: Handle Track Navigation & Windows Files ===
   createEffect(
     on(
-      [book, chapterNo, bookOrderNo, audioVersion],
+      [activeAudioBook, activeAudioChapter, activeAudioBookOrder, audioVersion],
       ([activeBookId, activeChapter, order, author]) => {
         if (!hasMounted()) return;
         if (!activeBookId || !activeChapter || !author) return;
@@ -381,7 +475,12 @@ export default function Audio(props) {
         }
 
         if (type() === "android") {
-          setTrack(playlist()?.[chapterNo() - 1]);
+          setTrack(playlist()?.[activeAudioChapter() - 1]);
+
+          // Guard native interface adjustments with active tray condition
+          if (!trayActive()) {
+            return;
+          }
 
           if (queueTransitioning) {
             skipNativePlay = false;
@@ -527,7 +626,7 @@ export default function Audio(props) {
   const handleEnded = () => {
     if (type() === "windows") {
       setProgress(0);
-      const isLastChapter = chapterNo() === numberOfChapters();
+      const isLastChapter = activeAudioChapter() === numberOfChapters();
 
       // ── chapter loop: replay in place ──────────────────────────────────────
       if (loopMode() === "chapter") {
@@ -543,7 +642,7 @@ export default function Audio(props) {
         if (isLastChapter) {
           restartCurrentBookWindows();
         } else {
-          handlePageChange(1, props.helpers);
+          handleAudioPageChange(1, props.helpers);
         }
         return;
       }
@@ -554,10 +653,11 @@ export default function Audio(props) {
         return;
       }
 
-      handlePageChange(1, props.helpers);
+      handleAudioPageChange(1, props.helpers);
     }
   };
 
+  // FULLY RE-ACTIVATING / INITIALIZING ANDROID MEDIA TRAY
   const togglePlay = async () => {
     if (type() === "windows") {
       if (!audioRef) return;
@@ -570,6 +670,7 @@ export default function Audio(props) {
       }
       setIsPlaying(!isPlaying());
     }
+
     if (type() === "android") {
       const currentlyPlaying = isPlaying();
       // console.log("[togglePlay] Called. Currently playing:", currentlyPlaying, "Book:", book(), "Chapter:", chapterNo());
@@ -583,8 +684,11 @@ export default function Audio(props) {
           await stopService();
         }
       } else {
+        // Explicitly set media session as active
+        setTrayActive(true);
+
         const list = playlist();
-        const currentIndex = chapterNo() - 1;
+        const currentIndex = activeAudioChapter() - 1;
 
         if (list && list.length > currentIndex && currentIndex >= 0) {
           const track = list[currentIndex];
@@ -624,12 +728,14 @@ export default function Audio(props) {
   };
 
   const handlePrev = async () => {
-    type() === "android" ? await previous() : handlePageChange(-1, props.helpers);
+    type() === "android" && trayActive() ? await previous() : handleAudioPageChange(-1, props.helpers);
   };
   // AFTER
   const handleNext = async () => {
-    if (type() === "android") {
-      const isLastChapter = chapterNo() === numberOfChapters();
+    if (type() === "android" && trayActive()) {
+      const bookList = getBookList();
+      const meta = bookList.find((b) => b.id === activeAudioBook());
+      const isLastChapter = meta && activeAudioChapter() === meta.chapter_count;
       if (isLastChapter) {
         // Bypass onQueueEnded entirely — go straight to the next book.
         // queueEndedTrigger skips the debounce in EFFECT 1 so the rebuild
@@ -637,12 +743,12 @@ export default function Audio(props) {
         // they stay paused on chapter 1 of the new book.
         queueEndedTrigger = true;
         queueTransitioning = true;
-        handlePageChange(1, props.helpers);
+        handleAudioPageChange(1, props.helpers);
       } else {
         await next(); // Normal within-book chapter advance
       }
     } else {
-      handlePageChange(1, props.helpers); // Windows unchanged
+      handleAudioPageChange(1, props.helpers);
     }
   };
 
@@ -654,7 +760,7 @@ export default function Audio(props) {
     const next = LOOP_MODES[(LOOP_MODES.indexOf(loopMode()) + 1) % LOOP_MODES.length];
     setLoopMode(next);
 
-    if (type() === "android") {
+    if (type() === "android" && trayActive()) {
       // Always stay in sequential — chapter and book looping are handled in JS
       await setPlayMode("sequential").catch((err) => console.warn("[loopMode] setPlayMode failed:", err));
     }
@@ -668,24 +774,29 @@ export default function Audio(props) {
     const author = audioVersion();
     const firstTrack = list[0];
 
-    setChapterNo(1);
-    setChapterBtn(1);
+    setActiveAudioChapter(1);
+    if (syncWithReader()) {
+      setChapterNo(1);
+      setChapterBtn(1);
+    }
 
     queueEndedTrigger = true;
     queueTransitioning = true;
 
-    await stop().catch((e) => console.warn("[restartBook] stop failed:", e));
-    await clearPlayingQueue().catch((e) => console.warn("[restartBook] clear failed:", e));
+    if (trayActive()) {
+      await stop().catch((e) => console.warn("[restartBook] stop failed:", e));
+      await clearPlayingQueue().catch((e) => console.warn("[restartBook] clear failed:", e));
 
-    await setPlayingQueue({ songs: list, currentIndex: 0 }, "sequential").catch((err) => console.error("[restartBook] setPlayingQueue failed:", err));
+      await setPlayingQueue({ songs: list, currentIndex: 0 }, "sequential").catch((err) => console.error("[restartBook] setPlayingQueue failed:", err));
 
-    if (untrack(isPlaying)) {
-      await play({
-        url: firstTrack.url,
-        title: firstTrack.name,
-        artist: author,
-        album: firstTrack.name,
-      }).catch((err) => console.error("[restartBook] play failed:", err));
+      if (untrack(isPlaying)) {
+        await play({
+          url: firstTrack.url,
+          title: firstTrack.name,
+          artist: author,
+          album: firstTrack.name,
+        }).catch((err) => console.error("[restartBook] play failed:", err));
+      }
     }
 
     queueTransitioning = false;
@@ -693,8 +804,11 @@ export default function Audio(props) {
   };
   // ── Restart book (Windows) ──────────────────────────────────────────────────
   const restartCurrentBookWindows = () => {
-    setChapterNo(1);
-    setChapterBtn(1);
+    setActiveAudioChapter(1);
+    if (syncWithReader()) {
+      setChapterNo(1);
+      setChapterBtn(1);
+    }
     // EFFECT 2 reacts to chapterNo → loads new src.
     // The autoplay createEffect fires because isPlaying() stays true.
   };
@@ -788,7 +902,7 @@ export default function Audio(props) {
           <div class="Audio-controls-wrapper">
             <div class="Audio-header-row">
               <select
-                class="Audio-selectbox"
+                class="Audio-selectbox neu-button"
                 value={audioVersion()}
                 onChange={(e) => {
                   setAudioVersion(e.target.value);
@@ -800,14 +914,24 @@ export default function Audio(props) {
               </select>
             </div>
             <div class="Audio-btn-row">
-              <button class={`Audio-scroll ${autoScroll() ? "active-scroll" : ""}`} onClick={() => setAutoScroll(!autoScroll())} style={autoScroll() ? "background: var(--controls-pressed-button-front-gradient); color: white;" : ""}>
+              <button class={`neu-button Audio-scroll ${autoScroll() ? "active-scroll" : ""}`} onClick={() => setAutoScroll(!autoScroll())} style={autoScroll() ? "background: var(--controls-pressed-button-front-gradient); color: white;" : ""}>
                 Scroll&nbsp;&nbsp;
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-mouse" viewBox="0 0 16 16">
                   <path d="M8 3a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 3m4 8a4 4 0 0 1-8 0V5a4 4 0 1 1 8 0zM8 0a5 5 0 0 0-5 5v6a5 5 0 0 0 10 0V5a5 5 0 0 0-5-5" />
                 </svg>
               </button>
 
-              <button class={`Audio-loop ${loopMode() !== "off" ? "loop-active" : ""}`} onClick={cycleLoopMode} style={loopMode() !== "off" ? "background: var(--controls-pressed-button-front-gradient); color: white;" : ""}>
+              {/* {type() === "android" && ( */}
+              <button class={`neu-button Audio-sync`} onClick={() => setSyncWithReader(!syncWithReader())} style={!syncWithReader() ? "background: var(--controls-pressed-button-front-gradient); color: white;" : ""} title={syncWithReader() ? "Audio follows reader — tap to unlock" : "Audio playing freely — tap to re-sync"}>
+                {syncWithReader() ? "Sync'd" : "UnSync"}&nbsp;&nbsp;
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z" />
+                  <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3M3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9z" />
+                </svg>
+              </button>
+              {/* )} */}
+
+              <button class={`neu-button Audio-loop ${loopMode() !== "off" ? "loop-active" : ""}`} onClick={cycleLoopMode} style={loopMode() !== "off" ? "background: var(--controls-pressed-button-front-gradient); color: white;" : ""}>
                 {LOOP_LABELS[loopMode()]}&emsp;
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-repeat" viewBox="0 0 16 16">
                   <path d="M11 5.466V4H5a4 4 0 0 0-3.584 5.777.5.5 0 1 1-.896.446A5 5 0 0 1 5 3h6V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192m3.81.086a.5.5 0 0 1 .67.225A5 5 0 0 1 11 13H5v1.466a.25.25 0 0 1-.41.192l-2.36-1.966a.25.25 0 0 1 0-.384l2.36-1.966a.25.25 0 0 1 .41.192V12h6a4 4 0 0 0 3.585-5.777.5.5 0 0 1 .225-.67Z" />
@@ -904,23 +1028,6 @@ export default function Audio(props) {
         </div>
       </nav>
       <CountdownTimer audioRef={audioRef} playableSrc={playableSrc} togglePlay={togglePlay} hasState={hasState} pause={pause} resume={resume} isPlaying={isPlaying} setIsPlaying={setIsPlaying} />
-      <div class="Audio-info">
-        {/*
-        <code>forcePageBk: {forcePageBk() ? "true" : "false"}</code>
-        <code>Raw Evaluate: {duration() - position() > 30000 ? "true" : "false"}</code>
-        <code>Track Remaining: {formatTime(duration() - position())}</code> */}
-        {/* <code>State: {hasState() ? "true" : "false"}</code>
-        <code>Track Progress: {Math.trunc(parseFloat(progress()) * 1e4) / 1e4}</code>
-        <code>Track Duration: {duration()}</code>
-        <code>artist/author: {audioVersion()}</code>
-        <code>activeBookId: {book()}</code>
-        <code>album: {getBook(book())}</code>
-        <code>activeChapter: {chapterNo()}</code>
-        <code>order: {bookOrderNo()}</code>
-        <code>Track ID: {JSON.stringify(track()?.id)}</code>
-        <code>Track Name: {JSON.stringify(track()?.name)}</code>
-        <code>Track URL: {track()?.url?.split("/").slice(-3).join("/") ?? ""}</code> */}
-      </div>
       <Portal>
         <Show when={isImporting()}>
           <div class="Import-modal-overlay">

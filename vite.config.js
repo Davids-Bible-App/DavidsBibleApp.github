@@ -6,6 +6,15 @@ const host = process.env.TAURI_DEV_HOST;
 // https://vite.dev/config/
 export default defineConfig(async () => ({
   plugins: [solid()],
+  css: {
+    transformer: "lightningcss",
+    lightningcss: {
+      errorRecovery: true,
+    },
+  },
+  build: {
+    cssMinify: "lightningcss",
+  },
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   //

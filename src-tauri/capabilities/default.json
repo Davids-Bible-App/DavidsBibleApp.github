@@ -33,8 +33,6 @@
     "notification:default",
     "notification:allow-is-permission-granted",
     "notification:allow-request-permission",
-    "background-service:default",
-    "background-service:allow-is-running",
     "core:app:allow-register-listener",
     "core:window:allow-set-fullscreen",
     "process:allow-exit",

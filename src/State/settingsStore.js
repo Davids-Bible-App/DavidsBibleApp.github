@@ -33,10 +33,10 @@ export const [settings, setSettings] = createStore({
   navTopSwipe2: "history:Max",
   navTopDblClick: "meme:Min",
   navTopLongPress: "settings:Mid",
-  navBotSwipe1: "history:Mid",
+  navBotSwipe1: "audio:Mid",
   navBotSwipe2: "search:Max",
-  navBotDblClick: "bookmarks:Min",
-  navBotLongPress: "settings:Mid",
+  navBotDblClick: "audio:Min",
+  navBotLongPress: "chat:Max",
 });
 
 const SESSION_KEYS = ["bible1", "book", "chapterNo", "testamentBtn", "bookBtn", "chapterBtn", "wordHighlight"];
@@ -87,7 +87,7 @@ export async function loadAppState(scope = "all") {
         navBotSwipe1: res.navBotSwipe1 ?? "history:Mid",
         navBotSwipe2: res.navBotSwipe2 ?? "search:Max",
         navBotDblClick: res.navBotDblClick ?? "bookmarks:Min",
-        navBotLongPress: res.navBotLongPress ?? "settings:Mid",
+        navBotLongPress: res.navBotLongPress ?? "chat:Max",
       });
 
       document.documentElement.style.setProperty("--hue", settings.themeHue);
