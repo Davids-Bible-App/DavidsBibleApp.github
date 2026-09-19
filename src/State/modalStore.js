@@ -1,5 +1,3 @@
-// src/State/modalStore.js
-
 import { createSignal, createResource, createRoot, onCleanup } from "solid-js";
 import { invoke } from "@tauri-apps/api/core";
 import { registerRefetchers } from "../State/settingsStore.js";

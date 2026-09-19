@@ -1,6 +1,6 @@
 [package]
 name = "davidsbible"
-version = "1.0.6"
+version = "1.0.7"
 description = "Davids Bible Application And Study Tool"
 authors = ["you"]
 edition = "2021"
@@ -15,19 +15,25 @@ name = "davidsbible_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
-tauri-build = { version = "2", features = [] }
+tauri-build = { version = "=2.5.6", features = [] }
 
 [dependencies]
 tauri-plugin-dialog = "2.7.0"
 tauri-plugin-opener = "2.5.0"
-tauri = { version = "^2", features = [ "protocol-asset" ] }
+tauri = { version = "=2.10.3", features = [ "protocol-asset" ] }
+tauri-runtime = "=2.10.1"
+tauri-runtime-wry = "=2.10.1"
+tauri-plugin = "=2.5.4"
+tauri-utils = "=2.8.3"
+tauri-macros = "=2.5.5"
+tauri-codegen = "=2.5.5"
+
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tauri-plugin-fs = "2"
 tauri-plugin-sql = { version = "2", features = ["sqlite"] }
 tauri-plugin-os = "2"
 tauri-plugin-m3 = "0.2.2"
-tauri-plugin-sharekit = "0.2"
 rusqlite = { version = "0.31", features = ["bundled"] }
 # tauri-plugin-log = "2.8.0"
 log = "0.4.29"
@@ -40,8 +46,9 @@ alphanumeric-sort = "1.5.6"
 tokio = { version = "1", features = ["time", "sync", "macros"] }
 async-trait = "0.1.89"
 tauri-plugin-notification = "2"
-tauri-plugin-music-notification-api = { git = "https://github.com/AverTry/tauri-plugin-music-notification", branch = "main" }
-#tauri-plugin-music-notification-api = { path = "../../tauri-plugin-music-notification" }
+#tauri-plugin-music-notification-api = { git = "https://github.com/AverTry/tauri-plugin-music-notification", rev = "21ed5d7b42ea14832e09cdb204bcfbc957313937" }
+#tauri-plugin-music-notification-api = { git = "https://github.com/AverTry/tauri-plugin-music-notification", branch = "main" }
+tauri-plugin-music-notification-api = { path = "../../tauri-plugin-music-notification" }
 reqwest = { version = "0.12", default-features = false, features = ["stream", "rustls-tls"] }
 futures-util = "0.3"
 

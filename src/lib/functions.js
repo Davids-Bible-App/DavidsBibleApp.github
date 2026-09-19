@@ -133,3 +133,6 @@ export function abbreviator(v) {
       .replace(/^[a-z]{3}_/i, "")
       .toUpperCase();
 }
+
+// Helper: strip <mark> / </mark> (and malformed </ mark>) only
+export const stripMarkTags = (value) => (typeof value === "string" ? value.replace(/<\s*\/?\s*mark\b[^>]*>/gi, "") : value);

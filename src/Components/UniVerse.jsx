@@ -1,8 +1,8 @@
 import { createSignal, createEffect, createMemo, onMount, onCleanup, untrack } from "solid-js";
-import { setExpandedCtl, selection, setShowUniTopic, setShowUniCtrl } from "../State/globalSignals.js";
+import { selection, setShowUniTopic, setShowUniCtrl } from "../State/globalSignals.js";
 import { abbreviator, getBook } from "../lib/functions";
 import "./CSS/UniVerse.css";
-import { isFullscreen, toggleFullscreen, setFullscreen } from "../state/fullscreen.js";
+import { isFullscreen, setFullscreen } from "../State/fullscreen.js";
 
 const normalizeVerse = (v) => ({
   ed: v.ed || v.shortName || abbreviator(v.translation_id) || abbreviator(v.translation),
@@ -110,7 +110,6 @@ export default function UniVerse(props) {
       if (currentDist / initialPinchDist < 0.7) {
         setShowUniCtrl(false);
         setShowUniTopic(false);
-        // wasFullscreen === false &&
         setFullscreen(false);
       }
     }
@@ -170,18 +169,6 @@ export default function UniVerse(props) {
         {/* Top Header Bar */}
         <header class="UniVerse-header">
           <span class="UniVerse-citation">{formatCitation(currentVerse())}</span>
-          {/* &emsp;
-          <button
-            class="UniVerse-closeBtnc"
-            onClick={() => {
-              setShowUniTopic(false);
-              setShowUniCtrl(false);
-            }}
-          >
-            Exit UniVerse
-          </button>
-          &emsp;
-          <button onClick={toggleFullscreen}>{isFullscreen() ? "Exit Fullscreen" : "Enter Fullscreen"}</button> */}
         </header>
 
         {/* Main Content Area */}

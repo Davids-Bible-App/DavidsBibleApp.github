@@ -1,4 +1,3 @@
-// src/Components/CountdownTimer.jsx
 import { createSignal, createMemo, onCleanup, onMount, Index, batch } from "solid-js";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
@@ -298,8 +297,6 @@ const CountdownTimer = (props) => {
   const resetTimer = async () => {
     await invoke("timer_cancel");
     stopPolling();
-    // type() === "windows" && (await props.audioRef.pause());
-    // props.setIsPlaying(false);
     setIsActive(false);
     if (secondsLeft() === 0) {
       // Already restored — second press clears the picker

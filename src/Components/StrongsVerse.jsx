@@ -1,6 +1,9 @@
 import { createResource, createMemo, For, Show } from "solid-js";
 import { invoke } from "@tauri-apps/api/core";
 import { activePaper, selection } from "../State/globalSignals.js";
+import { preloadSheet } from "../State/sheetComponents";
+import { toggleSheet } from "../State/sheetStore";
+
 import "./CSS/StrongsVerse.css";
 
 const fetchStudyData = async ([bookId, chapter, verse]) => {
@@ -127,7 +130,15 @@ export default function StrongsVerse(props) {
                   <For each={word.definitions}>
                     {(def) => (
                       <div class="StrongsVerse-dict-entry">
-                        <button onClick={() => props.setActiveLookup({ query: def.strongsId, origin: word.englishWord })} class="StrongsVerse-strongs-tag">
+                        <button
+                          onPointerEnter={() => preloadSheet("strlook")}
+                          onPointerDown={(e) => e.stopPropagation()}
+                          onClick={() => {
+                            props.requestLookup({ query: def.strongsId, origin: word.englishWord });
+                            toggleSheet("strlook", "Max");
+                          }}
+                          class="StrongsVerse-strongs-tag"
+                        >
                           {def.strongsId}
                         </button>
 

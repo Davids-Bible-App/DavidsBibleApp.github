@@ -8,7 +8,7 @@
   cursor: pointer;
   &:hover {
     background: var(--bk-button-pressed-color);
-    color: #fff;
+    /* color: #fff; */
   }
   &:active {
     background: var(--controls-pressed-button-wrapper-gradient);
@@ -79,7 +79,7 @@
 .NavbarTop-bookChap {
   position: absolute;
   transform: translateX(-50%);
-  top: 19px;
+  top: 25.5px;
   left: 102.5px;
   font-size: 0.7rem;
 }

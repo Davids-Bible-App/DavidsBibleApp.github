@@ -5,17 +5,19 @@ import { open, message } from "@tauri-apps/plugin-dialog";
 import { appDataDir, join } from "@tauri-apps/api/path";
 import { listen } from "@tauri-apps/api/event";
 import { type } from "@tauri-apps/plugin-os";
+import HelpButton from "./HelpButton.jsx";
 import CountdownTimer from "./CountdownTimer.jsx";
 
-import { getBook, clickOutside } from "../lib/functions";
+import { getBook, getBookNo } from "../lib/functions";
 
 import { books } from "../State/globalResource.js";
-import { bookOrderNo, setBookOrderNo, book, setBook, chapterNo, numberOfChapters, setChapterNo, setChapterBtn } from "../State/globalSignals.js";
+import { bookOrderNo, setBookOrderNo, book, setBook, chapterNo, numberOfChapters, setChapterNo, setChapterBtn, setTestamentBtn } from "../State/globalSignals.js";
 import { play, pause, stop, resume, next, previous, seek, getState, setPlayingQueue, clearPlayingQueue, setPlayMode } from "tauri-plugin-music-notification-api";
 import { onPlay, onPause, onNext, onPrev, onQueueEnded, onPreviousAlbumNeeded } from "tauri-plugin-music-notification-api";
 import handlePageChange from "../lib/handlePageChange.js";
-import { startService, stopService, isServiceRunning } from "tauri-plugin-background-service";
 import "./CSS/Audio.css";
+
+export const [syncWithReader, setSyncWithReader] = createSignal(true); // Toggle to decouple reading book from playing audio
 
 export default function Audio(props) {
   const [isPlaying, setIsPlaying] = createSignal(false);
@@ -38,35 +40,34 @@ export default function Audio(props) {
   const [loopMode, setLoopMode] = createSignal("off"); // "off" | "chapter" | "book"
   const [hasMounted, setHasMounted] = createSignal(false);
 
-  // === NEW SIGNALS FOR LAZY MEDIA TRAY & SYNC CONTROL ===
+  // === SIGNALS FOR LAZY MEDIA TRAY & SYNC CONTROL ===
   const [trayActive, setTrayActive] = createSignal(false); // Keeps track of whether Android media session is initialized
-  const [syncWithReader, setSyncWithReader] = createSignal(true); // Toggle to decouple reading book from playing audio
 
   // Local copies of the audio book & chapter context to support decoupled browsing
   const [activeAudioBook, setActiveAudioBook] = createSignal("");
   const [activeAudioBookOrder, setActiveAudioBookOrder] = createSignal(1);
   const [activeAudioChapter, setActiveAudioChapter] = createSignal(1);
+  const [loadedPlaylistBook, setLoadedPlaylistBook] = createSignal(null);
 
   let audioRef;
   let skipNativePlay = false;
   let queueTransitioning = false;
   let queueEndedTrigger = false;
-  // NEW: When the OS asked to go to the previous album/book, we want the next
-  // queue rebuild to start at the LAST chapter, not chapter 1.
+  // Previous album/book, then queue rebuild to start at the LAST chapter.
   let pendingStartAtLastChapter = false;
   let playlistDebounceTimer;
   let windowsDebounceTimer;
   const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   const [isScreenUnlocked, setIsScreenUnlocked] = createSignal(document.visibilityState === "visible");
 
-  const copyReaderToAudio = (b, o, c) =>
+  const ReaderGovernsAudio = (b, o, c) =>
     batch(() => {
       setActiveAudioBook(b);
       setActiveAudioBookOrder(o);
       setActiveAudioChapter(c);
     });
 
-  const copyAudioToReader = (b, o, c) =>
+  const ReSyncReaderToAudio = (b, o, c) =>
     batch(() => {
       setBook(b);
       setBookOrderNo(o);
@@ -76,22 +77,27 @@ export default function Audio(props) {
 
   createEffect(
     on([syncWithReader, book, bookOrderNo, chapterNo, activeAudioBook, activeAudioBookOrder, activeAudioChapter], ([synced, rBook, rOrder, rChapter, aBook, aOrder, aChapter], prev) => {
-      if (!synced) return;
+      if (!synced) return; // DeSync Mode: Reader and Audio Govern their own.
 
       const isInitial = prev === undefined;
       const justEnabled = prev?.[0] === false;
 
       if (isInitial) {
-        copyReaderToAudio(rBook, rOrder, rChapter); // load: reader wins
+        ReaderGovernsAudio(rBook, rOrder, rChapter); // load: reader governs
       } else if (justEnabled) {
-        copyAudioToReader(aBook, aOrder, aChapter); // re-sync: audio wins once
+        ReSyncReaderToAudio(aBook, aOrder, aChapter); // re-sync: reader synced to audio, then reader governs
+        const bookNum = parseInt(getBookNo(aBook));
+        if (!isNaN(bookNum)) {
+          setTestamentBtn(bookNum <= 39 ? "ot" : "nt");
+        }
       } else {
-        copyReaderToAudio(rBook, rOrder, rChapter); // synced: reader governs
+        ReaderGovernsAudio(rBook, rOrder, rChapter); // synced: reader governs
       }
     }),
   );
 
   // ===== EVENT LISTENERS SETUP =====
+
   onMount(() => {
     // Defer past the first paint so listener registration doesn't block startup
     queueMicrotask(async () => {
@@ -104,36 +110,15 @@ export default function Audio(props) {
         // Parallelize the 6 IPC round-trips
         const [unPlay, unPause, unNext, unPrev, unPrevAlbum, unQueueEnded] = await Promise.all([
           onPlay(async (e) => {
-            console.log("[onPlay] event received");
             setIsPlaying(true);
             setTrayActive(true);
-
-            // Ensure background service is running when playback starts via media tray
-            try {
-              if (!(await isServiceRunning())) {
-                await startService();
-              }
-            } catch (err) {
-              console.warn("[onPlay] Failed to start background service:", err);
-            }
           }),
 
           onPause(async () => {
-            console.log("[onPause] event received");
             setIsPlaying(false);
-
-            // Stop background service when paused via media tray to save battery
-            try {
-              if (await isServiceRunning()) {
-                await stopService();
-              }
-            } catch (err) {
-              console.warn("[onPause] Failed to stop background service:", err);
-            }
           }),
           onNext((e) => {
             skipNativePlay = true;
-            console.log("[onNext] event received");
 
             // ── CHANGE START ──────────────────────────────────────────────────────
             if (loopMode() === "chapter") {
@@ -159,11 +144,9 @@ export default function Audio(props) {
           }),
           onPrev((e) => {
             skipNativePlay = true;
-            console.log("[onPrev] event received");
             handleAudioPageChange(-1, props.helpers);
           }),
           onPreviousAlbumNeeded(async (event) => {
-            console.log("[EVENT] onPreviousAlbumNeeded received. Going to previous book's last chapter.");
             pendingStartAtLastChapter = true;
             queueEndedTrigger = true;
             queueTransitioning = true;
@@ -172,8 +155,6 @@ export default function Audio(props) {
             handleAudioPageChange(-1, props.helpers);
           }),
           onQueueEnded(async (event) => {
-            console.log("[EVENT] onQueueEnded received. loopMode:", loopMode(), "advanceMode:", advanceMode());
-
             // ── CHANGE START ──────────────────────────────────────────────────
             if (loopMode() === "chapter") {
               // Last chapter ended — replay it, same as the onNext intercept does
@@ -197,6 +178,7 @@ export default function Audio(props) {
               queueTransitioning = true;
 
               if (advanceMode() === "books") {
+                // NOT IN USE
                 // Auto-advance (books mode) OR user deliberately pressed Next on last chapter
                 setIsPlaying(true);
                 handleAudioPageChange(1, props.helpers);
@@ -214,11 +196,8 @@ export default function Audio(props) {
         ]);
 
         const unlisteners = [unPlay, unPause, unNext, unPrev, unPrevAlbum, unQueueEnded];
-        console.log("[LISTENERS] Registered 6 event listeners");
 
         onCleanup(() => {
-          console.log("[Audio Teardown] Cleaning up listeners and background service");
-
           window.removeEventListener("visibilitychange", handleVisibility);
 
           // Clean up registered IPC event listeners
@@ -229,17 +208,6 @@ export default function Audio(props) {
           // Clear active timers
           clearTimeout(playlistDebounceTimer);
           clearTimeout(windowsDebounceTimer);
-
-          // Stop background service if component unmounts while running
-          (async () => {
-            try {
-              if (type() === "android" && (await isServiceRunning())) {
-                await stopService();
-              }
-            } catch (e) {
-              console.warn("[BG Service] stopService on cleanup failed:", e);
-            }
-          })();
         });
       }
       await fetchAuthors();
@@ -309,7 +277,6 @@ export default function Audio(props) {
   // === EFFECT 1: Build Android Playlist (Runs ONLY when Audio Book/Author changes) ===
   createEffect(() => {
     if (type() !== "android") return;
-
     const activeBookId = activeAudioBook();
     const order = activeAudioBookOrder();
     const author = audioVersion();
@@ -327,6 +294,11 @@ export default function Audio(props) {
     const shouldSkipDebounce = queueEndedTrigger;
     const delay = shouldSkipDebounce ? 0 : 50;
 
+    // Capture whether this rebuild was a manual book/chapter injection
+    // (debounced path) vs natural progression (next/prev/onQueueEnded).
+    // Only manual injections need a hard stop before switching source.
+    const isManualJump = !shouldSkipDebounce;
+
     // Capture and consume the "start at last chapter" flag for this rebuild.
     const startAtLast = pendingStartAtLastChapter;
     pendingStartAtLastChapter = false;
@@ -336,7 +308,6 @@ export default function Audio(props) {
         const orderStr = String(order || 1).padStart(2, "0");
         const name = getBook(activeBookId) || "Genesis";
         const safeName = name.replace(/\s+/g, "");
-        // const padLength = name === "Psalms" ? 3 : 2;
 
         const basePath = await appDataDir();
         const bookFolderPath = await join(basePath, "audio", author, `${orderStr}_${safeName}`);
@@ -353,7 +324,6 @@ export default function Audio(props) {
           lufs: null,
           coverUrl: "",
         }));
-
         // Untrack chapterNo so normal track progression doesn't destroy the queue!
         let initialChapter = untrack(activeAudioChapter);
 
@@ -366,11 +336,11 @@ export default function Audio(props) {
           if (syncWithReader()) {
             setChapterNo(initialChapter);
             setChapterBtn(initialChapter);
-            console.log("[EFFECT 1] Previous-album path: starting at last chapter =", initialChapter);
           }
         }
 
         setPlaylist(formattedPlaylist);
+        setLoadedPlaylistBook(activeBookId);
 
         // LAZY ENGAGEMENT GUARD:
         // We only talk to the native Media Session API if the tray has been engaged/activated!
@@ -378,15 +348,13 @@ export default function Audio(props) {
           const shouldAutoPlay = untrack(isPlaying);
 
           if (shouldAutoPlay) {
-            // Ensure background service is running to prevent OS blocking the next play call
-            if (type() === "android" && !(await isServiceRunning())) {
-              await startService();
+            // Only force a clean teardown when this is a manual book/chapter
+            // injection while already playing — natural progression (next/prev,
+            // onQueueEnded, onPreviousAlbumNeeded) must NOT stop the foreground service.
+            if (isManualJump) {
+              await stop().catch((e) => console.warn("[EFFECT 1] pre-switch stop failed:", e));
+              await clearPlayingQueue().catch((e) => console.warn("[EFFECT 1] pre-switch clear failed:", e));
             }
-
-            // User is actively playing: clear old queue and set new one before continuing playback
-            await stop().catch((e) => console.warn("Stop before queue clear failed:", e));
-            await clearPlayingQueue().catch((e) => console.warn("Queue clear failed:", e));
-
             if (isScreenUnlocked()) {
               // Small delay to allow MediaSession to reset
               await wait(100);
@@ -417,8 +385,6 @@ export default function Audio(props) {
             await stop().catch((e) => console.warn("Stop failed:", e));
             await clearPlayingQueue().catch((e) => console.warn("Queue clear failed:", e));
           }
-        } else {
-          console.log("[EFFECT 1] Paused & tray inactive. Skipping Android MediaSession initialization.");
         }
       } catch (err) {
         console.error("Error loading book playlist:", err);
@@ -490,6 +456,7 @@ export default function Audio(props) {
           if (skipNativePlay) {
             skipNativePlay = false;
             const list = playlist();
+
             const currentTrack = list?.[activeChapter - 1];
             if (currentTrack) {
               play({
@@ -503,8 +470,9 @@ export default function Audio(props) {
           }
 
           const list = playlist();
+          const listMatchesBook = loadedPlaylistBook() === activeBookId;
 
-          if (list.length > 0 && untrack(isPlaying)) {
+          if (listMatchesBook && list.length > 0 && untrack(isPlaying)) {
             // Currently playing: jump to the new chapter immediately
             const track = list[activeChapter - 1];
             if (track) {
@@ -515,7 +483,7 @@ export default function Audio(props) {
                 album: track.name,
               }).catch((e) => console.warn("Interrupted play jump", e));
             }
-          } else if (list.length > 0) {
+          } else if (listMatchesBook && list.length > 0) {
             // Paused: wipe the plugin's internal cursor so the next play()
             // call in togglePlay starts at the correct chapter, not the old one.
             // stop()+clearPlayingQueue() resets state without triggering playback.
@@ -534,19 +502,9 @@ export default function Audio(props) {
     if (type() === "windows") {
       if (playableSrc()) URL.revokeObjectURL(playableSrc());
     }
-
-    (async () => {
-      try {
-        if (await isServiceRunning()) {
-          await stopService();
-        }
-      } catch (e) {
-        console.error("[BG] stopService on cleanup failed", e);
-      }
-    })();
   });
 
-  // 2. Handle Autoplay safely when src changes
+  // Handle Autoplay safely when src changes
   createEffect((prevSrc) => {
     if (type() === "windows") {
       const currentSrc = playableSrc();
@@ -570,11 +528,11 @@ export default function Audio(props) {
         const currentProgress = audioRef.currentTime / audioRef.duration;
         setProgress(currentProgress * 100);
 
-        // Add these two — convert seconds → ms to match Android's formatTime format
+        // Convert seconds → ms to match Android's formatTime format
         setPosition(audioRef.currentTime * 1000);
         setDuration(audioRef.duration * 1000);
 
-        if (autoScroll()) {
+        if (syncWithReader() && autoScroll()) {
           const container = props.helpers.psr();
           if (container) {
             const maxScroll = container.scrollHeight - container.clientHeight;
@@ -601,7 +559,7 @@ export default function Audio(props) {
               const currentProgress = state.position / state.duration;
               setProgress(currentProgress * 100);
 
-              if (autoScroll()) {
+              if (syncWithReader() && autoScroll()) {
                 const container = props.helpers.psr();
                 if (container) {
                   const maxScroll = container.scrollHeight - container.clientHeight;
@@ -621,6 +579,10 @@ export default function Audio(props) {
 
       onCleanup(() => clearInterval(interval));
     }
+  });
+
+  createEffect(() => {
+    if (!syncWithReader()) setAutoScroll(false);
   });
 
   const handleEnded = () => {
@@ -647,7 +609,7 @@ export default function Audio(props) {
         return;
       }
 
-      // ── loop off (original behaviour) ───────────────────────────────────────
+      // ── loop off (original behaviour) NOT IN USE ───────────────────────────────────────
       if (advanceMode() === "book" && isLastChapter) {
         setIsPlaying(false);
         return;
@@ -657,7 +619,6 @@ export default function Audio(props) {
     }
   };
 
-  // FULLY RE-ACTIVATING / INITIALIZING ANDROID MEDIA TRAY
   const togglePlay = async () => {
     if (type() === "windows") {
       if (!audioRef) return;
@@ -673,18 +634,11 @@ export default function Audio(props) {
 
     if (type() === "android") {
       const currentlyPlaying = isPlaying();
-      // console.log("[togglePlay] Called. Currently playing:", currentlyPlaying, "Book:", book(), "Chapter:", chapterNo());
 
       if (currentlyPlaying) {
         await pause().catch((e) => console.warn("[togglePlay] Pause failed:", e));
         setIsPlaying(false);
-
-        // Optional: Stop the service if they manually paused
-        if (await isServiceRunning()) {
-          await stopService();
-        }
       } else {
-        // Explicitly set media session as active
         setTrayActive(true);
 
         const list = playlist();
@@ -694,12 +648,7 @@ export default function Audio(props) {
           const track = list[currentIndex];
 
           try {
-            // 1. KEEP WEBVIEW ALIVE: Start the background service before playing
-            if (!(await isServiceRunning())) {
-              await startService();
-            }
-
-            // 2. CRITICAL: Set the queue BEFORE playing so MediaSession appears at the right time
+            // setPlayingQueue BEFORE play so MediaSession/notification appears with correct queue context
             await setPlayingQueue(
               {
                 songs: list,
@@ -730,7 +679,7 @@ export default function Audio(props) {
   const handlePrev = async () => {
     type() === "android" && trayActive() ? await previous() : handleAudioPageChange(-1, props.helpers);
   };
-  // AFTER
+
   const handleNext = async () => {
     if (type() === "android" && trayActive()) {
       const bookList = getBookList();
@@ -761,7 +710,6 @@ export default function Audio(props) {
     setLoopMode(next);
 
     if (type() === "android" && trayActive()) {
-      // Always stay in sequential — chapter and book looping are handled in JS
       await setPlayMode("sequential").catch((err) => console.warn("[loopMode] setPlayMode failed:", err));
     }
   };
@@ -784,9 +732,6 @@ export default function Audio(props) {
     queueTransitioning = true;
 
     if (trayActive()) {
-      await stop().catch((e) => console.warn("[restartBook] stop failed:", e));
-      await clearPlayingQueue().catch((e) => console.warn("[restartBook] clear failed:", e));
-
       await setPlayingQueue({ songs: list, currentIndex: 0 }, "sequential").catch((err) => console.error("[restartBook] setPlayingQueue failed:", err));
 
       if (untrack(isPlaying)) {
@@ -824,6 +769,7 @@ export default function Audio(props) {
   const circleCircumference = 2 * Math.PI * circleRadius;
   const strokeOffset = () => circleCircumference - (progress() / 100) * circleCircumference;
 
+  // Not in use
   const cycleAdvanceMode = () => {
     const modes = ["books", "book"];
     const nextIndex = (modes.indexOf(advanceMode()) + 1) % modes.length;
@@ -843,7 +789,7 @@ export default function Audio(props) {
       if (!source) return;
       const sourcePath = typeof source === "string" ? source : source.path;
 
-      // ✅ Show modal & block button BEFORE invoke — no more blank wait
+      // Show modal & block button BEFORE invoke — no more blank wait
       setIsImporting(true);
       setImportProgress(0);
 
@@ -858,7 +804,6 @@ export default function Audio(props) {
 
       await message(`${author} audio extracted successfully!`);
       await fetchAuthors();
-      // setAudioVersion(author); // leave for saved author restore
     } catch (err) {
       setIsImporting(false);
       console.error("Import failed:", err);
@@ -885,7 +830,7 @@ export default function Audio(props) {
       await invoke("delete_author", { author });
       await message(`"${author}" deleted successfully.`);
       await fetchAuthors();
-      const remaining = authors(); // whatever your authors signal is called
+      const remaining = authors();
       setAudioVersion(remaining.length > 0 ? remaining[0] : "");
     } catch (err) {
       console.error("Delete failed:", err);
@@ -914,22 +859,27 @@ export default function Audio(props) {
               </select>
             </div>
             <div class="Audio-btn-row">
-              <button class={`neu-button Audio-scroll ${autoScroll() ? "active-scroll" : ""}`} onClick={() => setAutoScroll(!autoScroll())} style={autoScroll() ? "background: var(--controls-pressed-button-front-gradient); color: white;" : ""}>
+              <button
+                class={`neu-button Audio-scroll ${syncWithReader() && autoScroll() ? "active-scroll" : ""}`}
+                onClick={() => {
+                  if (!syncWithReader()) return;
+                  setAutoScroll(!autoScroll());
+                }}
+                style={syncWithReader() && autoScroll() ? "background: var(--controls-pressed-button-front-gradient); color: white;" : ""}
+              >
                 Scroll&nbsp;&nbsp;
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-mouse" viewBox="0 0 16 16">
                   <path d="M8 3a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 3m4 8a4 4 0 0 1-8 0V5a4 4 0 1 1 8 0zM8 0a5 5 0 0 0-5 5v6a5 5 0 0 0 10 0V5a5 5 0 0 0-5-5" />
                 </svg>
               </button>
 
-              {/* {type() === "android" && ( */}
               <button class={`neu-button Audio-sync`} onClick={() => setSyncWithReader(!syncWithReader())} style={!syncWithReader() ? "background: var(--controls-pressed-button-front-gradient); color: white;" : ""} title={syncWithReader() ? "Audio follows reader — tap to unlock" : "Audio playing freely — tap to re-sync"}>
-                {syncWithReader() ? "Sync'd" : "UnSync"}&nbsp;&nbsp;
+                {syncWithReader() ? "Sync'd" : "DeSync'd"}&nbsp;&nbsp;
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                   <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z" />
                   <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3M3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9z" />
                 </svg>
               </button>
-              {/* )} */}
 
               <button class={`neu-button Audio-loop ${loopMode() !== "off" ? "loop-active" : ""}`} onClick={cycleLoopMode} style={loopMode() !== "off" ? "background: var(--controls-pressed-button-front-gradient); color: white;" : ""}>
                 {LOOP_LABELS[loopMode()]}&emsp;
@@ -1021,6 +971,9 @@ export default function Audio(props) {
                   <button onClick={handleDeleteAuthor} disabled={isImporting() || !audioVersion()}>
                     Delete Author
                   </button>
+                  <HelpButton docName="Audio">
+                    <button>Help</button>
+                  </HelpButton>
                 </div>
               </div>
             )}

@@ -21,7 +21,7 @@ import {
 import { books, translations } from "../State/globalResource.js";
 import { loadAppState } from "../State/settingsStore.js";
 
-import { initFullscreen, isFullscreen, toggleFullscreen, setFullscreen } from "../State/fullscreen.js";
+import { initFullscreen, isFullscreen } from "../State/fullscreen.js";
 import "./CSS/MainContent.css";
 
 const DbTranslations = lazy(() => import("./DbTranslations"));
@@ -40,10 +40,9 @@ const CrossRef = lazy(() => import("./CrossRef"));
 const StrongsVerse = lazy(() => import("./StrongsVerse"));
 const StrongsLookup = lazy(() => import("./StrongsLookup"));
 const Editor = lazy(() => import("./Editor"));
-const Help = lazy(() => import("./Help"));
 
 export default function MainContent() {
-  // Each signal only flips true when THAT sheet first opens — never before
+  // Each signal only flips true when THAT sheet first opens
   const settingsReady = createSheetReady("settings");
   const audioReady = createSheetReady("audio");
   const chatReady = createSheetReady("chat");
@@ -53,12 +52,16 @@ export default function MainContent() {
   const crossrefReady = createSheetReady("crossref");
   const strongsReady = createSheetReady("strongs");
   const strlookReady = createSheetReady("strlook");
-  const helpReady = createSheetReady("help");
   const editorReady = createSheetReady("editor");
 
   onMount(initFullscreen);
 
   const [activeLookup, setActiveLookup] = createSignal(null);
+  let lookupSeq = 0;
+
+  function requestLookup(payload) {
+    setActiveLookup({ seq: ++lookupSeq, ...payload });
+  }
 
   // Get info from the currently displayed Translations only.
   const getInfo = (i) => translations()?.find((x) => i === x.id);
@@ -181,10 +184,7 @@ export default function MainContent() {
   };
 
   return (
-    <div
-      // onDblClick={toggleFullscreen}
-      class="edge-to-edge"
-    >
+    <div class="edge-to-edge">
       <div class="inset-wrapper">
         <SlidebarLeft ref={leftSB} psr={psr} ssr={ssr} books={books} frozen={isDragging} />
         <SlidebarRight ref={rightSB} />
@@ -248,20 +248,6 @@ export default function MainContent() {
             }
           >
             <History books={books} />
-          </Suspense>
-        </Show>
-      </BottomSheet>
-
-      <BottomSheet {...sheetProps("help")} steps={["Max:100"]}>
-        <Show when={helpReady()}>
-          <Suspense
-            fallback={
-              <div class="loading-pulse">
-                <span />
-              </div>
-            }
-          >
-            <Help />
           </Suspense>
         </Show>
       </BottomSheet>
@@ -345,7 +331,7 @@ export default function MainContent() {
               </div>
             }
           >
-            <StrongsVerse books={books} setActiveLookup={setActiveLookup} />
+            <StrongsVerse books={books} requestLookup={requestLookup} setActiveLookup={setActiveLookup} />
           </Suspense>
         </Show>
       </TopSheet>

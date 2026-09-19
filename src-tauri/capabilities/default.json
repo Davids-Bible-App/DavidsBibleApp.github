@@ -22,8 +22,6 @@
     "fs:allow-appdata-write-recursive",
     "fs:allow-resource-read-recursive",
     "fs:allow-resource-write-recursive",
-    "sharekit:allow-share-text",
-    "sharekit:default",
     "haptics:allow-impact-feedback",
     "haptics:allow-notification-feedback",
     "haptics:allow-selection-feedback",

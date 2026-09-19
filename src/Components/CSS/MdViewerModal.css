@@ -1,0 +1,266 @@
+/* ===== Theme variables (edit here) ===== */
+:root {
+  --mdmodal-backdrop: rgba(0, 0, 0, 0.5);
+  --mdmodal-bg: var(--t1);
+  --mdmodal-border: #e0e0e0;
+  --mdmodal-text: #1a1a1a;
+  --mdmodal-muted: #6b6b6b;
+  --mdmodal-heading: var(--s5);
+  --mdmodal-link: #1a73e8;
+  --mdmodal-code-bg: #f4f4f5;
+  --mdmodal-code-text: #c7254e;
+  --mdmodal-pre-bg: var(--s3);
+  --mdmodal-pre-text: var(--t1);
+  --mdmodal-blockquote-border: #d0d0d0;
+  --mdmodal-table-border: #e0e0e0;
+  --mdmodal-table-header-bg: var(--t2);
+  --mdmodal-scrollbar: #c7c7c7;
+  --mdmodal-radius: 12px;
+  --mdmodal-max-width: 640px;
+  --mdmodal-max-height: 80vh;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --mdmodal-backdrop: rgba(0, 0, 0, 0.65);
+    --mdmodal-bg: var(--clr-gray-870);
+    --mdmodal-border: #333338;
+    --mdmodal-text: #e6e6e6;
+    --mdmodal-muted: #9a9a9f;
+    --mdmodal-heading: #ffffff;
+    --mdmodal-link: #8ab4f8;
+    --mdmodal-code-bg: #2b2b30;
+    --mdmodal-code-text: #ff7b9c;
+    --mdmodal-pre-bg: #111113;
+    --mdmodal-pre-text: #f0f0f0;
+    --mdmodal-blockquote-border: #444448;
+    --mdmodal-table-border: #3a3a3f;
+    --mdmodal-table-header-bg: var(--clr-gray-900);
+    --mdmodal-scrollbar: #4a4a4f;
+  }
+}
+/* ======================================= */
+
+.MdViewerModal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--mdmodal-backdrop);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.MdViewerModal-class {
+  background: var(--mdmodal-bg);
+  color: var(--mdmodal-text);
+  border: 1px solid var(--mdmodal-border);
+  border-radius: var(--mdmodal-radius);
+  width: min(100%, var(--mdmodal-max-width));
+  max-height: var(--mdmodal-max-height);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+}
+
+.MdViewerModal-header {
+  background: var(--mdmodal-table-header-bg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1.1rem;
+  border-bottom: 1px solid var(--mdmodal-border);
+  flex-shrink: 0;
+}
+
+.MdViewerModal-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--mdmodal-heading);
+}
+
+.MdViewerModal-close {
+  background: transparent;
+  border: none;
+  color: var(--mdmodal-muted);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.1rem 0.4rem;
+  border-radius: 6px;
+}
+
+.MdViewerModal-close:hover {
+  background: var(--mdmodal-code-bg);
+  color: var(--mdmodal-text);
+}
+
+.MdViewerModal-scroll {
+  overflow-y: auto;
+  padding: 1rem 1.25rem 1.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--mdmodal-scrollbar) transparent;
+}
+
+.MdViewerModal-loading,
+.MdViewerModal-error {
+  color: var(--mdmodal-muted);
+  font-size: 0.9rem;
+}
+
+/* ===== Rendered markdown content ===== */
+.MdViewerModal-content h1,
+.MdViewerModal-content h2,
+.MdViewerModal-content h3 {
+  color: var(--mdmodal-heading);
+  line-height: 1.3;
+  margin: 1.2em 0 0.5em;
+}
+
+.MdViewerModal-content h1:first-child,
+.MdViewerModal-content h2:first-child,
+.MdViewerModal-content h3:first-child {
+  margin-top: 0;
+}
+
+.MdViewerModal-content p {
+  line-height: 1.6;
+  margin: 0.6em 0;
+}
+
+.MdViewerModal-content a {
+  color: var(--mdmodal-link);
+  text-decoration: underline;
+}
+
+.MdViewerModal-content code {
+  background: var(--mdmodal-code-bg);
+  color: var(--mdmodal-code-text);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-size: 0.88em;
+}
+
+.MdViewerModal-content pre {
+  background: var(--mdmodal-pre-bg);
+  color: var(--mdmodal-pre-text);
+  padding: 0.9em 1em;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.MdViewerModal-content pre code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+}
+
+.MdViewerModal-content blockquote {
+  border-left: 3px solid var(--mdmodal-blockquote-border);
+  margin: 0.8em 0;
+  padding: 0.2em 1em;
+  color: var(--mdmodal-muted);
+}
+
+.MdViewerModal-content ul,
+.MdViewerModal-content ol {
+  padding-left: 1.4em;
+  margin: 0.6em 0;
+}
+
+.MdViewerModal-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0.8em 0;
+  font-size: 0.92em;
+}
+
+.MdViewerModal-content th,
+.MdViewerModal-content td {
+  border: 1px solid var(--mdmodal-table-border);
+  padding: 0.45em 0.7em;
+  text-align: left;
+}
+
+.MdViewerModal-content th {
+  background: var(--mdmodal-table-header-bg);
+}
+
+.MdViewerModal-content hr {
+  border: none;
+  border-top: 1px solid var(--mdmodal-border);
+  margin: 1.2em 0;
+}
+
+.MdViewerModal-content em {
+  font-style: italic;
+}
+
+.MdViewerModal-content strong {
+  font-weight: 700;
+}
+
+.MdViewerModal-content strong em,
+.MdViewerModal-content em strong {
+  font-weight: 700;
+  font-style: italic;
+}
+
+.MdViewerModal-content del {
+  color: var(--mdmodal-muted);
+  text-decoration: line-through;
+}
+
+.MdViewerModal-content li {
+  line-height: 1.6;
+  margin: 0.25em 0;
+}
+
+.MdViewerModal-content li > ul,
+.MdViewerModal-content li > ol {
+  margin: 0.25em 0;
+}
+
+/* GFM task lists: - [ ] / - [x] */
+.MdViewerModal-content li.task-list-item {
+  list-style: none;
+  margin-left: -1.4em;
+}
+
+.MdViewerModal-content li.task-list-item input[type="checkbox"] {
+  margin-right: 0.5em;
+  accent-color: var(--mdmodal-link);
+}
+
+.MdViewerModal-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+  display: block;
+  margin: 0.8em 0;
+}
+
+.MdViewerModal-content mark {
+  background: var(--mdmodal-code-bg);
+  color: var(--mdmodal-text);
+  padding: 0.05em 0.3em;
+  border-radius: 3px;
+}
+
+.MdViewerModal-content kbd {
+  background: var(--mdmodal-code-bg);
+  border: 1px solid var(--mdmodal-table-border);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  padding: 0.1em 0.45em;
+  font-size: 0.85em;
+  font-family: inherit;
+}
+
+.MdViewerModal-content sup,
+.MdViewerModal-content sub {
+  font-size: 0.75em;
+}

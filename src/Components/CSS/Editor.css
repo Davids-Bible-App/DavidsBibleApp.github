@@ -22,7 +22,7 @@
 .Editor-Toolbar button {
   background: transparent;
   border: 1px solid transparent;
-  color: inherit;
+  color: var(--text-color-tone);
   padding: 4px 8px;
   border-radius: 4px;
   cursor: pointer;
@@ -109,4 +109,111 @@
   border-radius: 4px;
   color: inherit;
   cursor: pointer;
+}
+
+/* Anchor button declaration */
+.menu-anchor {
+  anchor-name: --editor-more-btn;
+}
+
+/* Base Popover State (Default Hidden by Popover API) */
+.dropdown-menu[popover] {
+  margin: 0;
+  padding: 6px 0;
+  /* background-color: var(--bg-surface, #252526); */
+  padding: 10px;
+  border: 1px solid var(--btn-border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  min-width: 180px;
+  color: inherit;
+  width: max-content;
+  overflow-x: hidden;
+
+  /* Target Anchor Connection */
+  position: fixed;
+  position-anchor: --editor-more-btn;
+  position-area: bottom span-right; /* Anchors below button, expands right */
+  margin-top: 6px;
+  position-try-fallbacks: flip-block, flip-inline;
+}
+
+/* CRITICAL: Display rule MUST be attached to :popover-open, 
+   otherwise display: flex overrides the native hidden state! */
+.dropdown-menu[popover]:popover-open {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Fallback for webviews without Anchor Positioning */
+@supports not (position-area: bottom span-right) {
+  .dropdown-menu[popover]:popover-open {
+    inset: auto;
+    top: 50px;
+    left: 20px;
+  }
+}
+
+/* Menu Items & Typography */
+.menu-group-label {
+  padding: 6px 12px 2px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-color);
+  letter-spacing: 0.5px;
+}
+
+.menu-item {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-size: 0.9rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.menu-item:hover,
+.menu-item:active {
+  background-color: var(--bg-hover, rgba(255, 255, 255, 0.08));
+}
+
+.menu-item small {
+  opacity: 0.6;
+}
+
+.menu-item.btn-danger {
+  color: var(--text-color-highlights);
+}
+
+.menu-item.btn-danger:hover {
+  background-color: rgba(255, 85, 85, 0.15);
+}
+
+.menu-divider {
+  height: 1px;
+  background-color: var(--border-color, #3c3c3c);
+  margin: 4px 0;
+}
+
+.Editor-StatusBar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 4px 12px;
+  background-color: light-dark(rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.3));
+  border-top: 1px solid var(--ThemeAccent1, #333);
+  font-size: 0.75rem;
+  color: var(--text-muted, #888888);
+  user-select: none;
+}
+
+.editor-stats b {
+  color: var(--text-color-tone);
+  font-weight: 600;
 }

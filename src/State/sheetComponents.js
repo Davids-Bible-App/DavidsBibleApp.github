@@ -1,4 +1,3 @@
-// src/State/sheetComponents.js
 import { lazy } from "solid-js";
 
 export const sheetComponents = {
@@ -12,7 +11,6 @@ export const sheetComponents = {
   strongs: lazy(() => import("../Components/StrongsVerse")),
   strlook: lazy(() => import("../Components/StrongsLookup")),
   editor: lazy(() => import("../Components/Editor")),
-  help: lazy(() => import("../Components/Help")),
 };
 
 export const preloadSheet = (id) => sheetComponents[id]?.preload();

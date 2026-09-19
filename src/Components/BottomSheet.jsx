@@ -6,7 +6,6 @@ import "./CSS/BottomSheet.css";
 function BottomSheet(props) {
   // states: "Hid", "Min", "Mid", "Max"
   const [isDragging, setIsDragging] = createSignal(false);
-  // const [dragOffset, setDragOffset] = createSignal(0);
   let startY = 0;
   let currentDragOffset = 0;
   let containerRef;
@@ -76,7 +75,6 @@ function BottomSheet(props) {
     const safeMax = `(100vh - var(--edge2edge-top, 0px) - var(--edge2edge-bottom, 0px))`;
 
     if (containerRef) {
-      // Clamp between 0px and safeMax — prevents viewport overscroll on Android
       containerRef.style.height = `calc(
       min(
         max(0px, min(${baseHeightStr}, ${safeMax}) + ${offsetVh}vh),
@@ -94,7 +92,7 @@ function BottomSheet(props) {
     const { steps } = config();
     const currentIndex = steps.indexOf(activeState().name);
 
-    let nextStep = activeState().name; // logical step name
+    let nextStep = activeState().name;
     let targetStateStr = props.sheetState; // Preserve full string (e.g., "Mid:50%") if no change
 
     if (currentIndex === -1) {
@@ -116,7 +114,6 @@ function BottomSheet(props) {
     }
 
     if (containerRef) {
-      // ✅ If we didn't change steps, use getSheetHeight() to preserve fallback overrides
       if (nextStep === activeState().name) {
         containerRef.style.height = getSheetHeight();
       } else {
@@ -124,7 +121,6 @@ function BottomSheet(props) {
       }
     }
 
-    // ✅ Pass the preserved string back to the store
     props.setSheetState(targetStateStr);
     currentDragOffset = 0;
     e.target.releasePointerCapture(e.pointerId);

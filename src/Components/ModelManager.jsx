@@ -117,7 +117,7 @@ export default function ModelManager(props) {
     unlistenGpuFallback = await listen("model-gpu-fallback", (e) => {
       setGpuNotice(e.payload);
     });
-    // ← NEW: clear the progress bar promptly when a download is cancelled
+    // Clear the progress bar promptly when a download is cancelled
     unlistenCancelled = await listen("download-cancelled", (e) => {
       const id = e.payload;
       setProgress((prev) => {
@@ -322,7 +322,6 @@ export default function ModelManager(props) {
     } catch (err) {
       console.error("Failed to download model:", err);
       const message = typeof err === "string" ? err : "Download failed.";
-      // Cancellation is an expected outcome, not an error banner.
       if (message !== "Download cancelled.") {
         setError(message);
       }
@@ -336,7 +335,6 @@ export default function ModelManager(props) {
     }
   }
 
-  // ← NEW
   async function handleCancelDownload(id) {
     try {
       await invoke("cancel_download", { id });
@@ -421,7 +419,7 @@ export default function ModelManager(props) {
     }
     setError(null);
     try {
-      const modelPath = m.filename; // adjust if you need the full path — check what `path` your Rust side expects
+      const modelPath = m.filename;
       const [total, current, vram] = await Promise.all([invoke("get_active_model_layer_count", { filename: m.filename }), invoke("get_gpu_layers", { filename: m.filename }), invoke("get_gpu_vram_mib")]);
       setLayerCount(total);
       setGpuLayers(current ?? 0);

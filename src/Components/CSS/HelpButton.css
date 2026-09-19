@@ -1,0 +1,52 @@
+/* ===== Theme variables (edit here) ===== */
+:root {
+  --help-btn-bg: #f0f0f0;
+  --help-btn-bg-hover: #e0e0e0;
+  --help-btn-color: #333333;
+  --help-btn-border: #cccccc;
+  --help-btn-size: 1.75rem;
+}
+
+[data-theme="dark"] {
+  --help-btn-bg: #2a2a2e;
+  --help-btn-bg-hover: #3a3a3f;
+  --help-btn-color: #e6e6e6;
+  --help-btn-border: #4a4a4f;
+}
+/* ======================================= */
+
+.HelpButton-class {
+  width: var(--help-btn-size);
+  height: var(--help-btn-size);
+  border-radius: 50%;
+  border: 1px solid var(--help-btn-border);
+  background: var(--help-btn-bg);
+  color: var(--help-btn-color);
+  font-weight: 600;
+  font-size: 0.9rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    transform 100ms ease;
+}
+
+.HelpButton-class:hover {
+  background: var(--help-btn-bg-hover);
+}
+
+.HelpButton-class:active {
+  transform: scale(0.94);
+}
+
+.HelpButton-class:focus-visible {
+  outline: 2px solid var(--help-btn-color);
+  outline-offset: 2px;
+}
+
+.HelpButton-trigger {
+  display: contents;
+}

@@ -5,7 +5,6 @@ import { toggleSheet } from "./sheetStore";
 import { showToast } from "../Components/Toast";
 import { isDarkMode } from "../State/globalSignals.js";
 import { keepScreenOn } from "tauri-plugin-keep-screen-on-api";
-import { isFullscreen, setFullscreen } from "../State/fullscreen.js";
 
 // prettier-ignore
 import { 
@@ -139,25 +138,6 @@ export async function saveSettings() {
   }
 }
 
-// The Load Function (Call this once when the app starts)
-// export async function loadSessionState() {
-//   try {
-//     const keys = ["bible1", "book", "chapterNo", "testamentBtn", "bookBtn", "chapterBtn", "wordHighlight"];
-//     const res = await invoke("get_configs", { keys });
-
-//     // Update signals only if the DB has a value, otherwise they keep their defaults
-//     if (res.bible1) setBible1(res.bible1);
-//     if (res.book) setBook(res.book);
-//     if (res.chapterNo) setChapterNo(parseInt(res.chapterNo, 10));
-//     if (res.testamentBtn) setTestamentBtn(res.testamentBtn);
-//     if (res.bookBtn) setBookBtn(res.bookBtn);
-//     if (res.chapterBtn) setChapterBtn(parseInt(res.chapterBtn, 10));
-//     if (res.wordHighlight) setWordHighlight(res.wordHighlight != null ? res.wordHighlight === "true" : false);
-//   } catch (error) {
-//     console.error("Failed to load session state:", error);
-//   }
-// }
-
 // Use createRoot to provide a top-level owner
 createRoot(() => {
   let saveTimeout;
@@ -232,7 +212,6 @@ createRoot(() => {
   // Usage
   deferredSyncEffect(() => settings.leatherTexture, setActivePaper);
   deferredSyncEffect(() => settings.keepScreenOn, keepScreenOn);
-  // deferredSyncEffect(() => settings.fullscreenOn, setFullscreen);
 });
 
 export function handleFontResize(delta = 0) {

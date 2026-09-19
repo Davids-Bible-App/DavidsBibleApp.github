@@ -24,7 +24,7 @@ function getLocalDayInfo() {
 }
 
 // --- localStorage helpers ---------------------------------------------------
-// Storage now holds ONLY the day-locked reference (book/chapter/verse).
+// Storage holds ONLY the day-locked reference (book/chapter/verse).
 // Translation + text are resolved live from the currently loaded translation.
 
 function loadStoredPick() {

@@ -1,10 +1,8 @@
 import { createEffect, createSignal, createResource, onMount, onCleanup, Suspense, lazy } from "solid-js";
 // prettier-ignore
 import {
-  bible1, expandedCtl, setExpandedCtl, setInjectedVerse, setSelectedTopic,
-  selection, setSelection, showSelection, setShowSelection, setTrigger,
-  setBibleVersion, setActiveNoteVerse, setTopicController, setTargetVerse,
-  showUniCtrl, setShowUniCtrl
+  bible1, expandedCtl, setExpandedCtl, setInjectedVerse, setBibleVersion, setActiveNoteVerse, setTargetVerse,
+  selection, setSelection, showSelection, setShowSelection, showUniCtrl, setShowUniCtrl
 } from "../State/globalSignals.js";
 import { openBookmarkModal, openTopicModal } from "../State/modalStore.js";
 import { settings, triggerRefetch } from "../State/settingsStore.js";
@@ -12,8 +10,6 @@ import { groupConsecutiveVerses, dbExists, getBook } from "../lib/functions.js";
 import { toggleSheet, closeAllSheets } from "../State/sheetStore";
 import ToastStack, { showToast } from "./Toast";
 import { updateAndLogScripture } from "../State/historyStore";
-import { shareText } from "@choochmeque/tauri-plugin-sharekit-api";
-import { type } from "@tauri-apps/plugin-os";
 import { invoke } from "@tauri-apps/api/core";
 import "./CSS/ControlBox.css";
 
@@ -46,11 +42,10 @@ export default function ControlBox(props) {
 
     const currentDist = _getTouchDist(e.touches);
 
-    // Calculate raw difference without Math.abs()
     // Positive means expanding, negative means contracting
     const delta = currentDist - _pinchStartDist;
 
-    // Only fire if they expanded outward by more than 55px
+    // Fire if they expanded outward by more than 55px
     if (delta > 55) {
       _pinchFired = true;
       uniVerse();
@@ -74,7 +69,6 @@ export default function ControlBox(props) {
 
     const first = selectedVerses[0].dataset;
 
-    // Ensure the ID has the extension to match what Rust uses for ATTACH
     let transId = first.tr;
     if (!transId.endsWith(".dba")) {
       transId += ".dba";
@@ -92,7 +86,7 @@ export default function ControlBox(props) {
         color: dbColor,
       });
 
-      // Immediate UI Feedback
+      // UI Feedback
       selectedVerses.forEach((el) => {
         // Verse only gets color if sideLights is FALSE
         el.setAttribute("data-clr", !settings.sideLights ? clrValue : "none");
@@ -157,11 +151,7 @@ export default function ControlBox(props) {
 
       // 4. Map the clean text back to your standard output format
       rawSelection.forEach((raw) => {
-        // Find the matching clean verse from the Rust response
-        // (Using the keys provided by your Rust backend in your previous screenshot)
         const cleanVerse = allCleanVerses.find((cv) => cv.number === raw.vs && cv.bookId === raw.bk && cv.chapterNumber === raw.ch);
-
-        // Fallback to empty string if not found, rather than crashing
         const cleanText = cleanVerse ? cleanVerse.text : "";
 
         selectedStr.push(`(${raw.ed}) ${getBook(raw.bk)} ${raw.ch}:${raw.vs} ${cleanText}`);
@@ -172,7 +162,7 @@ export default function ControlBox(props) {
           bk: raw.bk,
           ch: raw.ch,
           vs: raw.vs,
-          tx: cleanText, // Now strictly clean!
+          tx: cleanText,
         });
       });
 
@@ -195,29 +185,23 @@ export default function ControlBox(props) {
   };
 
   const addBookmark = async () => {
-    // 1. Get the selection data
     const data = await updateVerseSelection();
 
     if (data?.selectedObj) openBookmarkModal(data.selectedObj);
     addToHistory(data);
     setExpandedCtl(0);
-    // setSelection([]);
   };
 
   const copyVerse = async () => {
-    // 1. Get the selection data
     const data = await updateVerseSelection();
 
     if (data && data.selectedObj && data.selectedObj.length > 0) {
       const selected = data.selectedObj;
 
-      // 3. Format the verses
       const formattedText = groupConsecutiveVerses(selected, true);
 
-      // 4. Write to clipboard
       await navigator.clipboard.writeText(formattedText);
 
-      // 5. Fire the side effects
       showToast(selectedVerses(), "none", 5000, true, true);
       addToHistory(data);
       setExpandedCtl(0);
@@ -226,7 +210,6 @@ export default function ControlBox(props) {
   };
 
   const addToHistory = async (data) => {
-    // console.log(`LOG[:179]: data: `, data);
     if (data) {
       updateAndLogScripture({
         translation_id: data.selectedObj[0].tr,
@@ -243,7 +226,6 @@ export default function ControlBox(props) {
       if (data) {
         toggleSheet("strongs", "Mid");
         setExpandedCtl(0);
-        // setSelection([]);
         addToHistory(data);
       }
     } catch (error) {
@@ -277,7 +259,6 @@ export default function ControlBox(props) {
   };
 
   const topicAddVerse = async () => {
-    // 1. Get the selection data
     const data = await updateVerseSelection();
 
     if (data?.selectedObj) openTopicModal(data.selectedObj);
@@ -305,46 +286,7 @@ export default function ControlBox(props) {
 
       toggleSheet("meme", "Max");
       setExpandedCtl(0);
-      // setSelection([]);
       addToHistory(data);
-    }
-  };
-
-  const shareVerse = async () => {
-    let shareData = {
-      title: "A Title",
-      text: "Some Text",
-      url: "https://mylink.here.org",
-    };
-
-    const data = await updateVerseSelection();
-
-    if (data && data.selectedObj && data.selectedObj.length > 0) {
-      const selected = data.selectedObj;
-
-      const formattedText = groupConsecutiveVerses(selected);
-
-      if (type() === "windows") {
-        try {
-          await shareText(`Sharing with you:\n ${formattedText}`);
-          addToHistory(data);
-        } catch (err) {
-          showToast(`Error: ${err}`, "error");
-        } finally {
-          setExpandedCtl(0);
-          setSelection([]);
-        }
-      } else {
-        try {
-          await shareText(`Sharing with you all:\n ${formattedText}`);
-          addToHistory(data);
-        } catch (error) {
-          showToast(`Android Sharing failed: ${error}`, "error", 4000);
-        } finally {
-          setExpandedCtl(0);
-          setSelection([]);
-        }
-      }
     }
   };
 

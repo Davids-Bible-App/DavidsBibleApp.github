@@ -38,40 +38,6 @@ const deleteFile = async (filename) => {
   }
 };
 
-// const copyDbFile = async () => {
-//   try {
-//     const sources = await open({
-//       directory: false,
-//       multiple: true, // ← allow multi-select
-//       defaultPath: await downloadDir(),
-//       filters: [{ name: "Database", extensions: ["dba", "db"] }],
-//     });
-
-//     if (!sources || sources.length === 0) return;
-
-//     // Normalise: `open` returns a string when multiple:false,
-//     // but an array of { path } objects when multiple:true on some targets.
-//     const files = await Promise.all(
-//       (Array.isArray(sources) ? sources : [sources]).map(async (s) => {
-//         const sourceUri = typeof s === "string" ? s : s.path;
-//         const fileName = await basename(sourceUri);
-//         return { sourceUri, fileName };
-//       }),
-//     );
-
-//     await invoke("copy_translation_files", { files }); // ← plural command
-
-//     const names = files.map((f) => f.fileName).join(", ");
-//     await message(`${files.length} file(s) imported:\n${names}`);
-//   } catch (err) {
-//     console.error("Import failed:", err);
-//     await message(err.toString(), { title: "Error", kind: "error" });
-//   } finally {
-//     loadFiles();
-//   }
-// };
-
-// Signals — add alongside your existing ones
 const [isImporting, setIsImporting] = createSignal(false);
 const [importProgress, setImportProgress] = createSignal(0);
 
@@ -109,7 +75,6 @@ const copyDbFile = async () => {
         errors.push(`${fileName}: ${err}`);
       }
 
-      // Progress reflects files completed so far
       setImportProgress(((i + 1) / files.length) * 100);
     }
 
@@ -123,7 +88,7 @@ const copyDbFile = async () => {
     console.error("Import failed:", err);
     await message(err.toString(), { title: "Error", kind: "error" });
   } finally {
-    setIsImporting(false); // ← unlocks UI regardless of outcome
+    setIsImporting(false);
     setImportProgress(0);
     loadFiles();
   }
@@ -139,15 +104,9 @@ export default function DbTranslations(props) {
 
   createEffect(async () => {
     if (props.translations.state === "ready") {
-      // 1. The array of IDs you want to match against
       const availableDBs = files();
-
-      // 2. The original array of objects you want to filter
       const allTranslations = props.translations();
-
-      // 3. Create a new array containing only matching objects
       const resultingTranslations = await allTranslations.filter((translation) => {
-        // Check if the current object's 'id' exists within the 'availableDBs' array
         return availableDBs.includes(translation.id + ".dba");
       });
 

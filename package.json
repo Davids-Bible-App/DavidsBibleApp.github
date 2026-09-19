@@ -1,6 +1,6 @@
 {
   "name": "davidsbible",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "",
   "type": "module",
   "scripts": {
@@ -29,8 +29,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@choochmeque/tauri-plugin-sharekit-api": "^0.2.5",
-    "@tauri-apps/api": "^2.10.0",
+    "@tauri-apps/api": "2.10.1",
     "@tauri-apps/plugin-dialog": "^2.7.0",
     "@tauri-apps/plugin-fs": "^2.4.4",
     "@tauri-apps/plugin-haptics": "^2.3.2",
@@ -46,10 +45,10 @@
     "tauri-plugin-background-service": "^0.5.2",
     "tauri-plugin-keep-screen-on-api": "^0.1.4",
     "tauri-plugin-m3": "^0.2.2",
-    "tauri-plugin-music-notification-api": "github:AverTry/tauri-plugin-music-notification"
+    "tauri-plugin-music-notification-api": "file:../tauri-plugin-music-notification"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^2",
+    "@tauri-apps/cli": "2.10.1",
     "vite": "^8.0.16",
     "vite-plugin-solid": "^2.11.0"
   }

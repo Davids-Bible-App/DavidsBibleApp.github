@@ -1,9 +1,9 @@
 /* ── Theme Colors ── */
 .BibleChat-root {
-  --bc-bg-primary: #faf9f6;
-  --bc-bg-secondary: #fff;
-  --bc-bg-input: #fff;
-  --bc-bg-status: #f2f2f2;
+  --bc-bg-primary: var(--t2);
+  --bc-bg-secondary: var(--t1);
+  --bc-bg-input: var(--s2);
+  --bc-bg-status: var(--s1);
   --bc-bg-error: #fdecea;
   --bc-bg-overlay: rgba(0, 0, 0, 0.35);
   --bc-bg-hover: #f2f0ea;
@@ -14,7 +14,7 @@
   --bc-text-primary: #222;
   --bc-text-secondary: #666;
   --bc-text-error: #b00020;
-  --bc-accent: #3b6e5b;
+  --bc-accent: var(--s3);
   --bc-accent-disabled: #999;
   --bc-bubble-shadow: rgba(0, 0, 0, 0.08);
 
@@ -37,7 +37,7 @@
   gap: 8px;
   padding: 8px 10px;
   border-bottom: 1px solid var(--bc-border-top);
-  background: var(--bc-bg-secondary);
+  background: var(--bc-bg-input);
 }
 
 .BibleChat-topbar-btn {
@@ -95,6 +95,7 @@
   border-radius: 8px;
   cursor: pointer;
   margin-bottom: 4px;
+  background: var(--t3);
 }
 
 .BibleChat-history-item:hover {
@@ -102,7 +103,7 @@
 }
 
 .BibleChat-history-item--active {
-  background: var(--bc-bg-active);
+  background: var(--t5);
   border: 1px solid var(--bc-accent);
 }
 
@@ -179,7 +180,7 @@
 }
 
 .BibleChat-bubble--assistant {
-  background: var(--bc-bg-secondary);
+  background: var(--bc-bg-status);
   color: var(--bc-text-primary);
   box-shadow: 0 1px 2px var(--bc-bubble-shadow);
 }

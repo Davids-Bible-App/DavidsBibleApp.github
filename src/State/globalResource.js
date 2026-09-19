@@ -5,7 +5,7 @@ import { bible1 } from "./globalSignals.js";
 // We execute createRoot and immediately export the returned resources
 export const { books, translations } = createRoot(() => {
   const [booksResource] = createResource(
-    () => bible1(), // Tracking the signal
+    () => bible1(),
     async (file) => await invoke("get_books", { translationFile: `${file}.dba` }),
   );
 

@@ -50,11 +50,9 @@ export default function BibleChat() {
       setModelStatus("error");
       setError(`Model failed to load: ${e.payload}`);
     });
-    // ← NEW: reflect a manual unload immediately
+    // ← Reflect a manual unload immediately
     const unlistenUnloaded = await listen("model-unloaded", () => setModelStatus("unloaded"));
 
-    // ← CHANGED: previously this left modelStatus stuck on "loading" forever
-    // if nothing was loaded, because nothing auto-loads a model anymore.
     try {
       const loaded = await invoke("is_model_loaded");
       setModelStatus(loaded ? "ready" : "unloaded");
@@ -101,7 +99,7 @@ export default function BibleChat() {
   }
 
   async function deleteConversation(id, event) {
-    event.stopPropagation(); // don't also trigger openConversation
+    event.stopPropagation();
     const sure = await confirm("Delete this conversation? This can't be undone.", {
       title: "Delete conversation",
       kind: "warning",
@@ -158,7 +156,7 @@ export default function BibleChat() {
     } catch (err) {
       console.error("BibleChat error:", err);
       setError(typeof err === "string" ? err : "Something went wrong generating a reply.");
-      setMessages((prev) => prev.slice(0, -1)); // drop the empty placeholder
+      setMessages((prev) => prev.slice(0, -1)); // drop empty placeholder
     } finally {
       unlisten();
       setBusy(false);

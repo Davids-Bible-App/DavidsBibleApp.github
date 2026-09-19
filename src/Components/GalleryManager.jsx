@@ -1,4 +1,4 @@
-import { createSignal, createResource, createEffect, For, Show, createMemo, onMount, onCleanup, Suspense, lazy } from "solid-js";
+import { createSignal, createResource, createEffect, For, Show, createMemo, onCleanup, Suspense, lazy } from "solid-js";
 import { Portal } from "solid-js/web";
 import { invoke } from "@tauri-apps/api/core";
 import { ask } from "@tauri-apps/plugin-dialog";
@@ -6,19 +6,17 @@ import { type } from "@tauri-apps/plugin-os";
 // prettier-ignore
 import {
   expandedCtl, setExpandedCtl, selectedTopic, setSelectedTopic,
-  selection, setSelection, bibleVersion, topicController, setTopicController,
-  showUniTopic, setShowUniTopic,
-  trigger
+  setSelection, showUniTopic, setShowUniTopic, trigger
 } from "../State/globalSignals.js";
 import Bookmark from "./Bookmark.jsx";
 import { registerRefetchers, triggerRefetch } from "../State/settingsStore.js";
-import { topicVerses, refetchTopicVerses, mutateTopicVerses as mutateVerses, topicTarget, closeTopicModal, topicMetadata, refetchTopicMetadata, mutateTopics } from "../State/modalStore.js";
+import { topicVerses, refetchTopicVerses, mutateTopicVerses as mutateVerses, topicMetadata, mutateTopics } from "../State/modalStore.js";
 import { abbreviator, clickOutside, groupConsecutiveVerses } from "../lib/functions.js";
-import { pendingVerses, setPendingVerses } from "../State/editorStore";
+import { setPendingVerses } from "../State/editorStore";
 import { toggleSheet } from "../State/sheetStore";
 import "./CSS/GalleryManager.css";
 
-import ToastStack, { showToast } from "./Toast";
+import { showToast } from "./Toast";
 const UniVerse = lazy(() => import("./UniVerse"));
 
 const [dataExport, setDataExport] = createSignal({ verses: {}, text: "" });
@@ -315,7 +313,7 @@ export default function GalleryManager(props) {
           BOOKMARKS
         </button>
       </div>
-      {/* Uni-wrap for inline padding - Style adjust for scroll-gutters stable */}
+
       <div class="GalleryManager-undertab" style={type() === "android" && "padding-inline: 14px;"}>
         <Show when={activeTab() !== "topic" || (activeTab() === "topic" && !selectedTopic())}>
           <div class="GalleryManager-search-wrap" style={type() === "windows" && "padding-inline: 10px;"}>
@@ -398,7 +396,6 @@ function TopicSection(props) {
       pointerEvents: "none",
       background: computed.background,
       backgroundColor: computed.backgroundColor,
-      // borderRadius: "1rem",
       boxShadow: "0 14px 36px rgba(0,0,0,0.38), 0 4px 12px rgba(0,0,0,0.24)",
       opacity: "0.98",
       fontSize: "0.9rem",
@@ -621,7 +618,7 @@ function TopicSection(props) {
   };
 
   const _onGalleryPinchStart = (e) => {
-    if (topicDragId || groupDragId) return; // don't clash with an active drag
+    if (topicDragId || groupDragId) return;
     if (e.touches.length === 2) {
       e.preventDefault();
       _pinchStartDist = _getGalleryTouchDist(e.touches);
@@ -689,7 +686,6 @@ function TopicSection(props) {
             <TopicDescription topic={selectedTopic()} />
             {/* Grouped Verses View (Draggable) */}
             <div class="GalleryManager-card-wrap scroll_Win">
-              {/* <button onClick={() => uniVerse()}>uniVerse</button> */}
               <For each={groupConsecutiveVerses(topicVerses() || [], false, true, false, false)}>
                 {(group) => {
                   const groupId = group[0].id;

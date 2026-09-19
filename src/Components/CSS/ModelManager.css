@@ -1,7 +1,48 @@
+:root {
+  /* Brand / Accent Colors */
+  --primary: #3b6e5b;
+  --secondary: #6b8f7a;
+  --accent: #6b8afd;
+
+  /* Text Colors */
+  --text-main: #222222;
+  --text-muted: #888888;
+  --text-dim: #666666;
+  --text-light: #ffffff;
+
+  /* Surface / Background Colors */
+  --bg-panel: var(--t2);
+  --bg-overlay: rgba(0, 0, 0, 0.45);
+  --bg-active: #eef4f1;
+  --bg-track: #eee;
+  --bg-default-badge: #999999;
+
+  /* Borders & Inputs */
+  --border-color: #cccccc;
+  --input-bg: #1c1c22;
+  --input-border: #3a3a44;
+  --input-focus: #6b8afd;
+
+  /* Status Colors */
+  --error-bg: #fdecea;
+  --error-text: #b00020;
+  --error-border: #f0c8c8;
+
+  --info-bg: #3373bd;
+  --info-text: #fdecea;
+
+  /* Component specific fallbacks */
+  --ModelManager-accent: var(--accent);
+  --ModelManager-border-color: currentColor;
+  --ModelManager-input-bg: var(--input-bg);
+  --ModelManager-input-border: var(--input-border);
+  --ModelManager-input-focus: var(--input-focus);
+}
+
 .ModelManager-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: var(--bg-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -14,7 +55,7 @@
   height: clamp(200px, 90%, 650px);
   margin-block: 1rem;
   overflow-y: auto;
-  background: #fff;
+  background: var(--bg-panel);
   border-radius: 12px;
   padding: 14px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
@@ -26,7 +67,7 @@
   justify-content: space-between;
   font-weight: 600;
   font-size: 16px;
-  color: #222;
+  color: var(--text-main);
   margin-bottom: 8px;
 }
 
@@ -35,15 +76,15 @@
   background: transparent;
   font-size: 20px;
   line-height: 1;
-  color: #666;
+  color: var(--text-dim);
   cursor: pointer;
 }
 
 .ModelManager-error {
   padding: 8px 10px;
   border-radius: 8px;
-  background: #fdecea;
-  color: #b00020;
+  background: var(--error-bg);
+  color: var(--error-text);
   font-size: 13px;
   margin-bottom: 10px;
 }
@@ -51,8 +92,8 @@
 .ModelManager-info {
   padding: 8px 10px;
   border-radius: 8px;
-  background: #3373bd;
-  color: #fdecea;
+  background: var(--info-bg);
+  color: var(--info-text);
   font-size: 13px;
   margin-bottom: 10px;
   text-align: center;
@@ -63,19 +104,19 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  color: #888;
+  color: var(--text-muted);
   margin: 14px 0 6px;
 }
 
 .ModelManager-empty {
   font-size: 13px;
-  color: #888;
+  color: var(--text-muted);
   padding: 8px 0;
 }
 
 .ModelManager-row {
   display: flex;
-  flex-direction: column; /* ← was a single horizontal row */
+  flex-direction: column;
   gap: 6px;
   padding: 8px;
   border-radius: 8px;
@@ -106,8 +147,8 @@
 }
 
 .ModelManager-row--active {
-  background: #eef4f1;
-  border: 1px solid #3b6e5b;
+  background: var(--bg-active);
+  border: 1px solid var(--primary);
 }
 
 .ModelManager-row-text {
@@ -119,24 +160,24 @@
 .ModelManager-row-title {
   font-size: 13px;
   font-weight: 600;
-  color: #222;
+  color: var(--text-main);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  min-width: 0; /* allows the ellipsis to actually engage inside flex */
+  min-width: 0;
 }
 
 .ModelManager-row-size {
   font-size: 12px;
-  color: #888;
-  flex-shrink: 0; /* size never gets squashed by a long filename */
+  color: var(--text-muted);
+  flex-shrink: 0;
 }
 
 .ModelManager-badge {
   font-size: 10px;
   font-weight: 600;
-  color: #fff;
-  background: #3b6e5b;
+  color: var(--text-light);
+  background: var(--primary);
   padding: 0px 6px;
   border-radius: 10px;
   text-transform: uppercase;
@@ -146,31 +187,31 @@
   display: flex;
   gap: 10px;
   font-size: 12px;
-  color: #888;
+  color: var(--text-muted);
   margin-top: 2px;
 }
 
 .ModelManager-badge--override {
-  background: #3b6e5b;
+  background: var(--primary);
 }
 .ModelManager-badge--file {
-  background: #6b8f7a;
+  background: var(--secondary);
 }
 .ModelManager-badge--default {
-  background: #999;
+  background: var(--bg-default-badge);
 }
 
 .ModelManager-prompt-editor {
   padding: 10px 8px 12px;
   margin: -2px 0 6px;
-  border-left: 2px solid #3b6e5b;
+  border-left: 2px solid var(--primary);
   padding-left: 10px;
 }
 
 .ModelManager-prompt-source {
   font-size: 11px;
   font-weight: bold;
-  color: #888;
+  color: var(--text-muted);
   margin-bottom: 6px;
 }
 
@@ -181,7 +222,7 @@
   resize: vertical;
   padding: 8px;
   border-radius: 8px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border-color);
   font-family: inherit;
   font-size: 13px;
 }
@@ -212,9 +253,9 @@
 .ModelManager-btn {
   padding: 5px 10px;
   border-radius: 6px;
-  border: 1px solid #ccc;
-  background: #fff;
-  color: #222;
+  border: 1px solid var(--border-color);
+  background: var(--bg-panel);
+  color: var(--text-main);
   font-size: 12px;
   cursor: pointer;
   margin: 0;
@@ -226,8 +267,8 @@
 }
 
 .ModelManager-btn--danger {
-  color: #b00020;
-  border-color: #f0c8c8;
+  color: var(--error-text);
+  border-color: var(--error-border);
 }
 
 .ModelManager-upload-btn {
@@ -235,9 +276,9 @@
   padding: 8px;
   margin-top: 8px;
   border-radius: 8px;
-  border: 1px dashed #aaa;
+  border: 1px dashed var(--border-color);
   background: transparent;
-  color: #3b6e5b;
+  color: var(--primary);
   font-size: 13px;
   cursor: pointer;
 }
@@ -261,10 +302,6 @@
     border-style: dotted;
   }
 }
-:root {
-  --ModelManager-accent: #6b8afd;
-  --ModelManager-border-color: currentColor;
-}
 
 .ModelManager-upload-wrap {
   position: relative;
@@ -276,14 +313,14 @@
 .ModelManager-progress-track {
   height: 4px;
   border-radius: 2px;
-  background: #eee;
+  background: var(--bg-track);
   margin-top: 6px;
   overflow: hidden;
 }
 
 .ModelManager-progress-fill {
   height: 100%;
-  background: #3b6e5b;
+  background: var(--primary);
   transition: width 0.2s ease;
 }
 
@@ -298,10 +335,10 @@
   min-width: 0;
   font-size: 13px;
   font-weight: 600;
-  color: #222;
+  color: var(--text-main);
   padding: 2px 6px;
   border-radius: 6px;
-  border: 1px solid #3b6e5b;
+  border: 1px solid var(--primary);
   font-family: inherit;
 }
 
@@ -318,9 +355,9 @@
   height: 22px;
   padding: 0;
   border-radius: 6px;
-  border: 1px solid #3b6e5b;
-  background: #3b6e5b;
-  color: #fff;
+  border: 1px solid var(--primary);
+  background: var(--primary);
+  color: var(--text-light);
   font-size: 12px;
   line-height: 1;
   cursor: pointer;
@@ -328,13 +365,6 @@
 .ModelManager-rename-confirm:disabled {
   opacity: 0.5;
   cursor: default;
-}
-
-/* ── Catalog editor theme vars — move these into your top-of-file vars block ── */
-:root {
-  --ModelManager-input-bg: #1c1c22;
-  --ModelManager-input-border: #3a3a44;
-  --ModelManager-input-focus: #6b8afd;
 }
 
 .ModelManager-catalog-editor {
@@ -383,61 +413,26 @@
 }
 
 @media (prefers-color-scheme: dark) {
+  :root {
+    --text-main: #e0e0e0;
+    --text-muted: #999999;
+    --text-dim: #999999;
+    --bg-panel: #2a2a2a;
+    --bg-active: #24352d;
+    --bg-track: #444444;
+    --border-color: #555555;
+    --error-bg: #3b1a1a;
+    --error-text: #f47272;
+    --error-border: #5a3333;
+  }
+
   .ModelManager-rename-input {
     background: #1f1f1f;
-    color: #e0e0e0;
-    border-color: #6b8f7a;
+    border-color: var(--secondary);
   }
-}
 
-@media (prefers-color-scheme: dark) {
-  .ModelManager-panel {
-    background: #2a2a2a;
-  }
-  .ModelManager-header {
-    color: #e0e0e0;
-  }
-  .ModelManager-close {
-    color: #999;
-  }
-  .ModelManager-error {
-    background: #3b1a1a;
-    color: #f47272;
-  }
-  .ModelManager-section-title {
-    color: #999;
-  }
-  .ModelManager-empty {
-    color: #999;
-  }
-  .ModelManager-row--active {
-    background: #24352d;
-  }
-  .ModelManager-row-title {
-    color: #e0e0e0;
-  }
-  .ModelManager-row-sub {
-    color: #999;
-  }
-  .ModelManager-btn {
-    background: #2a2a2a;
-    border-color: #555;
-    color: #e0e0e0;
-  }
-  .ModelManager-btn--danger {
-    color: #f47272;
-    border-color: #5a3333;
-  }
-  .ModelManager-progress-track {
-    background: #444;
-  }
-  .ModelManager-prompt-source {
-    color: #999999;
-  }
   .ModelManager-prompt-slider,
   .ModelManager-prompt-textarea {
     background: #1f1f1f;
-    color: #e0e0e0;
-    border-color: #555;
   }
 }

@@ -19,7 +19,7 @@ export default function CrossRef(props) {
 
       const queries = current.refs.map((refStr) => {
         if (refStr.includes("-")) {
-          // It's a range: "GEN.4.25-GEN.4.26"
+          // Range: "GEN.4.25-GEN.4.26"
           const [start, end] = refStr.split("-");
           const [book_id, chapter, startVerse] = start.split(".");
           const [_, __, endVerse] = end.split(".");
@@ -32,7 +32,7 @@ export default function CrossRef(props) {
             end_verse: parseInt(endVerse),
           };
         } else {
-          // It's a single verse: "GEN.4.1"
+          // Single verse: "GEN.4.1"
           const [book_id, chapter, verse] = refStr.split(".");
           return {
             ref_id: refStr,
@@ -61,19 +61,15 @@ export default function CrossRef(props) {
   const getRefDetails = (refStr) => {
     if (!refStr) return { display: "", data: null };
 
-    // 1. Parse the string
     const isRange = refStr.includes("-");
     const mainPart = isRange ? refStr.split("-")[0] : refStr;
     const [bookId, chapter, verse] = mainPart.split(".");
 
-    // 2. Lookup the full book name from your props
     const bookEntry = props.books()?.find((b) => b.id === bookId);
     const bookName = bookEntry ? bookEntry.name : bookId;
 
-    // 3. Format the Translation (e.g., "eng_kjv" -> "KJV")
     const transLabel = bible1()?.split("_")[1]?.toUpperCase() || "";
 
-    // 4. Construct the Human-Readable Display
     let display = "";
     if (isRange) {
       const endVerse = refStr.split("-")[1].split(".")[2];
@@ -84,7 +80,6 @@ export default function CrossRef(props) {
 
     if (transLabel) display += ` (${transLabel})`;
 
-    // 5. Construct the Navigation Data
     const navData = {
       translation_id: `${bible1()}.dba`,
       book_id: bookId,
@@ -127,9 +122,7 @@ export default function CrossRef(props) {
                     >
                       {display}
                     </span>
-                    <p style="margin-top: 0.2rem;">
-                      {crossRefTexts.loading ? "Loading text..." : crossRefTexts()?.[ref] || "Text not available."}
-                    </p>
+                    <p style="margin-top: 0.2rem;">{crossRefTexts.loading ? "Loading text..." : crossRefTexts()?.[ref] || "Text not available."}</p>
                   </div>
                 );
               }}

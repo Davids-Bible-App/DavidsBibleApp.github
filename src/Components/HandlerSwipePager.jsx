@@ -29,7 +29,7 @@ export default function HandlerSwipePager(props) {
   let singleFingerPaged = false;
   let singleFingerIntent = "idle"; // "idle" | "horizontal" | "vertical" | "longpress"
 
-  // NEW: Long Press State
+  // Long Press State
   let longPressTimer = null;
 
   // two-finger
@@ -59,7 +59,7 @@ export default function HandlerSwipePager(props) {
       singleFingerPaged = false;
       singleFingerIntent = "idle";
 
-      // NEW: Start the Long Press Timer
+      // Start the Long Press Timer
       if (isSwiping) {
         const target = e.target;
         longPressTimer = setTimeout(() => {
@@ -104,7 +104,7 @@ export default function HandlerSwipePager(props) {
       const absDx = Math.abs(dx);
       const absDy = Math.abs(dy);
 
-      // NEW: Cancel long press if the finger drifts more than 10px
+      // Cancel long press if the finger drifts more than 10px
       if (absDx > 20 || absDy > 20) {
         clearTimeout(longPressTimer);
       }
@@ -229,7 +229,7 @@ export default function HandlerSwipePager(props) {
 
   function onPointerUp(e) {
     pointers.delete(e.pointerId);
-    // NEW: Finger lifted, cancel the long press
+    // Finger lifted, cancel the long press
     clearTimeout(longPressTimer);
 
     if (pointers.size === 0) {

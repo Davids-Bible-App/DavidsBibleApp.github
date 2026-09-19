@@ -1,5 +1,4 @@
-// src/Components/BookmarkModal.jsx
-import { createSignal, createEffect, createResource, For, Show } from "solid-js";
+import { createSignal, createEffect, For, Show } from "solid-js";
 import { invoke } from "@tauri-apps/api/core";
 import { bookmarkTarget, closeBookmarkModal, bms as existing } from "../State/modalStore.js";
 import { formatVerseRefs } from "../lib/bookmarkUtils.js";
@@ -29,12 +28,12 @@ const BookmarkModal = () => {
     return (existing() ?? []).find((bm) => bm.title.toLowerCase() === t) ?? null;
   };
 
-  // Suggestions for dropdown — similar but NOT exact (exact is already handled)
+  // Suggestions for dropdown
   const suggestions = () => {
     const t = title().trim().toLowerCase();
     const all = existing() ?? [];
     if (!t) return all;
-    // Show partial matches; exclude the exact match since status pill covers that
+    // Show partial matches
     return all.filter((bm) => {
       const bmt = bm.title.toLowerCase();
       return bmt.includes(t) && bmt !== t;
@@ -43,7 +42,7 @@ const BookmarkModal = () => {
 
   const showDropdown = () => focused() && suggestions().length > 0 && !exactMatch();
 
-  // ── Autocomplete pick — fills input only, no lock-in ───────────────────────
+  // Autocomplete pick
   const pickSuggestion = (bm) => {
     setTitle(bm.title);
     setFocused(false);
@@ -51,7 +50,7 @@ const BookmarkModal = () => {
     // No selectedId — the title is now an exact match so exactMatch() handles it
   };
 
-  // ── Save ────────────────────────────────────────────────────────────────────
+  // Save
   const handleSave = async () => {
     const t = title().trim();
     if (!t) {
@@ -116,7 +115,6 @@ const BookmarkModal = () => {
 
         <div class="BMModal-ref">{formatVerseRefs(verses())}</div>
 
-        {/* Input + dropdown */}
         <div class="BMModal-input-wrap">
           <input
             class="BMModal-input"

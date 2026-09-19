@@ -1,4 +1,4 @@
-import { createSignal, onMount, Show } from "solid-js";
+import { createSignal, onMount, onCleanup, Show } from "solid-js";
 import { pendingVerses, setPendingVerses } from "../State/editorStore";
 import { abbreviator, getBook, groupConsecutiveVerses } from "../lib/functions";
 import { onSheetClose } from "../State/sheetStore";
@@ -21,8 +21,6 @@ function debounce(fn, ms) {
 
 /**
  * DOM-walk HTML → Markdown converter.
- * Much more reliable than a chain of regexes on raw HTML strings because it
- * handles nesting, inline styles, and mixed content naturally.
  */
 function domToMarkdown(node) {
   if (node.nodeType === Node.TEXT_NODE) {
@@ -84,6 +82,10 @@ function domToMarkdown(node) {
       const alt = node.getAttribute("alt") || "";
       return `![${alt}](${src})`;
     }
+    case "CODE":
+      return `\`${children().trim()}\``;
+    case "PRE":
+      return `\n\`\`\`\n${children().trim()}\n\`\`\`\n`;
     case "UL":
       return (
         "\n" +
@@ -119,9 +121,33 @@ function domToMarkdown(node) {
 
 export default function Editor(props) {
   let editorRef;
+  let menuRef;
+
   const [history, setHistory] = createSignal([]);
   const [historyIndex, setHistoryIndex] = createSignal(-1);
-  const [saveStatus, setSaveStatus] = createSignal(""); // "Saved ✓" flash message
+  const [saveStatus, setSaveStatus] = createSignal("");
+  const [isMenuOpen, setIsMenuOpen] = createSignal(false);
+  const [editorText, setEditorText] = createSignal("");
+
+  // Close popup menu when clicking/tapping outside
+  const handleClickOutside = (e) => {
+    if (menuRef && !menuRef.contains(e.target)) {
+      setIsMenuOpen(false);
+    }
+  };
+
+  onMount(() => {
+    document.addEventListener("pointerdown", handleClickOutside);
+    const savedDraft = localStorage.getItem("md-editor-draft");
+    if (savedDraft && editorRef) {
+      editorRef.innerHTML = savedDraft;
+    }
+    saveState();
+  });
+
+  onCleanup(() => {
+    document.removeEventListener("pointerdown", handleClickOutside);
+  });
 
   // -------------------------------------------------------------------------
   // History / draft persistence
@@ -130,6 +156,8 @@ export default function Editor(props) {
   const saveState = () => {
     if (!editorRef) return;
     const content = editorRef.innerHTML;
+
+    setEditorText(editorRef.innerText || "");
 
     // Skip identical consecutive states
     if (historyIndex() >= 0 && history()[historyIndex()] === content) return;
@@ -202,6 +230,11 @@ export default function Editor(props) {
         redo();
         return;
       }
+    }
+
+    if (e.key === "Tab") {
+      e.preventDefault();
+      document.execCommand("insertText", false, "  "); // Insert 2 spaces
     }
 
     // Double-Enter to exit Blockquote
@@ -400,7 +433,82 @@ export default function Editor(props) {
     return raw;
   };
 
-  const getHTML = () => (editorRef ? editorRef.innerHTML : "");
+  const getHTML = () => {
+    if (!editorRef) return "";
+
+    const content = editorRef.innerHTML;
+
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exported Document</title>
+  <style>
+    :root {
+      --ThemeAccent1: #007acc;
+      --text-color: #e0e0e0;
+      --text-color-dimmed: #aaaaaa;
+      --verseNo: #0098ff;
+      --bg-color: #1e1e1e;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.6;
+      color: var(--text-color);
+      background-color: var(--bg-color);
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    /* Content Typography */
+    h1 {
+      font-size: 2em;
+      border-bottom: 1px solid #444;
+      padding-bottom: 0.3em;
+    }
+    h2 {
+      font-size: 1.5em;
+      border-bottom: 1px solid #444;
+      padding-bottom: 0.3em;
+    }
+    h3 {
+      font-size: 1.25em;
+    }
+    blockquote {
+      border-left: 4px solid var(--ThemeAccent1);
+      margin: 1em 0;
+      padding-left: 16px;
+      color: var(--text-color-dimmed);
+      font-style: italic;
+    }
+    img {
+      max-width: 100%;
+      border-radius: 4px;
+    }
+    hr {
+      border: 0;
+      height: 1px;
+      background: var(--ThemeAccent1);
+      margin: 16px 0;
+    }
+    a {
+      color: var(--ThemeAccent1);
+    }
+
+    /* Topic Metadata Block */
+    .editor-topic-block {
+      margin-bottom: 1.5em;
+    }
+  </style>
+</head>
+<body>
+  ${content}
+</body>
+</html>`;
+  };
 
   // -------------------------------------------------------------------------
   // Clipboard
@@ -468,6 +576,13 @@ export default function Editor(props) {
     saveState();
   };
 
+  const wordCount = () => {
+    const text = editorText().trim();
+    return text ? text.split(/\s+/).length : 0;
+  };
+
+  const charCount = () => editorText().length;
+
   // -------------------------------------------------------------------------
   // Render
   // -------------------------------------------------------------------------
@@ -476,7 +591,6 @@ export default function Editor(props) {
     <div class="Editor-Container">
       {/* ── Toolbar ── */}
       <div class="Editor-Toolbar">
-        {/* Text style */}
         <button onClick={() => format("bold")} title="Bold">
           <b>B</b>
         </button>
@@ -492,7 +606,6 @@ export default function Editor(props) {
 
         <div class="divider" />
 
-        {/* Alignment */}
         <button onClick={() => format("justifyLeft")} title="Align Left">
           ↤
         </button>
@@ -505,7 +618,6 @@ export default function Editor(props) {
 
         <div class="divider" />
 
-        {/* Block format */}
         <button onClick={() => toggleHeading(1)}>H1</button>
         <button onClick={() => toggleHeading(2)}>H2</button>
         <button onClick={() => toggleHeading(3)}>H3</button>
@@ -518,7 +630,6 @@ export default function Editor(props) {
 
         <div class="divider" />
 
-        {/* Insert */}
         <button onClick={insertLink} title="Insert Link">
           🔗
         </button>
@@ -528,15 +639,84 @@ export default function Editor(props) {
 
         <div class="divider" />
 
-        {/* History */}
-        <button onClick={undo} disabled={historyIndex() <= 0} title="Undo (Ctrl+Z)">
+        <button onClick={undo} disabled={historyIndex() <= 0} title="Undo">
           ↩
         </button>
-        <button onClick={redo} disabled={historyIndex() >= history().length - 1} title="Redo (Ctrl+Y)">
+        <button onClick={redo} disabled={historyIndex() >= history().length - 1} title="Redo">
           ↪
         </button>
 
-        {/* Pending verses */}
+        {/* Status Toast inside Toolbar */}
+        <Show when={saveStatus()}>
+          <span class="save-status">{saveStatus()}</span>
+        </Show>
+
+        {/* More Options Popover Container */}
+        <button popovertarget="editor-more-menu" title="More Options" class="menu-btn menu-anchor">
+          <svg width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor">
+            <circle cx="12" cy="5" r="2" />
+            <circle cx="12" cy="12" r="2" />
+            <circle cx="12" cy="19" r="2" />
+          </svg>
+        </button>
+
+        <div id="editor-more-menu" popover="auto" class="dropdown-menu">
+          <div class="menu-group-label">Save As</div>
+          <button
+            class="menu-item"
+            onClick={() => {
+              saveMD();
+              document.getElementById("editor-more-menu")?.hidePopover();
+            }}
+          >
+            <span>Markdown</span> <small>.md</small>
+          </button>
+          <button
+            class="menu-item"
+            onClick={() => {
+              saveHTML();
+              document.getElementById("editor-more-menu")?.hidePopover();
+            }}
+          >
+            <span>HTML</span> <small>.html</small>
+          </button>
+
+          <div class="menu-divider" />
+
+          <div class="menu-group-label">Copy As</div>
+          <button
+            class="menu-item"
+            onClick={() => {
+              copyMDToClipboard();
+              document.getElementById("editor-more-menu")?.hidePopover();
+            }}
+          >
+            <span>Markdown</span>
+          </button>
+          <button
+            class="menu-item"
+            onClick={() => {
+              copyHTMLToClipboard();
+              document.getElementById("editor-more-menu")?.hidePopover();
+            }}
+          >
+            <span>HTML</span>
+          </button>
+
+          <div class="menu-divider" />
+
+          <button
+            class="menu-item btn-danger"
+            onClick={() => {
+              clearEditor();
+              document.getElementById("editor-more-menu")?.hidePopover();
+            }}
+          >
+            Clear Editor
+          </button>
+        </div>
+
+        {/* Pending Verses Button */}
         <Show when={pendingVerses().length > 0}>
           <div class="divider" />
           <button onClick={insertPendingVerses} class="btn-accent">
@@ -545,41 +725,14 @@ export default function Editor(props) {
         </Show>
       </div>
 
-      {/* ── Content ── */}
+      {/* ── Content Area ── */}
       <div ref={editorRef} class="Editor-Content scroll_Win" contenteditable="true" onInput={handleInput} onKeyDown={handleKeyDown} onPaste={handlePaste} placeholder="Start writing or insert verses…" />
 
-      {/* ── Footer ── */}
-      <div class="Editor-Footer">
-        {/* Save to file */}
-        <div class="footer-group">
-          <span class="footer-label">Save</span>
-          <button onClick={saveMD} title="Save as Markdown file">
-            ↓ .md
-          </button>
-          <button onClick={saveHTML} title="Save as HTML file">
-            ↓ .html
-          </button>
-        </div>
-
-        {/* Copy to clipboard */}
-        <div class="footer-group">
-          <span class="footer-label">Copy</span>
-          <button onClick={copyMDToClipboard} title="Copy Markdown to clipboard">
-            ⎘ MD
-          </button>
-          <button onClick={copyHTMLToClipboard} title="Copy HTML to clipboard">
-            ⎘ HTML
-          </button>
-        </div>
-
-        {/* Status flash */}
-        <Show when={saveStatus()}>
-          <span class="save-status">{saveStatus()}</span>
-        </Show>
-
-        <button class="btn-danger" onClick={clearEditor}>
-          Clear
-        </button>
+      {/* ── Bottom Status Bar ── */}
+      <div class="Editor-StatusBar">
+        <span class="editor-stats">
+          <b>{wordCount()}</b> words &nbsp;|&nbsp; <b>{charCount()}</b> chars
+        </span>
       </div>
     </div>
   );

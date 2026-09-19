@@ -158,7 +158,6 @@ export default function SettingsPanel(props) {
             <option value="audio">Audio</option>
             <option value="chat">Chat</option>
             <option value="editor">Editor</option>
-            <option value="help">Help</option>
             <option value="history">History</option>
             <option value="meme">Memes</option>
             <option value="search">Search</option>
@@ -250,31 +249,6 @@ export default function SettingsPanel(props) {
               </div>
             </div>
           </section>
-
-          {/* <section class="SettingsPanel-section">
-            <heading>
-              Full Screen &emsp;
-              <small>
-                ( <i>Can interfere with gestures</i> )
-              </small>
-            </heading>
-            <div style="width:100%;display:flex;justify-content:center;align-content:center;">
-              <div style="display:flex;gap:12px;align-items:center;">
-                <div class="toggle-row">
-                  <span class="toggle-state" classList={{ active: !settings.fullScreenOn }}>
-                    Off
-                  </span>
-                  <label class="switch">
-                    <input type="checkbox" checked={settings.fullScreenOn} onChange={(e) => setSettings("fullScreenOn", e.target.checked)} />
-                    <span class="slider round"></span>
-                  </label>
-                  <span class="toggle-state" classList={{ active: settings.fullScreenOn }}>
-                    On
-                  </span>
-                </div>
-              </div>
-            </div>
-          </section> */}
 
           <section class="SettingsPanel-section">
             <heading>Keep Screen On</heading>

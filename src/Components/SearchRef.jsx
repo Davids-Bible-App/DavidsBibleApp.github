@@ -1,17 +1,19 @@
-import { createSignal, createEffect, For, Show } from "solid-js";
+import { createSignal, createEffect, For, Show, onCleanup } from "solid-js";
 import { invoke } from "@tauri-apps/api/core";
-import { abbreviator, getBook } from "../lib/functions.js";
+import { groupConsecutiveVerses, stripMarkTags, abbreviator, getBook } from "../lib/functions.js";
 import { toggleSheet, currentSheet, setSheetStep } from "../State/sheetStore";
 import { onSheetClose, activeSheet, getBaseStep } from "../State/sheetStore";
 
 import { executeJumpTo } from "../lib/navigationUtils";
+import { showToast } from "./Toast";
+
 import "./CSS/SearchRef.css";
-import { bible1, setTrigger, setTopicController, setSelectedTopic, setSelection, wordHighlight, setWordHighlight } from "../State/globalSignals.js";
+import { bible1, setSelectedTopic, wordHighlight, setWordHighlight } from "../State/globalSignals.js";
 import { openTopicModal } from "../State/modalStore.js";
 import { setPendingVerses } from "../State/editorStore";
 import { updateAndLogScripture } from "../State/historyStore";
 
-export default function SearchRef(props) {
+export default function SearchRef() {
   const [searchResults, setSearchResults] = createSignal([]);
   const [isReference, setIsReference] = createSignal(false);
   const [searchInput, setSearchInput] = createSignal("");
@@ -26,6 +28,11 @@ export default function SearchRef(props) {
   const [searchHistory, setSearchHistory] = createSignal(JSON.parse(localStorage.getItem("bibleSearchHistory") || "[]"));
   const [showDropdown, setShowDropdown] = createSignal(false);
   const [selectedVerses, setSelectedVerses] = createSignal([]);
+
+  const [noResultsVisible, setNoResultsVisible] = createSignal(false);
+  let noResultsTimeout;
+
+  onCleanup(() => clearTimeout(noResultsTimeout));
 
   let searchInputRef;
   let startX = 0;
@@ -49,9 +56,6 @@ export default function SearchRef(props) {
     "search",
     () => {
       searchInputRef?.blur();
-      // setSearchInput("");
-      // setSearchResults([]);
-      // setIsReference(false);
       setSelectedVerses([]);
     },
     300,
@@ -63,7 +67,6 @@ export default function SearchRef(props) {
     isSwipe = false;
     setIsDragging(true);
     setDragOffset(0);
-    // e.currentTarget.setPointerCapture(e.pointerId);
   };
 
   const handlePointerMove = (e) => {
@@ -91,14 +94,12 @@ export default function SearchRef(props) {
     }
     isSwipe = false;
     setDragOffset(0);
-    // e.currentTarget.releasePointerCapture(e.pointerId);
   };
 
   const handlePointerCancel = (e) => {
     setIsDragging(false);
     isSwipe = false;
     setDragOffset(0);
-    // e.currentTarget.releasePointerCapture(e.pointerId);
   };
 
   const startEditingPage = () => {
@@ -197,20 +198,31 @@ export default function SearchRef(props) {
     // Handle the two different result types
     if (res.type === "Reference") {
       setIsReference(true);
-      // console.log("Referenced Verses!", res.data); // Array of VerseEntry
       setSearchResults({ hits: res.data, total_count: res.data.length });
     } else {
       setIsReference(false);
-      // console.log("Highlighted Search Words:", res.data.hits); // SearchResponse
       setSearchResults(res.data);
       setPage(pageNum);
+    }
+
+    clearTimeout(noResultsTimeout);
+    if (searchResults()?.total_count === 0) {
+      setNoResultsVisible(true);
+      noResultsTimeout = setTimeout(() => setNoResultsVisible(false), 2000);
+    } else {
+      setNoResultsVisible(false);
     }
 
     searchResults().total_count > 0 && saveToHistory(val);
 
     if (res.data) {
       currentSheet("search") === "Min" && setSheetStep("Mid");
-      searchInputRef?.blur();
+      if (searchResults()?.total_count === 0) {
+        searchInputRef?.focus();
+        setShowDropdown(true); // don't rely on onFocus firing — force it back open
+      } else {
+        searchInputRef?.blur();
+      }
     }
   };
 
@@ -280,6 +292,19 @@ export default function SearchRef(props) {
     executeJumpTo(hit, () => {
       toggleSheet("search", "Min");
     });
+  };
+
+  const sendToClipboard = async () => {
+    if (selectedVerses().length === 0) return;
+
+    const formattedText = groupConsecutiveVerses(selectedVerses(), true);
+    const cleanText = stripMarkTags(formattedText);
+
+    await navigator.clipboard.writeText(cleanText);
+    showToast("Verses Copied To Clipboard!", "success", 3000, true, true);
+
+    addToHistory(formatVersesForExport(selectedVerses()));
+    setSelectedVerses([]);
   };
 
   return (
@@ -365,34 +390,29 @@ export default function SearchRef(props) {
             </button>
           </>
         )}
-        <Show
-          when={searchResults()?.total_count > 0}
-          fallback={
-            searchResults()?.total_count == 0 && (
-              <center>
-                <small>"Sorry no results found"</small>
-              </center>
-            )
-          }
-        >
+        <Show when={searchResults()?.total_count > 0}>
           <center>
             <small>Total Results: | {searchResults()?.total_count} |</small>
             <Show when={selectedVerses().length > 0}>
               <div class="SearchRef-FloatingActionBar">
-                <small>Send {selectedVerses().length} Verses to </small>
+                <small>Send {selectedVerses().length} Verses to : </small>
                 <button onClick={sendToEditor}>Editor</button>
-                &nbsp;<small> or </small>&nbsp;
+                &nbsp;<small>|</small>&nbsp;
                 <button onClick={sendToTopic}>Topic</button>
+                &nbsp;<small>|</small>&nbsp;
+                <button onClick={sendToClipboard}>Clipboard</button>
               </div>
             </Show>
           </center>
         </Show>
-        <Show when={showDropdown() && searchHistory().length > 0}>
+        <Show when={showDropdown() && (searchHistory().length > 0 || searchResults()?.total_count === 0)}>
           <ul class="SearchRef-HistoryDropdown">
+            <Show when={noResultsVisible()}>
+              <li class="SearchRef-noResults">Sorry, no results found</li>
+            </Show>
             <For each={searchHistory()}>
               {(item) => (
                 <li class="SearchRef-historyItem">
-                  {/* The clickable search term */}
                   <span
                     class="SearchRef-historyText"
                     onMouseDown={(e) => {
@@ -404,13 +424,11 @@ export default function SearchRef(props) {
                   >
                     {item}
                   </span>
-
-                  {/* The delete button */}
                   <button
                     class="SearchRef-historyDelete"
                     onMouseDown={(e) => {
                       e.preventDefault();
-                      e.stopPropagation(); // Stops the click from bubbling up and triggering a search
+                      e.stopPropagation();
                       removeFromHistory(item);
                     }}
                     aria-label="Remove from history"

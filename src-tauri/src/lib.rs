@@ -41,7 +41,6 @@ pub fn run() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_m3::init())
-        .plugin(tauri_plugin_sharekit::init())
         .plugin(tauri_plugin_haptics::init())
         .plugin(tauri_plugin_keep_screen_on::init())
         .plugin(tauri_plugin_opener::init())

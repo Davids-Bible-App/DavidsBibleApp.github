@@ -3,6 +3,8 @@ import { toggleSheet } from "../State/sheetStore";
 import { preloadSheet } from "../State/sheetComponents";
 import { dbExists } from "../lib/functions.js";
 import { showToast } from "./Toast";
+import { syncWithReader, setSyncWithReader } from "./Audio.jsx";
+import { stop } from "tauri-plugin-music-notification-api";
 import "./CSS/MenuItems.css";
 
 export default function MenuItems(props) {
@@ -21,6 +23,14 @@ export default function MenuItems(props) {
     menuItems.addEventListener("toggle", handleToggle);
     onCleanup(() => menuItems.removeEventListener("toggle", handleToggle));
   });
+
+  const refresh = async () => {
+    await stop();
+    if (syncWithReader()) window.location.reload();
+    setSyncWithReader(true);
+    showToast("Resyncing Reader!", "info", 1500, true, true);
+    setTimeout(() => window.location.reload(), 1700);
+  };
 
   return (
     <menu
@@ -118,7 +128,7 @@ export default function MenuItems(props) {
       </li>
 
       <li class="MenuBtn-item">
-        <button class="neu-button" onPointerDown={(e) => e.stopPropagation()} onClick={() => window.location.reload()}>
+        <button class="neu-button" onPointerDown={(e) => e.stopPropagation()} onClick={refresh}>
           <div aria-hidden="true">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
               <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z" />

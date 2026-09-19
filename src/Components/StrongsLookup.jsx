@@ -18,19 +18,18 @@ export default function StrongsLookup(props) {
   let inputRef;
 
   // Keep track of the last injection to prevent the input from getting stuck
-  let lastInjectedQuery = "";
+  let lastLookupSeq = null;
 
   // Listen for injected objects from StrongsVerse component
   createEffect(() => {
-    const injected = props.activeLookup();
-    if (injected && injected.query !== lastInjectedQuery) {
-      setWasInjected(true);
-      lastInjectedQuery = injected.query;
-      setSearchInput(injected.query);
-      setActiveSearch({ query: injected.query, origin: injected.origin });
+    const lookup = props.activeLookup();
+    if (!lookup || lookup.seq === lastLookupSeq) return;
 
-      toggleSheet("strlook", "Max");
-    }
+    lastLookupSeq = lookup.seq;
+    setWasInjected(true);
+    setSearchInput(lookup.query);
+    setActiveSearch({ query: lookup.query, origin: lookup.origin });
+    toggleSheet("strlook", "Max");
   });
 
   const [data] = createResource(activeSearch, fetchLookupData);

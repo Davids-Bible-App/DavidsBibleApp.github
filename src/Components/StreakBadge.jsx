@@ -27,7 +27,7 @@ export default function StreakBadge() {
       <div id="streak-popover" popover="auto" class="StreakBadge-popover">
         <div class="StreakBadge-arrow" aria-hidden="true"></div>
 
-        <h3 class="StreakBadge-title">Your Streak</h3>
+        <h3 class="StreakBadge-title">Your Daily Streak Usage</h3>
 
         <dl class="StreakBadge-stats">
           <div class="StreakBadge-row">

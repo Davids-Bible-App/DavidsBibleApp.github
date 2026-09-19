@@ -14,7 +14,6 @@ export default function History(props) {
   // 1. Live Update: Re-runs fetchHistory automatically whenever historyTrigger changes
   const [history, { refetch }] = createResource(historyTrigger, fetchHistory);
 
-  // 2. Fallback Update: Refetches just in case when the user opens the History sheet
   createEffect(() => {
     if (currentSheet() === "history") {
       refetch();

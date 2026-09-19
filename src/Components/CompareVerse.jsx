@@ -27,8 +27,8 @@ const loadFiles = async () => {
   }
 };
 
-export default function CompareVerse(props) {
-  const [edition, setEdition] = createSignal("eng_kjv"); // Default Bible Version
+export default function CompareVerse() {
+  const [edition, setEdition] = createSignal("eng_kjv");
   const [numberOfVerses, setNumberOfVerses] = createSignal(1);
   const [activeTab, setActiveTab] = createSignal(true);
 

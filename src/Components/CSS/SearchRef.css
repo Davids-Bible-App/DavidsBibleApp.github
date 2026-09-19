@@ -251,6 +251,29 @@ mark {
   background-color: rgba(255, 0, 0, 0.1);
 }
 
+.SearchRef-HistoryDropdown li.SearchRef-noResults {
+  text-align: center;
+  color: #ff5c5c;
+  cursor: default;
+  pointer-events: none;
+  animation: SearchRef-fadeNoResults 2s ease forwards;
+}
+
+.SearchRef-HistoryDropdown li.SearchRef-noResults:hover {
+  background-color: transparent;
+  color: #ff5c5c;
+}
+
+@keyframes SearchRef-fadeNoResults {
+  0%,
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 .Entry-header {
   display: flex;
   justify-content: space-between;

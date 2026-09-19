@@ -21,11 +21,7 @@ const [winScroll, setWinScroll] = createSignal(false);
 const PrimaryPanel = (props) => {
   return (
     <div class="primary-panel" style={props.style}>
-      <div
-        class="primary-content paper"
-        classList={{ scroll_Win: winScroll(), paperOverlay: activePaper() }}
-        ref={props.scrollRef}
-      >
+      <div class="primary-content paper" classList={{ scroll_Win: winScroll(), paperOverlay: activePaper() }} ref={props.scrollRef}>
         <Bible bible={bible1} />
       </div>
     </div>
@@ -115,8 +111,7 @@ const DraggerBar = (props) => {
     }
   };
   // Dynamic class for the dragger bar
-  const draggerClass = () =>
-    props.orientation() === "horizontal" ? "dragger-bar dragger-horizontal" : "dragger-bar dragger-vertical";
+  const draggerClass = () => (props.orientation() === "horizontal" ? "dragger-bar dragger-horizontal" : "dragger-bar dragger-vertical");
 
   function toggleLockCSS(e) {
     e.stopPropagation();
@@ -138,36 +133,12 @@ const DraggerBar = (props) => {
         <button class="paper" id="lockToggleBtn" data-locked="true" onClick={(e) => toggleLockCSS(e)}>
           <span id="lockIconContainer">
             {/* Locked Icon */}
-            <svg
-              id="lockedIcon"
-              class="icon paper"
-              classList={{ paperOverlay: activePaper() }}
-              xmlns="http://www.w3.org/2000/svg"
-              width="12"
-              height="12"
-              fill="currentColor"
-              viewBox="0 0 16 16"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M8 0a4 4 0 0 1 4 4v2.05a2.5 2.5 0 0 1 2 2.45v5a2.5 2.5 0 0 1-2.5 2.5h-7A2.5 2.5 0 0 1 2 13.5v-5a2.5 2.5 0 0 1 2-2.45V4a4 4 0 0 1 4-4M4.5 7A1.5 1.5 0 0 0 3 8.5v5A1.5 1.5 0 0 0 4.5 15h7a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 11.5 7zM8 1a3 3 0 0 0-3 3v2h6V4a3 3 0 0 0-3-3"
-              />
+            <svg id="lockedIcon" class="icon paper" classList={{ paperOverlay: activePaper() }} xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M8 0a4 4 0 0 1 4 4v2.05a2.5 2.5 0 0 1 2 2.45v5a2.5 2.5 0 0 1-2.5 2.5h-7A2.5 2.5 0 0 1 2 13.5v-5a2.5 2.5 0 0 1 2-2.45V4a4 4 0 0 1 4-4M4.5 7A1.5 1.5 0 0 0 3 8.5v5A1.5 1.5 0 0 0 4.5 15h7a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 11.5 7zM8 1a3 3 0 0 0-3 3v2h6V4a3 3 0 0 0-3-3" />
             </svg>
             {/* Unlocked Icon */}
-            <svg
-              id="unlockedIcon"
-              class="icon paper"
-              classList={{ paperOverlay: activePaper() }}
-              xmlns="http://www.w3.org/2000/svg"
-              width="12"
-              height="12"
-              fill="currentColor"
-              viewBox="0 0 16 16"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M8 0c1.07 0 2.041.42 2.759 1.104l.14.14.062.08a.5.5 0 0 1-.71.675l-.076-.066-.216-.205A3 3 0 0 0 5 4v2h6.5A2.5 2.5 0 0 1 14 8.5v5a2.5 2.5 0 0 1-2.5 2.5h-7A2.5 2.5 0 0 1 2 13.5v-5a2.5 2.5 0 0 1 2-2.45V4a4 4 0 0 1 4-4M4.5 7A1.5 1.5 0 0 0 3 8.5v5A1.5 1.5 0 0 0 4.5 15h7a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 11.5 7z"
-              />
+            <svg id="unlockedIcon" class="icon paper" classList={{ paperOverlay: activePaper() }} xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M8 0c1.07 0 2.041.42 2.759 1.104l.14.14.062.08a.5.5 0 0 1-.71.675l-.076-.066-.216-.205A3 3 0 0 0 5 4v2h6.5A2.5 2.5 0 0 1 14 8.5v5a2.5 2.5 0 0 1-2.5 2.5h-7A2.5 2.5 0 0 1 2 13.5v-5a2.5 2.5 0 0 1 2-2.45V4a4 4 0 0 1 4-4M4.5 7A1.5 1.5 0 0 0 3 8.5v5A1.5 1.5 0 0 0 4.5 15h7a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 11.5 7z" />
             </svg>
           </span>
         </button>
@@ -192,20 +163,9 @@ const DraggerBar = (props) => {
           </button>
         </div>
         <button class="paper" onClick={(e) => toggleOrientation(e)}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="14"
-            height="14"
-            fill="currentColor"
-            class="bi bi-arrow-repeat paper"
-            classList={{ paperOverlay: activePaper() }}
-            viewBox="0 0 16 16"
-          >
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-arrow-repeat paper" classList={{ paperOverlay: activePaper() }} viewBox="0 0 16 16">
             <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41m-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9" />
-            <path
-              fill-rule="evenodd"
-              d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5 5 0 0 0 8 3M3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9z"
-            />
+            <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5 5 0 0 0 8 3M3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9z" />
           </svg>
         </button>
       </div>
@@ -231,21 +191,8 @@ const SecondaryPanel = (props) => {
 
   return (
     <div class="secondary-panel" ref={panelRef} style={panelStyle()}>
-      <DraggerBar
-        setPane={props.setPane}
-        getInfo={props.getInfo}
-        panelPos={props.panelPos}
-        setPanelPos={props.setPanelPos}
-        orientation={props.orientation}
-        setOrientation={props.setOrientation}
-        onClose={() => props.setSecondaryVisible(false)}
-        setTouchActionRestored={props.setTouchActionRestored}
-      />
-      <div
-        class="secondary-content paper"
-        classList={{ scroll_Win: winScroll(), paperOverlay: activePaper() }}
-        ref={props.scrollRef}
-      >
+      <DraggerBar setPane={props.setPane} getInfo={props.getInfo} panelPos={props.panelPos} setPanelPos={props.setPanelPos} orientation={props.orientation} setOrientation={props.setOrientation} onClose={() => props.setSecondaryVisible(false)} setTouchActionRestored={props.setTouchActionRestored} />
+      <div class="secondary-content paper" classList={{ scroll_Win: winScroll(), paperOverlay: activePaper() }} ref={props.scrollRef}>
         <Bible bible={bible2} />
       </div>
     </div>
@@ -310,7 +257,6 @@ export default function Splitter(props) {
         setPrevPrimaryScroll(primaryEl.scrollTop);
       }
     };
-    // console.log(`LOG[:503]: `, px2percent(props.pageHeight()));
     primaryEl.addEventListener("scroll", handlePrimaryScroll);
     onCleanup(() => primaryEl.removeEventListener("scroll", handlePrimaryScroll));
   });
@@ -348,17 +294,7 @@ export default function Splitter(props) {
           <div class="close-message">{closeMessage()}</div>
         </Show>
         <Show when={props.isSecondaryVisible()}>
-          <SecondaryPanel
-            getInfo={props.getInfo}
-            setPane={props.setPane}
-            panelPos={props.panelPos}
-            setPanelPos={props.setPanelPos}
-            orientation={props.orientation}
-            setOrientation={props.setOrientation}
-            setSecondaryVisible={props.setSecondaryVisible}
-            scrollRef={(el) => (secondaryScrollRef = el)}
-            setTouchActionRestored={props.setTouchActionRestored}
-          />
+          <SecondaryPanel getInfo={props.getInfo} setPane={props.setPane} panelPos={props.panelPos} setPanelPos={props.setPanelPos} orientation={props.orientation} setOrientation={props.setOrientation} setSecondaryVisible={props.setSecondaryVisible} scrollRef={(el) => (secondaryScrollRef = el)} setTouchActionRestored={props.setTouchActionRestored} />
         </Show>
       </div>
     </>

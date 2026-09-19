@@ -61,14 +61,13 @@ export default function MemeMaker() {
   const [offlineImages, setOfflineImages] = createSignal(new Set());
   const [localMemeDir, setLocalMemeDir] = createSignal("");
 
-  // 1. Create a Signal to hold the verified fonts.
-  // We initialize it with the local fonts, as those are built into the OS and never fail.
+  // Local OS Fonts.
   const [verifiedFonts, setVerifiedFonts] = createSignal(FONTS.filter((f) => f.hasBold));
 
   onMount(() => {
     const fontsId = "meme-maker-fonts";
 
-    // 1. Check if we already injected the fonts (prevents duplicate injections on re-mounts)
+    // 1. Check if we already injected the fonts
     if (!document.getElementById(fontsId)) {
       const link = document.createElement("link");
       link.id = fontsId;
@@ -81,7 +80,6 @@ export default function MemeMaker() {
       // 2. Wait for the CSS to actually download before verifying
       link.onload = () => verifyAndSetFonts();
     } else {
-      // If it's already in the head, just verify immediately
       verifyAndSetFonts();
     }
   });
@@ -108,33 +106,6 @@ export default function MemeMaker() {
 
     setVerifiedFonts([...FONTS.filter((f) => f.hasBold), ...validOnlineFonts]);
   }
-
-  // onMount(async () => {
-  //   const onlineFonts = FONTS.filter((f) => !f.hasBold);
-  //   const validOnlineFonts = [];
-
-  //   // 2. Test each online font
-  //   for (const font of onlineFonts) {
-  //     try {
-  //       // Extract just the font name (e.g., "'Permanent Marker', cursive" -> "Permanent Marker")
-  //       const fontName = font.value.split(",")[0].replace(/['"]/g, "").trim();
-
-  //       // Attempt to load a sample size of the font
-  //       const loadedFonts = await document.fonts.load(`16px "${fontName}"`);
-
-  //       if (loadedFonts.length > 0) {
-  //         validOnlineFonts.push(font); // It works! Keep it.
-  //       } else {
-  //         console.warn(`Font unavailable, removing from list: ${font.label}`);
-  //       }
-  //     } catch (error) {
-  //       console.warn(`Font error: ${font.label}`, error);
-  //     }
-  //   }
-
-  //   // 3. Combine the local fonts with the successfully loaded online fonts
-  //   setVerifiedFonts([...FONTS.filter((f) => f.hasBold), ...validOnlineFonts]);
-  // });
 
   /* layers */
   const [layers, setLayers] = createSignal([
@@ -786,14 +757,6 @@ export default function MemeMaker() {
     }
   }
 
-  // createEffect(() => {
-  //   images();
-  //   selectedImage();
-  //   saveToLocal();
-  // });
-
-  // Helper to resize and convert to WebP
-
   // Helper to resize and return a WebP blob
 
   const createResizedBlob = (img, maxDim) => {
@@ -922,7 +885,6 @@ export default function MemeMaker() {
         await invoke("delete_meme_image", { filename: src });
         await invoke("delete_meme_image", { filename: src.replace(".webp", "_thumb.webp") });
         await invoke("delete_meme_image", { filename: src.replace(".webp", "_preview.webp") });
-        // setSelectedImage(null);
       } catch (e) {
         console.error("Failed to delete local file:", e);
       }
@@ -1164,7 +1126,6 @@ export default function MemeMaker() {
           class="MemeMaker-workspace-viewport"
           style={{
             "aspect-ratio": aspectRatio() === "auto" || aspectRatio() === "custom" ? "unset" : aspectRatio(),
-            // "max-height": "35vh", // CRITICAL: Limits height. - Now Grid handles height.
           }}
         >
           <div

@@ -1,5 +1,4 @@
-// src/Components/Bookmark.jsx
-import { createSignal, createEffect, createResource, For, Show, onCleanup } from "solid-js";
+import { createSignal, createEffect, For, Show, onCleanup } from "solid-js";
 import { invoke } from "@tauri-apps/api/core";
 import { ask } from "@tauri-apps/plugin-dialog";
 import { executeJumpTo } from "../lib/navigationUtils";
@@ -8,7 +7,6 @@ import { triggerRefetch } from "../State/settingsStore.js";
 
 import { bms } from "../State/modalStore.js";
 import { setTrigger } from "../State/globalSignals.js";
-import { type } from "@tauri-apps/plugin-os";
 import "./CSS/Bookmark.css";
 
 const Bookmark = (props) => {
@@ -270,7 +268,7 @@ const Bookmark = (props) => {
                     </div>
                   </Show>
 
-                  {/* Compressed multi-verse reference */}
+                  {/* Format multi-verse reference */}
                   <div class="Bookmark-item-ref">
                     <span class="Bookmark-item-verse">{formatVerseRefs(verses)}</span>
                   </div>

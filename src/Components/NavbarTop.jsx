@@ -103,7 +103,7 @@ export default function NavbarTop(props) {
               </button>
 
               <Show when={(props.orientation() === "vertical" && props.isSecondaryVisible()) || !settings.titleView}>
-                <div class="NavbarTop-bookChap" style={!props.isSecondaryVisible() && !settings.titleView && "top: 23px;"}>
+                <div class="NavbarTop-bookChap">
                   <b>
                     <span>{book()}</span>
                     &nbsp;

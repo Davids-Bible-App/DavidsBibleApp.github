@@ -134,7 +134,6 @@ export default function Bible(props) {
   return (
     <>
       <div class="paper" classList={{ paperOverlay: activePaper() }}>
-        {/* --- NEW SHOW WRAPPER --- */}
         <Show
           when={activeVersion()?.bk}
           fallback={
@@ -145,7 +144,6 @@ export default function Bible(props) {
             </div>
           }
         >
-          {/* --- ORIGINAL BIBLE CONTENT --- */}
           <container
             class="Bible-container"
             style={{
@@ -291,7 +289,6 @@ function VerseParts(props) {
     expandedCtl() === 0 && setSelected(null);
   });
 
-  // 1. Wrap the logic in an arrow function so it becomes a reactive getter
   const isSidelight = () => (isDarkMode() ? settings.sideLightsDark : settings.sideLightsLight);
 
   return (
@@ -327,10 +324,7 @@ function VerseParts(props) {
         style={`${!props.ver() ? "display: list-item" : "display: contents"};`}
       >
         <verse classList={props.ver() && { select: selected() }} data-ed={props.activeVersion.translation?.short_name} data-tr={props.activeVersion.translation?.id} data-bk={props.activeVersion.bk?.id} data-ch={chapterNo()} data-vs={props.verse.number} data-clr={props.verse.highlight || "none"}>
-          <span
-            style={!props.ver() && "display: none"}
-            // classList={props.ver() && { verseFL: props.verse.number === 1 }}
-          >
+          <span style={!props.ver() && "display: none"}>
             <small style={"color:var(--verseNo); font-weight: var(--verseNoEm);"}>{props.verse.number}.</small>
           </span>
           {(wasHeading = true)}
