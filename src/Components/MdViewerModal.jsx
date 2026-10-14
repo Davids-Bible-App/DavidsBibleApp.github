@@ -19,7 +19,7 @@ async function fetchAndParse(name) {
  * import.meta.glob map) and renders it with `marked`.
  *
  * The fetch only happens when this component mounts, i.e. only after
- * HelpButton has been clicked — never on app load.
+ * DocsButton has been clicked — never on app load.
  */
 export default function MdViewerModal(props) {
   const [html] = createResource(() => props.docName, fetchAndParse);
@@ -30,9 +30,21 @@ export default function MdViewerModal(props) {
     if (e.key === "Escape") props.onClose();
   };
 
+  // MdViewerModal.jsx
   onMount(() => {
     document.addEventListener("keydown", handleKeydown);
     dialogRef?.focus();
+
+    // Real native listener in the CAPTURE phase — capture runs top-down
+    // before bubbling starts, so this fires before body's bubble-phase
+    // listener has any chance to run. Bypasses Solid's delegation entirely.
+    // const stop = (e) => e.stopPropagation();
+    // dialogRef.addEventListener("pointerdown", stop, true);
+    // dialogRef.addEventListener("click", stop, true);
+    // onCleanup(() => {
+    //   dialogRef.removeEventListener("pointerdown", stop, true);
+    //   dialogRef.removeEventListener("click", stop, true);
+    // });
   });
 
   onCleanup(() => {
@@ -43,12 +55,13 @@ export default function MdViewerModal(props) {
     if (e.target === e.currentTarget) props.onClose();
   };
 
+  const title = () => props.docName.split("/").pop();
   return (
     <Portal>
       <div class="MdViewerModal-backdrop" onClick={handleBackdropClick}>
-        <div class="MdViewerModal-class" role="dialog" aria-modal="true" aria-label={`${props.docName} help`} tabindex="-1" ref={dialogRef}>
+        <div class="MdViewerModal-class" data-modal-root role="dialog" aria-modal="true" aria-label={`${title()} docs`} tabindex="-1" ref={dialogRef} onPointerDown={(e) => e.stopPropagation()}>
           <div class="MdViewerModal-header">
-            <h2 class="MdViewerModal-title">{props.docName} Help</h2>
+            <h2 class="MdViewerModal-title">{title()} Docs</h2>
             <button class="MdViewerModal-close" type="button" aria-label="Close" onClick={props.onClose}>
               &times;
             </button>
@@ -56,10 +69,7 @@ export default function MdViewerModal(props) {
 
           <div class="MdViewerModal-scroll">
             <Show when={!html.loading} fallback={<p class="MdViewerModal-loading">Loading…</p>}>
-              <Show when={!html.error} fallback={<p class="MdViewerModal-error">{html.error?.message ?? "Couldn't load this help topic."}</p>}>
-                {/* Content comes from your own bundled .md files, not
-                    user input, so raw innerHTML is fine here. If you ever
-                    load remote/user-supplied markdown, sanitize first. */}
+              <Show when={!html.error} fallback={<p class="MdViewerModal-error">{html.error?.message ?? "Couldn't load this docs topic."}</p>}>
                 <div class="MdViewerModal-content" innerHTML={html()} />
               </Show>
             </Show>

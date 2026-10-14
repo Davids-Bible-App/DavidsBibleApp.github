@@ -1,14 +1,14 @@
 import { createEffect, createSignal, onCleanup, onMount, For, untrack, batch, on } from "solid-js";
 import { Portal } from "solid-js/web";
 import { invoke } from "@tauri-apps/api/core";
-import { open, message } from "@tauri-apps/plugin-dialog";
+import { ask, open, message } from "@tauri-apps/plugin-dialog";
 import { appDataDir, join } from "@tauri-apps/api/path";
 import { listen } from "@tauri-apps/api/event";
 import { type } from "@tauri-apps/plugin-os";
-import HelpButton from "./HelpButton.jsx";
+import DocsButton from "./DocsButton.jsx";
 import CountdownTimer from "./CountdownTimer.jsx";
 
-import { getBook, getBookNo } from "../lib/functions";
+import { getBook, getBookNo, clickOutside } from "../lib/functions";
 
 import { books } from "../State/globalResource.js";
 import { bookOrderNo, setBookOrderNo, book, setBook, chapterNo, numberOfChapters, setChapterNo, setChapterBtn, setTestamentBtn } from "../State/globalSignals.js";
@@ -804,6 +804,7 @@ export default function Audio(props) {
 
       await message(`${author} audio extracted successfully!`);
       await fetchAuthors();
+      setMenuOpen(false);
     } catch (err) {
       setIsImporting(false);
       console.error("Import failed:", err);
@@ -812,13 +813,13 @@ export default function Audio(props) {
   };
 
   const handleDeleteAuthor = async () => {
-    const author = audioVersion(); // whichever author is currently selected
+    const author = audioVersion();
     if (!author) {
       await message("No author selected to delete.", { title: "Notice", kind: "warning" });
       return;
     }
 
-    const confirmed = await message(`Delete all audio for "${author}"? This cannot be undone.`, {
+    const confirmed = await ask(`Delete all audio for "${author}"? This cannot be undone.`, {
       title: "Confirm Delete",
       kind: "warning",
     });
@@ -953,7 +954,7 @@ export default function Audio(props) {
               </div>
             </div>
           </div>
-          <div class="Audio-menu-container">
+          <div class="Audio-menu-container" use:clickOutside={() => menuOpen() && setMenuOpen(false)}>
             <button class="Audio-menu-btn" onClick={() => setMenuOpen(!menuOpen())}>
               <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--main-icon-text-color)">
                 <circle cx="12" cy="5" r="2"></circle>
@@ -968,12 +969,18 @@ export default function Audio(props) {
                   <button onClick={handleGenericImport} disabled={isImporting()}>
                     {isImporting() ? "Importing..." : "Import Zip"}
                   </button>
-                  <button onClick={handleDeleteAuthor} disabled={isImporting() || !audioVersion()}>
+                  <button
+                    onClick={() => {
+                      handleDeleteAuthor();
+                      setMenuOpen(false);
+                    }}
+                    disabled={isImporting() || !audioVersion()}
+                  >
                     Delete Author
                   </button>
-                  <HelpButton docName="Audio">
-                    <button>Help</button>
-                  </HelpButton>
+                  <DocsButton docName="help/Audio">
+                    <button>Information</button>
+                  </DocsButton>
                 </div>
               </div>
             )}

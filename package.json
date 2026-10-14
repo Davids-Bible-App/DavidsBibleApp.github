@@ -1,6 +1,6 @@
 {
   "name": "davidsbible",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "",
   "type": "module",
   "scripts": {
@@ -45,7 +45,7 @@
     "tauri-plugin-background-service": "^0.5.2",
     "tauri-plugin-keep-screen-on-api": "^0.1.4",
     "tauri-plugin-m3": "^0.2.2",
-    "tauri-plugin-music-notification-api": "file:../tauri-plugin-music-notification"
+    "tauri-plugin-music-notification-api": "github:AverTry/tauri-plugin-music-notification"
   },
   "devDependencies": {
     "@tauri-apps/cli": "2.10.1",

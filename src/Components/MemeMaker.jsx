@@ -7,6 +7,7 @@ import { invoke, convertFileSrc } from "@tauri-apps/api/core";
 import { appDataDir, join } from "@tauri-apps/api/path";
 import { save, ask, message } from "@tauri-apps/plugin-dialog";
 import { writeFile } from "@tauri-apps/plugin-fs";
+import DocsButton from "./DocsButton.jsx";
 import "./CSS/MemeMaker.css";
 
 let fileInput;
@@ -1451,6 +1452,9 @@ export default function MemeMaker() {
               >
                 Save
               </button>
+              <DocsButton docName="help/MemeMaker">
+                <button class="MemeMaker-toggleButton extended">Info</button>
+              </DocsButton>
             </group>
             <group>
               <button class="MemeMaker-small" onClick={undo}>

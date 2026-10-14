@@ -121,7 +121,10 @@ export const triggerHaptic = async (style = "light") => {
 };
 
 export function clickOutside(el, accessor) {
-  const onClick = (e) => !el.contains(e.target) && accessor()?.();
+  const onClick = (e) => {
+    if (e.target.closest("[data-modal-root]")) return; // ignore any open modal
+    if (!el.contains(e.target)) accessor()?.();
+  };
   document.body.addEventListener("click", onClick);
   onCleanup(() => document.body.removeEventListener("click", onClick));
 }

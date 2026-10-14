@@ -913,7 +913,7 @@ dependencies = [
 
 [[package]]
 name = "davidsbible"
-version = "1.0.7"
+version = "1.0.8"
 dependencies = [
  "alphanumeric-sort",
  "ash",
@@ -5394,6 +5394,7 @@ dependencies = [
 [[package]]
 name = "tauri-plugin-music-notification-api"
 version = "0.2.1"
+source = "git+https://github.com/AverTry/tauri-plugin-music-notification#418b3b7c2bad4988abc1995fe419914e847dcaeb"
 dependencies = [
  "jni",
  "serde",

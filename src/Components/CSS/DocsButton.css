@@ -1,0 +1,52 @@
+/* ===== Theme variables (edit here) ===== */
+:root {
+  --docs-btn-bg: #f0f0f0;
+  --docs-btn-bg-hover: #e0e0e0;
+  --docs-btn-color: #333333;
+  --docs-btn-border: #cccccc;
+  --docs-btn-size: 1.75rem;
+}
+
+[data-theme="dark"] {
+  --docs-btn-bg: #2a2a2e;
+  --docs-btn-bg-hover: #3a3a3f;
+  --docs-btn-color: #e6e6e6;
+  --docs-btn-border: #4a4a4f;
+}
+/* ======================================= */
+
+.DocsButton-class {
+  width: var(--docs-btn-size);
+  height: var(--docs-btn-size);
+  border-radius: 50%;
+  border: 1px solid var(--docs-btn-border);
+  background: var(--docs-btn-bg);
+  color: var(--docs-btn-color);
+  font-weight: 600;
+  font-size: 0.9rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    transform 100ms ease;
+}
+
+.DocsButton-class:hover {
+  background: var(--docs-btn-bg-hover);
+}
+
+.DocsButton-class:active {
+  transform: scale(0.94);
+}
+
+.DocsButton-class:focus-visible {
+  outline: 2px solid var(--docs-btn-color);
+  outline-offset: 2px;
+}
+
+.DocsButton-trigger {
+  display: contents;
+}

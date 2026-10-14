@@ -29,6 +29,7 @@ export default function MenuItems(props) {
     if (syncWithReader()) window.location.reload();
     setSyncWithReader(true);
     showToast("Resyncing Reader!", "info", 1500, true, true);
+    // Give it time to load the chapter/Book and save to DB
     setTimeout(() => window.location.reload(), 1700);
   };
 

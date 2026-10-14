@@ -1,6 +1,6 @@
 [package]
 name = "davidsbible"
-version = "1.0.7"
+version = "1.0.8"
 description = "Davids Bible Application And Study Tool"
 authors = ["you"]
 edition = "2021"
@@ -47,8 +47,8 @@ tokio = { version = "1", features = ["time", "sync", "macros"] }
 async-trait = "0.1.89"
 tauri-plugin-notification = "2"
 #tauri-plugin-music-notification-api = { git = "https://github.com/AverTry/tauri-plugin-music-notification", rev = "21ed5d7b42ea14832e09cdb204bcfbc957313937" }
-#tauri-plugin-music-notification-api = { git = "https://github.com/AverTry/tauri-plugin-music-notification", branch = "main" }
-tauri-plugin-music-notification-api = { path = "../../tauri-plugin-music-notification" }
+tauri-plugin-music-notification-api = { git = "https://github.com/AverTry/tauri-plugin-music-notification" }
+#tauri-plugin-music-notification-api = { path = "../../tauri-plugin-music-notification" }
 reqwest = { version = "0.12", default-features = false, features = ["stream", "rustls-tls"] }
 futures-util = "0.3"
 

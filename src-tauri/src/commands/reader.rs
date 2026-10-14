@@ -29,6 +29,7 @@ pub struct VerseUsage {
     pub chapter_number: i32,
     pub verse_number: i32,
     pub text: String,
+    pub strongs_ids: Vec<String>,
 }
 
 #[derive(Debug, Serialize)]
@@ -37,6 +38,8 @@ pub struct LookupResponse {
     pub dictionaries: Vec<StrongsDef>, // Changed to Vec to support multiple results
     pub verses: Vec<VerseUsage>,
     pub search_type: String, // "strongs" or "english"
+    pub occurrence_count: usize, // total word matches (can exceed verse_count)
+    pub verse_count: usize,      // distinct verses
 }
 
 #[tauri::command]
@@ -87,49 +90,124 @@ pub fn lookup_strongs(
             Ok(VerseUsage {
                 book_id: row.get(0)?, chapter_number: row.get(1)?,
                 verse_number: row.get(2)?, text: row.get(3)?,
+                strongs_ids: vec![exact_code.clone()],
             })
         }).map_err(|e| e.to_string())?;
 
         for v in verse_iter { verses.push(v.map_err(|e| e.to_string())?); }
 
-        Ok(LookupResponse { dictionaries, verses, search_type: "strongs".to_string() })
+        let occurrence_count = verses.len();
+        let verse_count = {
+            let set: std::collections::HashSet<(String, i32, i32)> = verses
+                .iter().map(|v| (v.book_id.clone(), v.chapter_number, v.verse_number)).collect();
+            set.len()
+        };
+
+        Ok(LookupResponse { dictionaries, verses, search_type: "strongs".to_string(), occurrence_count, verse_count })
 
     } else {
         // ENGLISH WORD SEARCH
         let like_pattern = format!("%{}%", query);
 
-        // 1. Get Multiple Dictionary Definitions where the translation contains the word
-        let mut def_stmt = conn.prepare(
-            "SELECT strongs, lemma, transliteration, pronunciation, kjv_def, definition 
-             FROM StrongsDefinition WHERE kjv_def LIKE ?1 LIMIT 20" // Limiting to top 20 matches
+        let word_regex = Regex::new(&format!(r"(?i)\b{}\b", regex::escape(query)))
+            .map_err(|e| e.to_string())?;
+
+        // Pulls individual codes like "G5396" or "H8193" out of a raw strongs
+        // field, which can hold more than one code plus morphology suffixes.
+        let code_regex = Regex::new(r"[GH]\d+").unwrap();
+
+        // 1. Find the actual tagged word(s) matching the query, and capture the
+        //    Strong's code tagged on THAT word — authoritative, unlike matching
+        //    kjv_def text, which is often phrased in its base/lemma form rather
+        //    than the inflected form that appears in the verse.
+        let mut verse_stmt = conn.prepare(
+            "SELECT cv.bookId, cv.chapterNumber, cv.verseNumber, cv.text, vw.text, vw.strongs
+            FROM VerseWord vw JOIN ChapterVerse cv ON vw.verseId = cv.id
+            WHERE vw.text LIKE ?1 LIMIT 2000;"
         ).map_err(|e| e.to_string())?;
 
-        let dict_iter = def_stmt.query_map(rusqlite::params![like_pattern], |row| {
+        let candidate_iter = verse_stmt.query_map(rusqlite::params![like_pattern], |row| {
+            Ok((
+                VerseUsage {
+                    book_id: row.get(0)?, chapter_number: row.get(1)?,
+                    verse_number: row.get(2)?, text: row.get(3)?,
+                    strongs_ids: Vec::new(),
+                },
+                row.get::<_, String>(4)?,          // vw.text
+                row.get::<_, Option<String>>(5)?,  // vw.strongs (raw)
+            ))
+        }).map_err(|e| e.to_string())?;
+
+        let mut matched_codes: std::collections::HashSet<String> = std::collections::HashSet::new();
+
+        for c in candidate_iter {
+            let (mut verse, word_token, raw_strongs) = c.map_err(|e| e.to_string())?;
+            if word_regex.is_match(&word_token) {
+                let codes: Vec<String> = raw_strongs
+                    .as_ref()
+                    .map(|raw| code_regex.find_iter(raw).map(|m| m.as_str().to_uppercase()).collect())
+                    .unwrap_or_default();
+
+                for code in &codes { matched_codes.insert(code.clone()); }
+                verse.strongs_ids = codes;
+
+                if verses.len() < 200 { verses.push(verse); }
+            }
+        }
+
+        // 2a. Dictionary entries actually tagged on the matched words —
+        //     authoritative set. This is what surfaces G5396 for "prating
+        //     against" even though its kjv_def literally reads "prate against".
+        if !matched_codes.is_empty() {
+            let placeholders: Vec<String> = matched_codes.iter().map(|_| "?".to_string()).collect();
+            let sql = format!(
+                "SELECT strongs, lemma, transliteration, pronunciation, kjv_def, definition 
+                FROM StrongsDefinition WHERE strongs IN ({}) ORDER BY strongs",
+                placeholders.join(",")
+            );
+            let mut tag_stmt = conn.prepare(&sql).map_err(|e| e.to_string())?;
+            let params: Vec<&dyn ToSql> = matched_codes.iter().map(|s| s as &dyn ToSql).collect();
+            let tag_iter = tag_stmt.query_map(params.as_slice(), |row| {
+                Ok(StrongsDef {
+                    strongs_id: row.get(0)?, lemma: row.get(1)?, transliteration: row.get(2)?,
+                    pronunciation: row.get(3)?, kjv_def: row.get(4)?, definition: row.get(5)?,
+                })
+            }).map_err(|e| e.to_string())?;
+            for d in tag_iter { dictionaries.push(d.map_err(|e| e.to_string())?); }
+        }
+
+        // 2b. Supplementary: entries whose kjv_def/definition literally contains
+        //     the query text (handles cases where the base word genuinely does
+        //     appear in the gloss). Skip codes already added above.
+        let mut def_stmt = conn.prepare(
+            "SELECT strongs, lemma, transliteration, pronunciation, kjv_def, definition 
+            FROM StrongsDefinition 
+            WHERE (kjv_def LIKE ?1 OR definition LIKE ?1)
+            ORDER BY strongs LIMIT 100"
+        ).map_err(|e| e.to_string())?;
+
+        let def_iter = def_stmt.query_map(rusqlite::params![like_pattern], |row| {
             Ok(StrongsDef {
                 strongs_id: row.get(0)?, lemma: row.get(1)?, transliteration: row.get(2)?,
                 pronunciation: row.get(3)?, kjv_def: row.get(4)?, definition: row.get(5)?,
             })
         }).map_err(|e| e.to_string())?;
 
-        for d in dict_iter { dictionaries.push(d.map_err(|e| e.to_string())?); }
+        for d in def_iter {
+            let d = d.map_err(|e| e.to_string())?;
+            if !matched_codes.contains(&d.strongs_id) {
+                dictionaries.push(d);
+            }
+        }
 
-        // 2. Get Verses containing the exact English word (case insensitive)
-        let mut verse_stmt = conn.prepare(
-            "SELECT cv.bookId, cv.chapterNumber, cv.verseNumber, cv.text
-             FROM VerseWord vw JOIN ChapterVerse cv ON vw.verseId = cv.id
-             WHERE vw.text COLLATE NOCASE = ?1 LIMIT 200;"
-        ).map_err(|e| e.to_string())?;
+        let occurrence_count = verses.len();
+        let verse_count = {
+            let set: std::collections::HashSet<(String, i32, i32)> = verses
+                .iter().map(|v| (v.book_id.clone(), v.chapter_number, v.verse_number)).collect();
+            set.len()
+        };
 
-        let verse_iter = verse_stmt.query_map(rusqlite::params![query], |row| {
-            Ok(VerseUsage {
-                book_id: row.get(0)?, chapter_number: row.get(1)?,
-                verse_number: row.get(2)?, text: row.get(3)?,
-            })
-        }).map_err(|e| e.to_string())?;
-
-        for v in verse_iter { verses.push(v.map_err(|e| e.to_string())?); }
-
-        Ok(LookupResponse { dictionaries, verses, search_type: "english".to_string() })
+        Ok(LookupResponse { dictionaries, verses, search_type: "english".to_string(), occurrence_count, verse_count })
     }
 }
 
