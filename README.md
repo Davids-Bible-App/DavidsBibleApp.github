@@ -75,3 +75,6 @@ MIT License - Copyright (c) 2026 Davids Bible App
 
 - Further Optomizations Needed on Load.
 - Docs to be Made, and General Help File
+
+## Android Development of this Project is Archived.
+### New Android development Will be recreated and improved using Google Flutter Code
